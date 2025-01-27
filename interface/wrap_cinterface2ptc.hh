@@ -10,8 +10,10 @@ extern "C"
 
 namespace wrap_ptc
 {
-  void initptc(void);
-  PyObject* getBasePTCType(char* name);
+  //~ void initptc(void);
+  PyMODINIT_FUNC PyInit_libptc_orbit(void);
+  //~ PyObject* getBasePTCType(char* name);
+  PyObject* getBasePTCType(const char* name);
   void initPTC_Map(PyObject* module);
 }
 

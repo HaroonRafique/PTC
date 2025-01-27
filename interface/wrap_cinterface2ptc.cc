@@ -304,19 +304,58 @@ static PyMethodDef ptcMethods[] =
 // Initialization of ptc routines.
 //--------------------------------------------------
 
-void initlibptc_orbit(void)
+//~ void initlibptc_orbit(void)
+//~ {
+  //~ PyObject *m, *d;
+  //~ m = Py_InitModule((char*)"libptc_orbit", ptcMethods);
+  //~ d = PyModule_GetDict(m);
+//~ }
+
+PyMODINIT_FUNC PyInit_libptc_orbit(void)
 {
-  PyObject *m, *d;
-  m = Py_InitModule((char*)"libptc_orbit", ptcMethods);
-  d = PyModule_GetDict(m);
+  static struct PyModuleDef ptc_module_def = {
+      PyModuleDef_HEAD_INIT,
+      "libptc_orbit",                // Name of the module
+      "PTC Python wrapper module",  // Module documentation
+      -1,                            // Size of per-interpreter state or -1
+      ptcMethods                     // Methods table
+  };
+
+  PyObject *m = PyModule_Create(&ptc_module_def);
+  if (m == NULL)
+  {
+    return NULL; // Return NULL on failure
+  }
+
+  // Add constants, if needed
+  return m; // Return the module object
 }
 
-PyObject* getBasePTCType(char* name)
+//~ PyObject* getBasePTCType(char* name)
+//~ {
+  //~ PyObject* mod = PyImport_ImportModule("ptc");
+  //~ PyObject* pyType = PyObject_GetAttrString(mod, name);
+  //~ Py_DECREF(mod);
+  //~ Py_DECREF(pyType);
+  //~ return pyType;
+//~ }
+
+PyObject* getBasePTCType(const char* name)
 {
   PyObject* mod = PyImport_ImportModule("ptc");
+  if (mod == NULL)
+  {
+    PyErr_SetString(PyExc_ImportError, "Failed to import PTC module.");
+    return NULL;
+  }
+
   PyObject* pyType = PyObject_GetAttrString(mod, name);
   Py_DECREF(mod);
-  Py_DECREF(pyType);
+  if (pyType == NULL)
+  {
+    PyErr_Format(PyExc_AttributeError, "PTC module has no attribute '%s'", name);
+    return NULL;
+  }
   return pyType;
 }
 
