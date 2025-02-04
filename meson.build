@@ -67,7 +67,9 @@ libptc = shared_library(
 libptc_dep = declare_dependency(
 	'libptc_dep',
 	default_options: ['default_library=dynamic'],
+	include_directores: ptc_inc_dirs,
 	sources: cpp_sources,
-	objects: libptc
+	link_with: libptc
+	#objects: libptc
 )
 
