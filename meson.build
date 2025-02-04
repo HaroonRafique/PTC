@@ -58,13 +58,14 @@ cpp_sources = files(
 
 ptc_inc_dirs = include_directories('source', 'interface')
 
-libptc = shared_library(
+libptc = library(
 	'ptc',
 	fort_sources,
 	include_directories: ptc_inc_dirs
 )
 
 libptc_dep = declare_dependency(
+	default_options: ['default_library=dynamic'],
 	include_directores: ptc_inc_dirs,
 	sources: cpp_sources,
 	link_with: libptc
