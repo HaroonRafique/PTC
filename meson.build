@@ -64,7 +64,7 @@ libptc = shared_library(
 	include_directories: ptc_inc_dirs
 )
 
-declare_dependency(
+libptc_dep = declare_dependency(
 	'libptc_dep',
 	fallback : ['libsimple', 'libsimple_dep'],
 	default_options: ['default_library=dynamic'],
