@@ -58,3 +58,8 @@ libptc = shared_library(
   fort_sources,
   include_directories: ptc_inc_dirs
 )
+
+declare_dependency(
+objects: libptc
+)
+
