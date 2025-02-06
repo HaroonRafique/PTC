@@ -1,7 +1,8 @@
 # HR 04.02.25
 # started with https://github.com/mesonbuild/meson/blob/master/test%20cases/fortran/6%20dynamic/meson.build
 
-project('ptc_test', 'fortran')
+#~ project('ptc_test', 'fortran')
+project('ptc_test', ['cpp','fortran'])
 
 fcid = meson.get_compiler('fortran').get_id()
 if fcid == 'intel-cl' or (host_machine.system() == 'windows' and fcid == 'pgi')
@@ -60,7 +61,9 @@ ptc_inc_dirs = include_directories('source', 'interface')
 
 libptc = library(
 	'ptc',
-	fort_sources,
+#~ 	sources:[fort_sources, cpp_sources],
+	sources:fort_sources,
+	#fort_sources,
 	include_directories: ptc_inc_dirs
 )
 
