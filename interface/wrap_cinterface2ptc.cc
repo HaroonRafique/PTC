@@ -315,7 +315,7 @@ PyMODINIT_FUNC PyInit_ptc_orbit(void)
 {
   static struct PyModuleDef ptc_module_def = {
       PyModuleDef_HEAD_INIT,
-      "ptc_orbit",                // Name of the module
+      "libptc_orbit",                // Name of the module
       "PTC Python wrapper module",  // Module documentation
       -1,                            // Size of per-interpreter state or -1
       ptcMethods                     // Methods table
