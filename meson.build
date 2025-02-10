@@ -71,9 +71,9 @@ libptc = library(
 
 libptc_dep = declare_dependency(
 #~ 	dependencies: [libptc_dep],
-#~ 	include_directories: dep_inc_dirs,
-	link_with: libptc
-#~ 	sources: cpp_sources
+	include_directories: dep_inc_dirs,
+	link_with: libptc,
+	sources: cpp_sources
 #~ 	objects: [libptc]
 )
 
