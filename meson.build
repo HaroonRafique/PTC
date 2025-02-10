@@ -4,6 +4,7 @@
 #~ project('ptc_test', 'fortran')
 project('ptc_test', ['cpp','fortran'])
 
+
 fcid = meson.get_compiler('fortran').get_id()
 if fcid == 'intel-cl' or (host_machine.system() == 'windows' and fcid == 'pgi')
 	error('MESON_SKIP_TEST: non-Gfortran Windows Fortran compilers do not do shared libraries in a Fortran standard way')
@@ -62,16 +63,15 @@ dep_inc_dirs = include_directories('interface')
 
 libptc = library(
 	'ptc',
-#~ 	sources:[fort_sources, cpp_sources],
 	sources:fort_sources,
-	#fort_sources,
+#~ 	sources:[fort_sources, cpp_sources],
 	include_directories: ptc_inc_dirs
 )
 
 libptc_dep = declare_dependency(
 	link_with: libptc,
-	include_directories: dep_inc_dirs
-#~ 	sources: cpp_sources,
-	#objects: libptc
+	include_directories: dep_inc_dirs,
+	sources: cpp_sources
+#~ 	objects: [libptc]
 )
 
