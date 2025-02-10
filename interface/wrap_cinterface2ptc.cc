@@ -311,7 +311,7 @@ static PyMethodDef ptcMethods[] =
   //~ d = PyModule_GetDict(m);
 //~ }
 
-PyMODINIT_FUNC PyInit_ptc_orbit(void)
+PyMODINIT_FUNC PyInit_pylibptc_orbit(void)
 {
   static struct PyModuleDef ptc_module_def = {
       PyModuleDef_HEAD_INIT,
