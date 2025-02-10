@@ -76,4 +76,3 @@ libptc_dep = declare_dependency(
 	sources: cpp_sources
 #~ 	objects: [libptc]
 )
-
