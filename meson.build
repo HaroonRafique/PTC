@@ -67,11 +67,13 @@ libptc = library(
 #~ 	sources:[fort_sources, cpp_sources],
 	include_directories: ptc_inc_dirs
 )
+#~ libptc_dep = dependency('libptc', fallback:['libptc', 'libptc_dep'])
 
 libptc_dep = declare_dependency(
-	link_with: libptc,
+#~ 	dependencies: [libptc_dep],
 	include_directories: dep_inc_dirs,
-	sources: cpp_sources
+	link_with: libptc
+#~ 	sources: cpp_sources
 #~ 	objects: [libptc]
 )
 
