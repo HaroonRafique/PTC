@@ -311,11 +311,11 @@ static PyMethodDef ptcMethods[] =
   //~ d = PyModule_GetDict(m);
 //~ }
 
-PyMODINIT_FUNC PyInit_ptc(void)
+PyMODINIT_FUNC PyInit_ptc_orbit(void)
 {
   static struct PyModuleDef ptc_module_def = {
       PyModuleDef_HEAD_INIT,
-      "ptc",                // Name of the module
+      "ptc_orbit",                // Name of the module
       "PTC Python wrapper module",  // Module documentation
       -1,                            // Size of per-interpreter state or -1
       ptcMethods                     // Methods table
