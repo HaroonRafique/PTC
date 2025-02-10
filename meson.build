@@ -58,6 +58,7 @@ cpp_sources = files(
 )
 
 ptc_inc_dirs = include_directories('source', 'interface')
+dep_inc_dirs = include_directories('interface')
 
 libptc = library(
 	'ptc',
@@ -68,8 +69,9 @@ libptc = library(
 )
 
 libptc_dep = declare_dependency(
-	sources: cpp_sources,
-	link_with: libptc
+	link_with: libptc,
+	include_directories: dep_inc_dirs
+#~ 	sources: cpp_sources,
 	#objects: libptc
 )
 
