@@ -63,16 +63,11 @@ dep_inc_dirs = include_directories('interface')
 
 libptc = library(
 	'ptc',
-	sources:fort_sources,
-#~ 	sources:[fort_sources, cpp_sources],
-	include_directories: ptc_inc_dirs
+	sources: fort_sources,
+	include_directories: ptc_inc_dirs,
+	install: true,
 )
-#~ libptc_dep = dependency('libptc', fallback:['libptc', 'libptc_dep'])
 
 libptc_dep = declare_dependency(
-#~ 	dependencies: [libptc_dep],
-	include_directories: dep_inc_dirs,
-	link_with: libptc,
-	sources: cpp_sources
-#~ 	objects: [libptc]
+	link_with: libptc
 )
