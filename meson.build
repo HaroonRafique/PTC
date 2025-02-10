@@ -61,13 +61,13 @@ cpp_sources = files(
 ptc_inc_dirs = include_directories('source', 'interface')
 dep_inc_dirs = include_directories('interface')
 
-libptc = library(
-	'ptc_orbit',
+libptc_orbit = library(
+	'libptc',
 	sources: fort_sources,
 	include_directories: ptc_inc_dirs,
 	install: true,
 )
 
-libptc_dep = declare_dependency(
-	link_with: libptc
+libptc_orbit_dep = declare_dependency(
+	link_with: libptc_orbit
 )
