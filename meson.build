@@ -62,7 +62,7 @@ ptc_inc_dirs = include_directories('source', 'interface')
 dep_inc_dirs = include_directories('interface')
 
 libptc = library(
-	'ptc',
+	'ptc_orbit',
 	sources: fort_sources,
 	include_directories: ptc_inc_dirs,
 	install: true,
