@@ -126,3 +126,31 @@ The variables `cpp_sources`, `dep_inc_dirs`, and `libptc_orbit_dep` remain in
 subproject. The PyORBIT3-side integration should build `pylibptc_orbit` there,
 where the PyORBIT3 core library, headers, and Python extension modules are
 available.
+
+## Next-stage PyORBIT3 + PTC handoff
+
+The next-stage handoff bundle is:
+
+```text
+PTC-PyORBIT3_files/
+```
+
+For the first integrated build attempt, copy that directory into a fresh test
+workspace and run:
+
+```console
+chmod +x build_instructions_PTC_PyORBIT3
+./build_instructions_PTC_PyORBIT3
+```
+
+That script clones latest PyORBIT3 and this PTC repository, patches only the
+fresh PyORBIT3 checkout, and builds PyORBIT3 with PTC enabled by default. It
+then imports `pylibptc_orbit` and reads:
+
+```text
+PTC-PyORBIT_flat_file.madx.flt
+```
+
+as the first PTC-in-PyORBIT3 smoke test. The companion
+`build_instructions_PyORBIT3` script is retained only as the known working
+PyORBIT3-only reference path.
