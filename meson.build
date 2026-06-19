@@ -1,8 +1,10 @@
-# HR 04.02.25
-# started with https://github.com/mesonbuild/meson/blob/master/test%20cases/fortran/6%20dynamic/meson.build
-
-#~ project('ptc_test', 'fortran')
-project('ptc_test', ['cpp','fortran'])
+project(
+	'libptc_orbit',
+	'fortran',
+	version: '0.1.0',
+	meson_version: '>=1.4.1',
+	default_options: ['buildtype=debugoptimized']
+)
 
 
 fcid = meson.get_compiler('fortran').get_id()
@@ -13,7 +15,6 @@ if fcid == 'intel-cl' or (host_machine.system() == 'windows' and fcid == 'pgi')
 	# https://www.pgroup.com/resources/docs/19.4/x86/pgi-user-guide/index.htm#lib-dynlnk-bld-dll-fort
 endif
 
-# Define Fortran source files
 fort_sources = files(
 	'source/m_real_polymorph.f90',
 	'source/n_complex_polymorph.f90',
@@ -53,6 +54,9 @@ fort_sources = files(
 	'interface/ptcinterface.f90'
 )
 
+# These sources depend on PyORBIT3 C++ headers and are intentionally not built
+# by this standalone project. A later PyORBIT3 integration can retrieve them
+# with get_variable('cpp_sources') and build the Python extension there.
 cpp_sources = files(
 	'interface/cinterface2ptc.cc',
 	'interface/wrap_cinterface2ptc.cc'
@@ -69,5 +73,6 @@ libptc_orbit = library(
 )
 
 libptc_orbit_dep = declare_dependency(
-	link_with: libptc_orbit
+	link_with: libptc_orbit,
+	include_directories: dep_inc_dirs
 )
