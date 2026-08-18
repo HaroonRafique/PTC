@@ -1,9 +1,16 @@
 # PTC library
 
-This repository currently builds the PTC Fortran code as a standalone shared
-library. It does not build the PyORBIT3 Python extension by itself because the
-C++ wrapper sources in `interface/` depend on PyORBIT3 headers and runtime
-types such as `Bunch`, `orbit_mpi`, and `pyORBIT_Object`.
+This repository currently supports two separate strands of work around the PTC
+Fortran code:
+
+- standalone readiness checks for building/loading PTC and defining the future
+  PyORBIT3 integration boundary
+- a new standalone Python-level `PyPTC` interface for direct PTC experiments,
+  tracking studies, plotting, and benchmarking against PyORBIT3/MADX
+
+It does not build the PyORBIT3 Python extension by itself because the C++
+wrapper sources in `interface/` depend on PyORBIT3 headers and runtime types
+such as `Bunch`, `orbit_mpi`, and `pyORBIT_Object`.
 
 ## Standalone build
 
@@ -115,6 +122,51 @@ Expected final `status.json`:
   "original_input_exit_code": 0
 }
 ```
+
+## PyPTC standalone Python strand
+
+The `PyPTC/` directory is a separate, additive standalone Python interface to
+PTC. It is intended for useful physics studies without PyORBIT3 machinery:
+direct PTC tracking, lattice perturbation experiments, plotting diagnostics,
+and benchmarking against PTC-PyORBIT3 and MAD-X.
+
+This strand keeps its own Fortran C-ABI shims and Python `ctypes` bindings
+under `PyPTC/`; the parent PTC source and the existing PyORBIT3-facing
+`interface/` code are not modified.
+
+Build the standalone PyPTC shared library with:
+
+```console
+bash PyPTC/build_ptc.sh
+```
+
+Run the current shim/API smoke test and plotting workflow with:
+
+```console
+python3 PyPTC/tests/test_pyptc_shims.py --output-dir PyPTC/test_outputs/shims
+```
+
+The current Python-level API covers:
+
+- machine summary, node Twiss/orbit access, and particle/bunch tracking
+- tunes and chromaticities
+- deterministic single-element misalignments by lattice index or
+  name/occurrence
+- aperture/loss-aware tracking
+- initial ramp, cavity, and AC control hooks
+- bunch generation through `/home/hr/Codes/pyparticlebunch`
+
+The test workflow writes diagnostic PNG files for Twiss/orbit/tunes/chroma,
+bare vs misaligned closed orbit, before/after bunch dashboards, aperture loss
+maps, and transverse particle positions at the peak-loss aperture node.
+
+Planned extensions for this strand include richer element metadata, normal-form
+and map access, family/knob controls, survey/layout transforms, normalized
+aperture/tune-smear studies, and per-particle tune-footprint diagnostics where
+the underlying PTC state exposes enough information.
+
+See `PyPTC/README.md` for the detailed status, commands, plots, and development
+plan.
 
 ## PyORBIT3 integration boundary
 
