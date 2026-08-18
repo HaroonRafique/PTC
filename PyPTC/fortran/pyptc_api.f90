@@ -4,7 +4,7 @@ module pyptc_api_module
   use orbit_ptc
   use ptc_multiparticle, only: x_orbit_sync
   use S_fitting, only: lattice_GET_tune, lattice_GET_CHROM, assign_one_aperture, TURN_OFF_ONE_aperture
-  use S_FAMILY, only: MISALIGN_FIBRE
+  use S_FAMILY, only: MISALIGN_FIBRE, MAD_MISALIGN_FIBRE
   implicit none
 
 contains
@@ -108,6 +108,24 @@ contains
     local_mis = real(mis, dp)
     call MISALIGN_FIBRE(p, local_mis)
   end subroutine pyptc_set_misalignment
+
+  subroutine pyptc_set_madx_misalignment(pos, mis, status) bind(C, name="pyptc_set_madx_misalignment")
+    integer(c_int), value, intent(in) :: pos
+    real(c_double), intent(in) :: mis(6)
+    integer(c_int), intent(out) :: status
+    type(fibre), pointer :: p
+    real(dp) :: local_mis(6)
+
+    status = 0_c_int
+    if (.not. pyptc_valid_pos(pos)) then
+      status = 1_c_int
+      return
+    end if
+
+    call move_to(my_ering, p, int(pos))
+    local_mis = real(mis, dp)
+    call MAD_MISALIGN_FIBRE(p, local_mis)
+  end subroutine pyptc_set_madx_misalignment
 
   subroutine pyptc_set_one_aperture(pos, kindaper, r, x, y, dx, dy, status) bind(C, name="pyptc_set_one_aperture")
     integer(c_int), value, intent(in) :: pos, kindaper

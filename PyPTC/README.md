@@ -52,6 +52,40 @@ Run the current smoke/physics test and generate diagnostic plots:
 python3 PyPTC/tests/test_pyptc_shims.py --output-dir PyPTC/test_outputs/shims
 ```
 
+Generate a fresh ISIS RCS simplified-lattice PTC flat file with the bundled
+MAD-X binary, then run the repeatable PyPTC smoke comparison:
+
+```bash
+python3 PyPTC/madx/generate_flat_file.py
+python3 PyPTC/madx/run_generated_flatfile_smoke.py
+```
+
+Or run the full build/generate/test sequence:
+
+```bash
+bash PyPTC/madx/run_all.sh
+```
+
+Compare MAD-X and PyPTC closed orbits after applying the same bundled
+misalignment table to the simplified lattice:
+
+```bash
+python3 PyPTC/madx/compare_madx_pyptc_closed_orbits.py
+```
+
+Scan each MAD-X error-table component independently, including raw PTC and
+PyPTC-only sign-flip checks:
+
+```bash
+python3 PyPTC/madx/scan_misalignment_components.py
+```
+
+The MAD-X workflow writes generated files and plots under `PyPTC/madx/outputs/`;
+the main comparison uses `simplified_closed_orbit_comparison/`, and the
+component/sign scan uses `cscan/`.  The bundled MAD-X binaries are intentionally
+tracked in git so a new checkout can reproduce the flat-file generation without
+finding an external MAD-X installation.
+
 Use from Python:
 
 ```python
@@ -68,8 +102,7 @@ fibre_index = ptc.set_misalignment_by_name("SP0_QF", occurrence=1, dx=0.003)
 ptc.update_twiss()
 
 applied = ptc.apply_madx_error_table(
-    "/home/hr/Repositories/survey_to_lattice/"
-    "05_survey_to_misalignments_v2/data/reference_outputs/jan26_survey_corrected.tfs"
+    "PyPTC/madx/reference_errors/jan26_survey_corrected.tfs"
 )
 ptc.update_twiss()
 
@@ -86,8 +119,29 @@ misalignment or every nonzero row from a MAD-X error table:
 python3 PyPTC/flatfile_misalign.py \
   --input ptc_standalone_readiness/inputs/PTC-PyORBIT_flat_file.madx.flt \
   --output PyPTC/outputs/isis_with_jan26_survey_errors.flt \
-  --madx-error-table /home/hr/Repositories/survey_to_lattice/05_survey_to_misalignments_v2/data/reference_outputs/jan26_survey_corrected.tfs
+  --madx-error-table PyPTC/madx/reference_errors/jan26_survey_corrected.tfs
 ```
+
+## MAD-X Flat-File Generation
+
+`PyPTC/madx/` contains the reproducible ISIS RCS flat-file generation strand:
+
+- `bin/` contains the committed ISIS MAD-X binaries; the default is
+  `madx-linux64_v5_02_00`, matching the PyORBIT flat-file-generation example.
+  The newer 5.06 binary is included for comparisons, but its generated flat
+  file is not currently accepted by the PTC reader used here.
+- `lattices/00_Simplified_Lattice/` is copied from
+  `/home/hr/Repositories/isis_2024/Lattice_Files/00_Simplified_Lattice`.
+- `ptc_scripts/` is copied from the PyORBIT MAD-X flat-file example.
+- `scripts/Create_PTC_flat_file.madx` is the PyPTC-adapted flat-file generator.
+- `reference_errors/jan26_survey_corrected.tfs` is copied from the latest
+  survey-to-lattice reference output.
+
+The repeatable smoke script regenerates `PTC-PyORBIT_flat_file.flt`, loads it
+through PyPTC, applies the full reference MAD-X error table, and asserts that
+the bare orbit is near zero while the misaligned orbit response is measurable.
+The comparison script also runs a native MAD-X bare/misaligned `TWISS` pair and
+writes `madx_vs_pyptc_closed_orbit_comparison.png`.
 
 ## Diagnostic Plots
 

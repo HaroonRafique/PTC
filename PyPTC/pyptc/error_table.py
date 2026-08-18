@@ -8,9 +8,8 @@ from pathlib import Path
 
 MISALIGNMENT_COLUMNS = ("dx", "dy", "ds", "dtheta", "dphi", "dpsi")
 MADX_ERROR_COLUMNS = ("NAME", "DX", "DY", "DS", "DPHI", "DTHETA", "DPSI")
-LATEST_SURVEY_REFERENCE_ERROR_TABLE = Path(
-    "/home/hr/Repositories/survey_to_lattice/"
-    "05_survey_to_misalignments_v2/data/reference_outputs/jan26_survey_corrected.tfs"
+LATEST_SURVEY_REFERENCE_ERROR_TABLE = (
+    Path(__file__).resolve().parents[1] / "madx" / "reference_errors" / "jan26_survey_corrected.tfs"
 )
 
 

@@ -73,6 +73,8 @@ class PTC:
             self.lib.pyptc_get_chromaticities.restype = None
             self.lib.pyptc_set_misalignment.argtypes = [ctypes.c_int, C_DOUBLE_P, C_INT_P]
             self.lib.pyptc_set_misalignment.restype = None
+            self.lib.pyptc_set_madx_misalignment.argtypes = [ctypes.c_int, C_DOUBLE_P, C_INT_P]
+            self.lib.pyptc_set_madx_misalignment.restype = None
             self.lib.pyptc_set_one_aperture.argtypes = [
                 ctypes.c_int,
                 ctypes.c_int,
@@ -208,12 +210,38 @@ class PTC:
         self.lib.pyptc_set_misalignment(int(fibre_index), mis.ctypes.data_as(C_DOUBLE_P), ctypes.byref(status))
         self._check_status("pyptc_set_misalignment", status)
 
+    def set_madx_misalignment(
+        self,
+        fibre_index: int,
+        dx: float = 0.0,
+        dy: float = 0.0,
+        ds: float = 0.0,
+        dtheta: float = 0.0,
+        dphi: float = 0.0,
+        dpsi: float = 0.0,
+    ) -> None:
+        # PTC's MAD_MISALIGN_FIBRE expects MAD-X angular inputs as
+        # dphi, dtheta, dpsi. Keep set_misalignment(...) in raw PTC order.
+        mis = np.ascontiguousarray([dx, dy, ds, dphi, dtheta, dpsi], dtype=np.float64)
+        status = ctypes.c_int()
+        self.lib.pyptc_set_madx_misalignment(int(fibre_index), mis.ctypes.data_as(C_DOUBLE_P), ctypes.byref(status))
+        self._check_status("pyptc_set_madx_misalignment", status)
+
     def set_misalignment_by_name(self, name: str, occurrence: int = 1, **kwargs: float) -> int:
         fibre_index = self._resolve(name, occurrence)
         self.set_misalignment(fibre_index, **kwargs)
         return fibre_index
 
-    def apply_misalignments(self, records: Iterable[dict[str, float | int | str] | object]) -> list[AppliedErrorRecord]:
+    def set_madx_misalignment_by_name(self, name: str, occurrence: int = 1, **kwargs: float) -> int:
+        fibre_index = self._resolve(name, occurrence)
+        self.set_madx_misalignment(fibre_index, **kwargs)
+        return fibre_index
+
+    def apply_misalignments(
+        self,
+        records: Iterable[dict[str, float | int | str] | object],
+        madx_convention: bool = False,
+    ) -> list[AppliedErrorRecord]:
         """Apply name-based misalignment records to the active PTC lattice.
 
         Repeated element names are mapped to occurrence 1, 2, ... in record
@@ -241,7 +269,10 @@ class PTC:
             key = name.upper()
             if occurrence_value is not None:
                 occurrence = int(occurrence_value)
-                fibre_index = self.set_misalignment_by_name(name, occurrence=occurrence, **kwargs)
+                if madx_convention:
+                    fibre_index = self.set_madx_misalignment_by_name(name, occurrence=occurrence, **kwargs)
+                else:
+                    fibre_index = self.set_misalignment_by_name(name, occurrence=occurrence, **kwargs)
                 applied.append(AppliedErrorRecord(name=name, occurrence=occurrence, fibre_index=fibre_index, **kwargs))
                 occurrences[key] = occurrence
                 continue
@@ -255,7 +286,10 @@ class PTC:
                 occurrences[key] = occurrence
                 fibre_indices = [resolve_fibre_index(lattice_path, name, occurrence)]
             for local_occurrence, fibre_index in enumerate(fibre_indices, start=1):
-                self.set_misalignment(fibre_index, **kwargs)
+                if madx_convention:
+                    self.set_madx_misalignment(fibre_index, **kwargs)
+                else:
+                    self.set_misalignment(fibre_index, **kwargs)
                 applied.append(
                     AppliedErrorRecord(
                         name=name,
@@ -275,7 +309,7 @@ class PTC:
         """Read and apply a MAD-X `ESAVE`/`EFIELD` error table to PTC."""
 
         records = read_madx_error_table(table, nonzero=nonzero, atol=atol)
-        return self.apply_misalignments(records)
+        return self.apply_misalignments(records, madx_convention=True)
 
     def set_aperture(
         self,
