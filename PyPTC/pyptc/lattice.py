@@ -70,12 +70,33 @@ def read_flatfile_fibres(flat_file: str | Path) -> list[FibreRecord]:
 def resolve_fibre_index(flat_file: str | Path, name: str, occurrence: int = 1) -> int:
     """Resolve an element name and occurrence to a one-based PTC fibre index."""
 
+    indices = resolve_fibre_indices(flat_file, name)
+    if occurrence < 1 or occurrence > len(indices):
+        raise ValueError(f"Element {name!r} occurrence {occurrence} not found in {Path(flat_file)}")
+    return indices[occurrence - 1]
+
+
+def resolve_fibre_indices(flat_file: str | Path, name: str) -> list[int]:
+    """Resolve an element name to all matching one-based PTC fibre indices.
+
+    MAD-X error tables may contain unsliced dipole names such as `SP1_DIP`,
+    while the PTC flat file stores the body as `SP1_DIP1` ... `SP1_DIP6`.
+    In that case the parent name expands to every sliced dipole fibre in
+    lattice order.
+    """
+
     wanted = name.upper()
-    seen = 0
+    exact = [record.index for record in read_flatfile_fibres(flat_file) if record.name.upper() == wanted]
+    if exact:
+        return exact
+
+    sliced_dipoles: list[int] = []
     for record in read_flatfile_fibres(flat_file):
-        if record.name.upper() != wanted:
-            continue
-        seen += 1
-        if seen == occurrence:
-            return record.index
-    raise ValueError(f"Element {name!r} occurrence {occurrence} not found in {Path(flat_file)}")
+        record_name = record.name.upper()
+        suffix = record_name[len(wanted) :]
+        if wanted.endswith("_DIP") and record_name.startswith(wanted) and suffix.isdigit():
+            sliced_dipoles.append(record.index)
+    if sliced_dipoles:
+        return sliced_dipoles
+
+    raise ValueError(f"Element {name!r} not found in {Path(flat_file)}")

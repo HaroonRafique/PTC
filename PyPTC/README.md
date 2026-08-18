@@ -25,6 +25,7 @@ through `ctypes` in `PyPTC/pyptc/`.
   - `tunes()`
   - `chromaticities()`
   - deterministic fibre misalignment by index or name/occurrence
+  - MAD-X `ESAVE`/`EFIELD` error-table parsing and application
   - per-fibre aperture setup/disable
   - global absolute aperture getter/setter
   - loss-aware ring tracking
@@ -66,9 +67,26 @@ print(ptc.chromaticities())
 fibre_index = ptc.set_misalignment_by_name("SP0_QF", occurrence=1, dx=0.003)
 ptc.update_twiss()
 
+applied = ptc.apply_madx_error_table(
+    "/home/hr/Repositories/survey_to_lattice/"
+    "05_survey_to_misalignments_v2/data/reference_outputs/jan26_survey_corrected.tfs"
+)
+ptc.update_twiss()
+
 ptc.set_aperture(fibre_index, kind=2, x=0.005, y=0.005)
 ptc.set_absolute_aperture(0.005)
 coords, loss = ptc.track_particle_ptc_with_loss([0.004, 0, 0, 0, 0, 0], turns=1)
+```
+
+For reproducible offline studies, `PyPTC/flatfile_misalign.py` can also write a
+copied flat file containing either one manual six-degree-of-freedom
+misalignment or every nonzero row from a MAD-X error table:
+
+```bash
+python3 PyPTC/flatfile_misalign.py \
+  --input ptc_standalone_readiness/inputs/PTC-PyORBIT_flat_file.madx.flt \
+  --output PyPTC/outputs/isis_with_jan26_survey_errors.flt \
+  --madx-error-table /home/hr/Repositories/survey_to_lattice/05_survey_to_misalignments_v2/data/reference_outputs/jan26_survey_corrected.tfs
 ```
 
 ## Diagnostic Plots
@@ -86,6 +104,10 @@ currently include:
   - lost-particle count versus lattice position `s`
 - `05_aperture_at_peak_loss_node.png`
   - rectangular aperture and particle positions at the node with most losses
+- `06_madx_error_table_misalignments.png`
+  - translations and rotations from the latest survey-to-lattice MAD-X table
+- `07_closed_orbit_bare_vs_madx_error_table.png`
+  - bare closed orbit compared with the orbit after applying the full table
 
 The dashboard follows the layout used in
 `/home/hr/Repositories/pyorbit_examples/03_PTC_PyORBIT_Examples/.../pyorbit_bunch_dashplotter.py`.
@@ -97,6 +119,9 @@ the lattice tune marker and action correlations for now.
 - Name-based lattice edits are resolved in Python from the PTC flat file, then
   applied through index-based Fortran shims.  This avoids fragile Fortran C
   string handling in the first implementation.
+- MAD-X error-table support reads the same `NAME, DX, DY, DS, DPHI, DTHETA,
+  DPSI` columns used by `READMYTABLE`/`SETERR`; values are passed to PyPTC in
+  MAD-X units, metres and radians.
 - The tune getter currently returns useful transverse 4D/no-cavity tunes for
   the ISIS RCS case.  Synchrotron tune is returned as `0.0` unless the PTC
   normal form provides it.
@@ -114,4 +139,3 @@ the lattice tune marker and action correlations for now.
 - Richer aperture model export, including element-specific shape metadata.
 - Survey/layout transforms.
 - Normalized aperture and tune-smear scans.
-

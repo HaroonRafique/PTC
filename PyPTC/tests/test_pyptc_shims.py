@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -21,7 +22,15 @@ REPO_ROOT = PYPTC_DIR.parent
 if str(PYPTC_DIR) not in sys.path:
     sys.path.insert(0, str(PYPTC_DIR))
 
-from pyptc import DEFAULT_LATTICE, DEFAULT_LIBRARY, PTC, generate_matched_gaussian_4d, resolve_fibre_index
+from pyptc import (
+    DEFAULT_LATTICE,
+    DEFAULT_LIBRARY,
+    LATEST_SURVEY_REFERENCE_ERROR_TABLE,
+    PTC,
+    generate_matched_gaussian_4d,
+    read_madx_error_table,
+    resolve_fibre_index,
+)
 
 
 def require_matplotlib(output_dir: Path):
@@ -86,6 +95,123 @@ def plot_optics(path: Path, rows: list[dict[str, float | int]], tunes: dict, chr
     fig.tight_layout()
     fig.savefig(path, dpi=160)
     plt.close(fig)
+
+
+def plot_madx_error_table(path: Path, records) -> None:
+    plt = require_matplotlib(path.parent)
+    names = [record.name for record in records]
+    x = np.arange(len(records))
+    dx = np.array([record.dx for record in records])
+    dy = np.array([record.dy for record in records])
+    ds = np.array([record.ds for record in records])
+    dtheta = np.array([record.dtheta for record in records])
+    dphi = np.array([record.dphi for record in records])
+    dpsi = np.array([record.dpsi for record in records])
+
+    fig, axes = plt.subplots(2, 1, figsize=(12, 7), sharex=True)
+    axes[0].bar(x - 0.25, dx * 1.0e3, width=0.25, label="DX")
+    axes[0].bar(x, dy * 1.0e3, width=0.25, label="DY")
+    axes[0].bar(x + 0.25, ds * 1.0e3, width=0.25, label="DS")
+    axes[0].set_ylabel("translation [mm]")
+    axes[0].legend(loc="upper right", ncol=3)
+    axes[0].grid(True, alpha=0.25)
+    axes[1].bar(x - 0.25, dtheta * 1.0e3, width=0.25, label="DTHETA")
+    axes[1].bar(x, dphi * 1.0e3, width=0.25, label="DPHI")
+    axes[1].bar(x + 0.25, dpsi * 1.0e3, width=0.25, label="DPSI")
+    axes[1].set_ylabel("rotation [mrad]")
+    axes[1].set_xticks(x)
+    axes[1].set_xticklabels(names, rotation=90, fontsize=7)
+    axes[1].legend(loc="upper right", ncol=3)
+    axes[1].grid(True, alpha=0.25)
+    axes[1].set_xlabel("MAD-X error table element")
+    fig.suptitle("MAD-X EFIELD table misalignments")
+    fig.tight_layout()
+    fig.savefig(path, dpi=170)
+    plt.close(fig)
+
+
+def run_madx_error_table_case(args: argparse.Namespace) -> dict:
+    output_dir = args.output_dir.resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    if not args.madx_error_table.exists():
+        raise FileNotFoundError(f"MAD-X error table not found: {args.madx_error_table}")
+
+    records = read_madx_error_table(args.madx_error_table, nonzero=False)
+    assert records
+    plot_madx_error_table(output_dir / "06_madx_error_table_misalignments.png", records)
+    error_table_rows = np.array(
+        [[record.dx, record.dy, record.ds, record.dtheta, record.dphi, record.dpsi] for record in records],
+        dtype=float,
+    )
+    write_array_csv(output_dir / "madx_error_table_misalignments.csv", error_table_rows, "dx,dy,ds,dtheta,dphi,dpsi")
+
+    ptc = PTC(args.library)
+    ptc.init_lattice(args.lattice)
+    bare_rows = ptc.all_node_twiss_orbit()
+    applied_errors = ptc.apply_madx_error_table(args.madx_error_table, nonzero=False)
+    ptc.update_twiss()
+    table_rows = ptc.all_node_twiss_orbit()
+    full_table_orbit = plot_orbit_response(output_dir / "07_closed_orbit_bare_vs_madx_error_table.png", bare_rows, table_rows)
+    max_delta_x = float(np.max(np.abs(full_table_orbit[:, 5])))
+    max_delta_y = float(np.max(np.abs(full_table_orbit[:, 6])))
+    assert max_delta_x > 1.0e-4 or max_delta_y > 1.0e-4
+    write_array_csv(
+        output_dir / "closed_orbit_bare_vs_madx_error_table.csv",
+        full_table_orbit,
+        "s,bare_orbitx,error_table_orbitx,bare_orbity,error_table_orbity,delta_orbitx,delta_orbity",
+    )
+
+    applied_rows = np.array(
+        [
+            [
+                record.fibre_index,
+                record.occurrence,
+                record.dx,
+                record.dy,
+                record.ds,
+                record.dtheta,
+                record.dphi,
+                record.dpsi,
+            ]
+            for record in applied_errors
+        ],
+        dtype=float,
+    )
+    write_array_csv(
+        output_dir / "applied_madx_error_table.csv",
+        applied_rows,
+        "fibre_index,occurrence,dx,dy,ds,dtheta,dphi,dpsi",
+    )
+
+    return {
+        "table": str(args.madx_error_table.resolve()),
+        "records": len(records),
+        "applied": len(applied_errors),
+        "max_abs_dx_m": float(max(abs(record.dx) for record in records)),
+        "max_abs_dy_m": float(max(abs(record.dy) for record in records)),
+        "max_abs_rotation_rad": float(max(max(abs(record.dtheta), abs(record.dphi), abs(record.dpsi)) for record in records)),
+        "max_orbit_delta_x_m": max_delta_x,
+        "max_orbit_delta_y_m": max_delta_y,
+        "orbit_png": "07_closed_orbit_bare_vs_madx_error_table.png",
+    }
+
+
+def run_madx_error_table_case_subprocess(args: argparse.Namespace) -> dict:
+    cmd = [
+        sys.executable,
+        str(Path(__file__).resolve()),
+        "_run_madx_error_table_case",
+        "--library",
+        str(args.library),
+        "--lattice",
+        str(args.lattice),
+        "--output-dir",
+        str(args.output_dir),
+        "--madx-error-table",
+        str(args.madx_error_table),
+    ]
+    subprocess.run(cmd, check=True, cwd=REPO_ROOT)
+    return json.loads((args.output_dir / "madx_error_table_summary.json").read_text(encoding="utf-8"))
 
 
 def plot_orbit_response(path: Path, bare: list[dict[str, float | int]], edited: list[dict[str, float | int]]) -> np.ndarray:
@@ -476,6 +602,8 @@ def run(args: argparse.Namespace) -> dict:
     ptc.set_orbit_time(0.0)
     ptc.configure_ac_magnet(fibre_index, dc=1.0, amplitude=0.0, phase_turns=0.0, d_ac=0.0, bn=[0.0], an=[0.0])
 
+    madx_error_table_summary = run_madx_error_table_case_subprocess(args)
+
     write_array_csv(output_dir / "initial_bunch.csv", bunch, "x,xp,y,yp,z,dE")
     write_array_csv(output_dir / "final_bunch.csv", final_bunch, "x,xp,y,yp,z,dE")
     write_array_csv(output_dir / "closed_orbit_response.csv", orbit_response, "s,bare_orbitx,misaligned_orbitx,bare_orbity,misaligned_orbity,delta_orbitx,delta_orbity")
@@ -483,7 +611,17 @@ def run(args: argparse.Namespace) -> dict:
     write_array_csv(output_dir / "aperture_peak_node_positions.csv", positions_at_peak, "x,xp,y,yp,pt,ct")
 
     pngs = sorted(path.name for path in output_dir.glob("*.png"))
-    assert len(pngs) >= 4
+    required_pngs = {
+        "01_ptc_twiss_orbit_tunes_chroma.png",
+        "02_closed_orbits_bare_vs_misaligned.png",
+        "03_bunch_dashboard_before_after_tracking.png",
+        "04_aperture_loss_map.png",
+        "05_aperture_at_peak_loss_node.png",
+        "06_madx_error_table_misalignments.png",
+        "07_closed_orbit_bare_vs_madx_error_table.png",
+    }
+    missing_pngs = sorted(required_pngs.difference(pngs))
+    assert not missing_pngs, f"Missing required PNG test outputs: {missing_pngs}"
 
     result = {
         "library": str(args.library.resolve()),
@@ -493,6 +631,7 @@ def run(args: argparse.Namespace) -> dict:
         "chromaticities": chroma,
         "misalignment": {"element": args.element, "occurrence": args.occurrence, "fibre_index": fibre_index, "dx_m": args.dx},
         "tracking": {"particles": args.particles, "turns": args.turns, "lost_in_bunch": sum(bool(info["lost"]) for info in losses)},
+        "madx_error_table": madx_error_table_summary,
         "loss_map": {
             "absolute_aperture_m": args.loss_map_aperture,
             "particles": args.loss_map_particles,
@@ -507,6 +646,22 @@ def run(args: argparse.Namespace) -> dict:
 
 
 def main() -> None:
+    if len(sys.argv) > 1 and sys.argv[1] == "_run_madx_error_table_case":
+        parser = argparse.ArgumentParser()
+        parser.add_argument("_command")
+        parser.add_argument("--library", type=Path, default=DEFAULT_LIBRARY)
+        parser.add_argument("--lattice", type=Path, default=DEFAULT_LATTICE)
+        parser.add_argument("--output-dir", type=Path, required=True)
+        parser.add_argument("--madx-error-table", type=Path, required=True)
+        args = parser.parse_args()
+        result = run_madx_error_table_case(args)
+        (args.output_dir / "madx_error_table_summary.json").write_text(
+            json.dumps(result, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--library", type=Path, default=DEFAULT_LIBRARY)
     parser.add_argument("--lattice", type=Path, default=DEFAULT_LATTICE)
@@ -522,6 +677,7 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=12345)
     parser.add_argument("--loss-map-aperture", type=float, default=0.005)
     parser.add_argument("--loss-map-particles", type=int, default=81)
+    parser.add_argument("--madx-error-table", type=Path, default=LATEST_SURVEY_REFERENCE_ERROR_TABLE)
     args = parser.parse_args()
 
     result = run(args)

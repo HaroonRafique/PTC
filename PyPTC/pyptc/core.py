@@ -8,7 +8,8 @@ from typing import Iterable
 
 import numpy as np
 
-from .lattice import resolve_fibre_index
+from .error_table import AppliedErrorRecord, read_madx_error_table
+from .lattice import resolve_fibre_index, resolve_fibre_indices
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -211,6 +212,70 @@ class PTC:
         fibre_index = self._resolve(name, occurrence)
         self.set_misalignment(fibre_index, **kwargs)
         return fibre_index
+
+    def apply_misalignments(self, records: Iterable[dict[str, float | int | str] | object]) -> list[AppliedErrorRecord]:
+        """Apply name-based misalignment records to the active PTC lattice.
+
+        Repeated element names are mapped to occurrence 1, 2, ... in record
+        order, matching how repeated rows in MAD-X tables are usually resolved.
+        """
+
+        occurrences: dict[str, int] = {}
+        applied: list[AppliedErrorRecord] = []
+        for record in records:
+            if hasattr(record, "as_kwargs"):
+                name = str(getattr(record, "name")).strip().strip('"').split(":")[0]
+                occurrence_value = getattr(record, "occurrence", None)
+                kwargs = getattr(record, "as_kwargs")()
+            else:
+                name = str(record["name"]).strip().strip('"').split(":")[0]
+                occurrence_value = record.get("occurrence")
+                kwargs = {
+                    "dx": float(record.get("dx", 0.0)),
+                    "dy": float(record.get("dy", 0.0)),
+                    "ds": float(record.get("ds", 0.0)),
+                    "dtheta": float(record.get("dtheta", 0.0)),
+                    "dphi": float(record.get("dphi", 0.0)),
+                    "dpsi": float(record.get("dpsi", 0.0)),
+                }
+            key = name.upper()
+            if occurrence_value is not None:
+                occurrence = int(occurrence_value)
+                fibre_index = self.set_misalignment_by_name(name, occurrence=occurrence, **kwargs)
+                applied.append(AppliedErrorRecord(name=name, occurrence=occurrence, fibre_index=fibre_index, **kwargs))
+                occurrences[key] = occurrence
+                continue
+
+            lattice_path = self.lattice
+            if lattice_path is None:
+                raise ValueError("Name-based fibre lookup requires init_lattice(...) first.")
+            fibre_indices = resolve_fibre_indices(lattice_path, name)
+            if len(fibre_indices) == 1:
+                occurrence = occurrences.get(key, 0) + 1
+                occurrences[key] = occurrence
+                fibre_indices = [resolve_fibre_index(lattice_path, name, occurrence)]
+            for local_occurrence, fibre_index in enumerate(fibre_indices, start=1):
+                self.set_misalignment(fibre_index, **kwargs)
+                applied.append(
+                    AppliedErrorRecord(
+                        name=name,
+                        occurrence=local_occurrence,
+                        fibre_index=fibre_index,
+                        **kwargs,
+                    )
+                )
+        return applied
+
+    def apply_madx_error_table(
+        self,
+        table: str | Path,
+        nonzero: bool = True,
+        atol: float = 0.0,
+    ) -> list[AppliedErrorRecord]:
+        """Read and apply a MAD-X `ESAVE`/`EFIELD` error table to PTC."""
+
+        records = read_madx_error_table(table, nonzero=nonzero, atol=atol)
+        return self.apply_misalignments(records)
 
     def set_aperture(
         self,
