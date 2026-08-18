@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+
+build*/
+.mesonpy-*/
+
+outputs*/
+test_outputs/
+
+.matplotlib/
+
+Maxwellian_bend_for_ptc.txt
