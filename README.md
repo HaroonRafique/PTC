@@ -7,6 +7,8 @@ types such as `Bunch`, `orbit_mpi`, and `pyORBIT_Object`.
 
 ## Standalone build
 
+Prerequisites: a Fortran compiler supported by Meson, `meson`, and `ninja`.
+
 ```console
 meson setup build
 meson compile -C build
@@ -42,6 +44,17 @@ Without a real PTC input file, the smoke test deliberately avoids calling
 `ptc_init_`; it only proves that the shared library is buildable, loadable from
 Python, and exports the symbols expected by a later PyORBIT3 integration.
 
+The exported names are checked with the GNU Fortran naming convention used by
+the existing C++ wrapper declarations, for example `ptc_init_`. If this check
+fails, inspect what the built library actually exports:
+
+```console
+nm -D build-standalone/libptc_orbit.so | grep -i ptc_init
+```
+
+If the symbol appears with different decoration, the local Fortran compiler or
+flags are not ABI-compatible with the wrapper declarations in `interface/`.
+
 ## Clean lattice test with outputs
 
 The repository includes the verified standalone PTC flat file at:
@@ -69,26 +82,10 @@ against the Fortran PTC entry points.
 PTC-generated side files, including `Maxwellian_bend_for_ptc.txt`, are also
 kept under this output directory.
 
-If the original flat file uses `0/1` for the labelled `PERMFRINGE` logical
-field, the script preserves the original failure evidence and generates a
-normalized copy under the output directory with only those labelled fields
-converted to `F/T`.
-
-The most useful currently verified external flat-file baseline from the local
-PyORBIT examples is the MAD-X generated file:
-
-```text
-/home/hr/Repositories/pyorbit_examples/03_PTC_PyORBIT_Examples/00_Create_PTC_Flat_File/Via_MAD-X/PTC-PyORBIT_flat_file.flt
-```
-
-That file is copied into `ptc_standalone_readiness/inputs/` so the readiness
-test no longer depends on an external checkout.
-
-This file passes the standalone `ptc_init_`/node sampling/direct ctypes
-particle-tracking test in this repository. The local bundled `.flt` is
-byte-identical to the `Via_cpymad` example and remains useful as failure
-evidence for flat-file parser compatibility, not as the preferred readiness
-baseline.
+If the original flat file fails before tracking because a labelled
+`PERMFRINGE` logical field uses `0/1`, the script preserves the original
+failure evidence and generates a normalized copy under the output directory
+with only those labelled fields converted to `F/T`.
 
 ## One-directory readiness package
 
@@ -126,31 +123,3 @@ The variables `cpp_sources`, `dep_inc_dirs`, and `libptc_orbit_dep` remain in
 subproject. The PyORBIT3-side integration should build `pylibptc_orbit` there,
 where the PyORBIT3 core library, headers, and Python extension modules are
 available.
-
-## Next-stage PyORBIT3 + PTC handoff
-
-The next-stage handoff bundle is:
-
-```text
-PTC-PyORBIT3_files/
-```
-
-For the first integrated build attempt, copy that directory into a fresh test
-workspace and run:
-
-```console
-chmod +x build_instructions_PTC_PyORBIT3
-./build_instructions_PTC_PyORBIT3
-```
-
-That script clones latest PyORBIT3 and this PTC repository, patches only the
-fresh PyORBIT3 checkout, and builds PyORBIT3 with PTC enabled by default. It
-then imports `pylibptc_orbit` and reads:
-
-```text
-PTC-PyORBIT_flat_file.madx.flt
-```
-
-as the first PTC-in-PyORBIT3 smoke test. The companion
-`build_instructions_PyORBIT3` script is retained only as the known working
-PyORBIT3-only reference path.

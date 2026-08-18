@@ -43,3 +43,17 @@ Expected final status:
   "original_input_exit_code": 0
 }
 ```
+
+## Symbol Check
+
+The build smoke script verifies the GNU Fortran-style symbols expected by the
+existing C++ wrapper declarations, including `ptc_init_`. If the check fails,
+run:
+
+```console
+nm -D build-standalone/libptc_orbit.so | grep -i ptc_init
+```
+
+No match means the library was not built from the expected Fortran interface
+source. A differently decorated match means the local compiler or flags are not
+ABI-compatible with the wrapper declarations.

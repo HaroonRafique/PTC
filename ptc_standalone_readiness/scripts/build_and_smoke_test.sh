@@ -38,6 +38,7 @@ if [ ! -f "${library}" ]; then
 fi
 
 log "Checking exported symbols"
+nm_output="$(nm -D "${library}")"
 for symbol in \
   ptc_init_ \
   ptc_get_ini_params_ \
@@ -47,8 +48,12 @@ for symbol in \
   ptc_synchronous_after_ \
   ptc_update_twiss_
 do
-  if ! nm -D "${library}" | grep -q "[[:space:]]${symbol}$"; then
+  if ! printf '%s\n' "${nm_output}" | grep -q "[[:space:]]${symbol}$"; then
     printf 'Expected symbol not found in %s: %s\n' "${library}" "${symbol}" >&2
+    printf 'Meson compiler info: %s\n' "$(meson introspect "${build_dir}" --compilers 2>/dev/null || true)" >&2
+    printf 'nm executable: %s\n' "$(command -v nm)" >&2
+    printf 'Available exported ptc_* symbols:\n' >&2
+    printf '%s\n' "${nm_output}" | awk '$3 ~ /^ptc_/ { print "  " $3 }' | sort >&2
     exit 1
   fi
 done
