@@ -6,3 +6,4 @@ repo_root="$(cd "${pyptc_dir}/.." && pwd)"
 
 bash "${pyptc_dir}/build/build_ptc.sh"
 python3 "${pyptc_dir}/workflows/madx/run_generated_flatfile_smoke.py" "$@"
+python3 "${pyptc_dir}/workflows/madx/compare_isis_apertures.py"

@@ -39,6 +39,8 @@ through `ctypes` in `PyPTC/pyptc/`.
   - deterministic fibre misalignment by index or name/occurrence
   - MAD-X `ESAVE`/`EFIELD` error-table parsing and application
   - per-fibre aperture setup/disable
+  - MAD-X rectangular aperture-file parsing, full-lattice aperture application,
+    and per-fibre PTC aperture readback
   - global absolute aperture getter/setter
   - loss-aware ring tracking
   - acceleration, ramping, modulation, and cavity state toggles
@@ -92,12 +94,21 @@ PyPTC-only sign-flip checks:
 python3 PyPTC/workflows/madx/scan_misalignment_components.py
 ```
 
+Regenerate the ISIS RCS aperture lattice, apply `ISIS.aperture` through PyPTC,
+query the stored PTC aperture state, and compare design JVT, MAD-X, and PyPTC
+half apertures:
+
+```bash
+python3 PyPTC/workflows/madx/compare_isis_apertures.py
+```
+
 The MAD-X workflow writes generated files and plots under
 `PyPTC/workflows/madx/outputs/`; the main comparison uses
 `simplified_closed_orbit_comparison/`, and the component/sign scan uses
-`cscan/`.  The bundled MAD-X binaries are intentionally tracked in git so a new
-checkout can reproduce the flat-file generation without finding an external
-MAD-X installation.
+`cscan/`.  The aperture comparison uses `aperture_comparison/` and writes
+`isis_rcs_aperture_overlay.png`. The bundled MAD-X binaries are intentionally
+tracked in git so a new checkout can reproduce the flat-file generation without
+finding an external MAD-X installation.
 
 Use from Python:
 
@@ -122,6 +133,11 @@ ptc.update_twiss()
 ptc.set_aperture(fibre_index, kind=2, x=0.005, y=0.005)
 ptc.set_absolute_aperture(0.005)
 coords, loss = ptc.track_particle_ptc_with_loss([0.004, 0, 0, 0, 0, 0], turns=1)
+
+applied_apertures = ptc.apply_madx_aperture_file(
+    "PyPTC/workflows/madx/lattices/02_Aperture_Lattice/ISIS.aperture"
+)
+queried_apertures = ptc.all_fibre_apertures()
 ```
 
 For reproducible offline studies, `PyPTC/scripts/flatfile_misalign.py` can also
@@ -177,6 +193,8 @@ currently include:
   - translations and rotations from the latest survey-to-lattice MAD-X table
 - `07_closed_orbit_bare_vs_madx_error_table.png`
   - bare closed orbit compared with the orbit after applying the full table
+- `workflows/madx/outputs/aperture_comparison/isis_rcs_aperture_overlay.png`
+  - design JVT, MAD-X, and queried PyPTC rectangular half apertures
 
 The dashboard follows the layout used in
 `/home/hr/Repositories/pyorbit_examples/03_PTC_PyORBIT_Examples/.../pyorbit_bunch_dashplotter.py`.
@@ -198,6 +216,9 @@ the lattice tune marker and action correlations for now.
   from the exposed absolute-aperture check.
 - Per-particle phase/tune attributes like PyORBIT's `ParticlePhaseAttributes`
   are not exposed yet.
+- The full MAD-X `APERTURE` command was too slow for the repeatable full-ring
+  aperture overlay, so `compare_isis_apertures.py` writes the MAD-X comparison
+  table from `TWISS` columns `APER_1/APER_2`.
 
 ## Planned Next Work
 
@@ -205,6 +226,7 @@ the lattice tune marker and action correlations for now.
 - Direct element metadata from PTC rather than flat-file parsing.
 - Family and knob controls for tune/chromaticity matching.
 - Direct normal-form and one-turn-map access.
-- Richer aperture model export, including element-specific shape metadata.
+- Richer aperture model export beyond the current rectangular/conformal ISIS
+  workflow, including element-specific shape metadata for other aperture types.
 - Survey/layout transforms.
 - Normalized aperture and tune-smear scans.

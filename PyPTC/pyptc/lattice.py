@@ -27,6 +27,7 @@ class FibreRecord:
 
     index: int
     name: str
+    length: float
     start_line: int
     end_line: int
 
@@ -53,6 +54,19 @@ def _block_element_name(lines: list[str], start: int, end: int) -> str | None:
     return parts[1] if len(parts) >= 2 else None
 
 
+def _block_element_length(lines: list[str], start: int, end: int) -> float:
+    element_header = next((index for index in range(start, end + 1) if ELEMENT_MARK in lines[index]), None)
+    if element_header is None or element_header + 2 > end:
+        return 0.0
+    parts = lines[element_header + 2].split()
+    if not parts:
+        return 0.0
+    try:
+        return float(parts[0])
+    except ValueError:
+        return 0.0
+
+
 def read_flatfile_fibres(flat_file: str | Path) -> list[FibreRecord]:
     """Return one-based PTC fibre records parsed from a PTC flat file."""
 
@@ -63,7 +77,15 @@ def read_flatfile_fibres(flat_file: str | Path) -> list[FibreRecord]:
         name = _block_element_name(lines, start, end)
         if name is None:
             continue
-        records.append(FibreRecord(index=index, name=name, start_line=start + 1, end_line=end + 1))
+        records.append(
+            FibreRecord(
+                index=index,
+                name=name,
+                length=_block_element_length(lines, start, end),
+                start_line=start + 1,
+                end_line=end + 1,
+            )
+        )
     return records
 
 

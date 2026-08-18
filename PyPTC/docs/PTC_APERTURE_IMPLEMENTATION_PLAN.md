@@ -30,8 +30,9 @@ Each subplot should overlay:
     relying only on stale reference files.
 - Extend flat-file generation:
   - Add a `--lattice aperture` option to `PyPTC/workflows/madx/generate_flat_file.py`.
-  - Use an aperture-aware MAD-X script that calls `ISIS.aperture`, runs
-    `APERTURE`, writes `madx_aperture.tfs`, and generates the PTC flat file.
+  - Use an aperture-aware MAD-X script that calls `ISIS.aperture`, writes a
+    `madx_aperture.tfs` table containing `APER_1/APER_2`, and generates the
+    PTC flat file.
 - Add PyPTC aperture APIs:
   - Parse MAD-X aperture assignment files containing
     `APERTYPE=RECTANGLE, APERTURE={half_x, half_y}`.
@@ -64,7 +65,7 @@ Add a repeatable script under `PyPTC/workflows/madx/`, for example
 `compare_isis_apertures.py`. It should:
 
 - Generate or load the aperture lattice flat file.
-- Run MAD-X `APERTURE` and parse `APER_1` and `APER_2`.
+- Run MAD-X with the aperture lattice and parse `APER_1` and `APER_2`.
 - Parse the design JVT CSV using `Semi_Ap_H` and `Semi_Ap_V`, converting mm to m.
 - Apply `ISIS.aperture` to every matching PTC fibre.
 - Query PTC aperture state for every fibre and write `pyptc_apertures.csv`.
@@ -73,6 +74,12 @@ Add a repeatable script under `PyPTC/workflows/madx/`, for example
 Name matching should normalize case and strip MAD-X occurrence suffixes such as
 `:1`. Missing aperture assignments for PTC fibres should be reported in a CSV
 summary.
+
+Implementation note: the first full-ring attempt using the MAD-X `APERTURE`
+command was much slower than needed for this comparison. The implemented
+workflow writes `madx_aperture.tfs` from a MAD-X `TWISS` table containing
+`APER_1/APER_2`, which gives the same rectangular aperture half-widths needed
+for the overlay and keeps the test repeatable.
 
 ## Test Plan
 

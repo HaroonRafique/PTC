@@ -53,6 +53,7 @@ for symbol in \
   pyptc_set_misalignment \
   pyptc_set_madx_misalignment \
   pyptc_set_one_aperture \
+  pyptc_get_one_aperture \
   pyptc_turn_off_one_aperture \
   pyptc_set_absolute_aperture \
   pyptc_get_absolute_aperture \
@@ -106,6 +107,7 @@ for name in (
     "pyptc_set_misalignment",
     "pyptc_set_madx_misalignment",
     "pyptc_set_one_aperture",
+    "pyptc_get_one_aperture",
     "pyptc_turn_off_one_aperture",
     "pyptc_set_absolute_aperture",
     "pyptc_get_absolute_aperture",

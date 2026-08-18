@@ -37,7 +37,7 @@ contains
 
   subroutine pyptc_get_api_level(api_level) bind(C, name="pyptc_get_api_level")
     integer(c_int), intent(out) :: api_level
-    api_level = 2_c_int
+    api_level = 3_c_int
   end subroutine pyptc_get_api_level
 
   subroutine pyptc_get_tunes(qx, qy, qs, status) bind(C, name="pyptc_get_tunes")
@@ -143,6 +143,39 @@ contains
     local_r = real(r, dp)
     call assign_one_aperture(my_ering, int(pos), int(kindaper), local_r, real(x, dp), real(y, dp), real(dx, dp), real(dy, dp))
   end subroutine pyptc_set_one_aperture
+
+  subroutine pyptc_get_one_aperture(pos, kindaper, r, x, y, dx, dy, status) bind(C, name="pyptc_get_one_aperture")
+    integer(c_int), value, intent(in) :: pos
+    integer(c_int), intent(out) :: kindaper, status
+    real(c_double), intent(out) :: r(2)
+    real(c_double), intent(out) :: x, y, dx, dy
+    type(fibre), pointer :: p
+
+    status = 0_c_int
+    kindaper = 0_c_int
+    r = 0.0_c_double
+    x = 0.0_c_double
+    y = 0.0_c_double
+    dx = 0.0_c_double
+    dy = 0.0_c_double
+    if (.not. pyptc_valid_pos(pos)) then
+      status = 1_c_int
+      return
+    end if
+
+    call move_to(my_ering, p, int(pos))
+    if (.not. associated(p%mag%p%aperture)) then
+      status = 2_c_int
+      return
+    end if
+
+    kindaper = int(p%mag%p%aperture%kind, c_int)
+    r = real(p%mag%p%aperture%r, c_double)
+    x = real(p%mag%p%aperture%x, c_double)
+    y = real(p%mag%p%aperture%y, c_double)
+    dx = real(p%mag%p%aperture%dx, c_double)
+    dy = real(p%mag%p%aperture%dy, c_double)
+  end subroutine pyptc_get_one_aperture
 
   subroutine pyptc_turn_off_one_aperture(pos, status) bind(C, name="pyptc_turn_off_one_aperture")
     integer(c_int), value, intent(in) :: pos

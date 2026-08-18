@@ -153,12 +153,17 @@ The current Python-level API covers:
 - deterministic single-element misalignments by lattice index or
   name/occurrence
 - aperture/loss-aware tracking
+- MAD-X rectangular aperture-file parsing, full ISIS RCS aperture application,
+  and queried PTC aperture readback
 - initial ramp, cavity, and AC control hooks
 - bunch generation through `/home/hr/Codes/pyparticlebunch`
 
 The test workflow writes diagnostic PNG files for Twiss/orbit/tunes/chroma,
 bare vs misaligned closed orbit, before/after bunch dashboards, aperture loss
-maps, and transverse particle positions at the peak-loss aperture node.
+maps, and transverse particle positions at the peak-loss aperture node. The
+MAD-X workflow also includes an ISIS RCS aperture comparison that overlays the
+design JVT aperture, MAD-X `APER_1/APER_2`, and queried PyPTC per-fibre
+apertures in `isis_rcs_aperture_overlay.png`.
 
 Planned extensions for this strand include richer element metadata, normal-form
 and map access, family/knob controls, survey/layout transforms, normalized

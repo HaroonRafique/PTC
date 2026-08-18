@@ -8,8 +8,9 @@ from typing import Iterable
 
 import numpy as np
 
+from .aperture import AppliedApertureRecord, normalize_aperture_name, read_madx_aperture_file
 from .error_table import AppliedErrorRecord, read_madx_error_table
-from .lattice import resolve_fibre_index, resolve_fibre_indices
+from .lattice import read_flatfile_fibres, resolve_fibre_index, resolve_fibre_indices
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -86,6 +87,17 @@ class PTC:
                 C_INT_P,
             ]
             self.lib.pyptc_set_one_aperture.restype = None
+            self.lib.pyptc_get_one_aperture.argtypes = [
+                ctypes.c_int,
+                C_INT_P,
+                C_DOUBLE_P,
+                C_DOUBLE_P,
+                C_DOUBLE_P,
+                C_DOUBLE_P,
+                C_DOUBLE_P,
+                C_INT_P,
+            ]
+            self.lib.pyptc_get_one_aperture.restype = None
             self.lib.pyptc_turn_off_one_aperture.argtypes = [ctypes.c_int, C_INT_P]
             self.lib.pyptc_turn_off_one_aperture.restype = None
             self.lib.pyptc_set_absolute_aperture.argtypes = [ctypes.c_double, C_INT_P]
@@ -340,6 +352,100 @@ class PTC:
         fibre_index = self._resolve(name, occurrence)
         self.set_aperture(fibre_index, **kwargs)
         return fibre_index
+
+    def get_aperture(self, fibre_index: int) -> dict[str, float | int] | None:
+        kind = ctypes.c_int()
+        radii = np.zeros(2, dtype=np.float64)
+        x = ctypes.c_double()
+        y = ctypes.c_double()
+        dx = ctypes.c_double()
+        dy = ctypes.c_double()
+        status = ctypes.c_int()
+        self.lib.pyptc_get_one_aperture(
+            int(fibre_index),
+            ctypes.byref(kind),
+            radii.ctypes.data_as(C_DOUBLE_P),
+            ctypes.byref(x),
+            ctypes.byref(y),
+            ctypes.byref(dx),
+            ctypes.byref(dy),
+            ctypes.byref(status),
+        )
+        if status.value == 2:
+            return None
+        self._check_status("pyptc_get_one_aperture", status)
+        return {
+            "kind": kind.value,
+            "r1": float(radii[0]),
+            "r2": float(radii[1]),
+            "x": x.value,
+            "y": y.value,
+            "dx": dx.value,
+            "dy": dy.value,
+        }
+
+    def get_aperture_by_name(self, name: str, occurrence: int = 1) -> dict[str, float | int] | None:
+        return self.get_aperture(self._resolve(name, occurrence))
+
+    def apply_rectangular_apertures(
+        self,
+        records: Iterable[dict[str, float | str] | object],
+        kind: int = 2,
+    ) -> list[AppliedApertureRecord]:
+        if self.lattice is None:
+            raise ValueError("Name-based aperture application requires init_lattice(...) first.")
+        fibre_index_by_name: dict[str, list[int]] = {}
+        for fibre in read_flatfile_fibres(self.lattice):
+            fibre_index_by_name.setdefault(normalize_aperture_name(fibre.name), []).append(fibre.index)
+        applied: list[AppliedApertureRecord] = []
+        for record in records:
+            if hasattr(record, "name"):
+                name = str(getattr(record, "name"))
+                half_x = float(getattr(record, "half_x"))
+                half_y = float(getattr(record, "half_y"))
+            else:
+                name = str(record["name"])
+                half_x = float(record["half_x"])
+                half_y = float(record["half_y"])
+            fibre_indices = fibre_index_by_name.get(normalize_aperture_name(name), [])
+            if not fibre_indices:
+                raise ValueError(f"Element {name!r} not found in {self.lattice}")
+            for fibre_index in fibre_indices:
+                self.set_aperture(fibre_index, kind=kind, x=half_x, y=half_y)
+                applied.append(
+                    AppliedApertureRecord(
+                        name=name,
+                        half_x=half_x,
+                        half_y=half_y,
+                        fibre_index=fibre_index,
+                    )
+                )
+        return applied
+
+    def apply_madx_aperture_file(self, path: str | Path) -> list[AppliedApertureRecord]:
+        return self.apply_rectangular_apertures(read_madx_aperture_file(path))
+
+    def all_fibre_apertures(self) -> list[dict[str, float | int | str]]:
+        if self.lattice is None:
+            raise ValueError("Fibre aperture query requires init_lattice(...) first.")
+        rows: list[dict[str, float | int | str]] = []
+        s_start = 0.0
+        for fibre in read_flatfile_fibres(self.lattice):
+            s_end = s_start + fibre.length
+            aperture = self.get_aperture(fibre.index)
+            if aperture is not None:
+                rows.append(
+                    {
+                        "fibre_index": fibre.index,
+                        "name": fibre.name,
+                        "s_start": s_start,
+                        "s_end": s_end,
+                        "s": s_end,
+                        **aperture,
+                    }
+                )
+            s_start = s_end
+        return rows
 
     def disable_aperture(self, fibre_index: int) -> None:
         status = ctypes.c_int()

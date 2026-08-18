@@ -24,6 +24,7 @@ DEFAULT_MADX_VERSION = "5_02_00"
 DEFAULT_MADX = MADX_BINARIES[DEFAULT_MADX_VERSION]
 LATTICES = {
     "simplified": MADX_DIR / "lattices" / "00_Simplified_Lattice",
+    "aperture": MADX_DIR / "lattices" / "02_Aperture_Lattice",
 }
 REQUIRED_LATTICE_FILES = (
     "ISIS.injected_beam",
@@ -31,7 +32,14 @@ REQUIRED_LATTICE_FILES = (
     "ISIS.strength",
     "ISIS.sequence",
 )
+EXTRA_REQUIRED_LATTICE_FILES = {
+    "aperture": ("2023.strength", "ISIS.aperture"),
+}
 REQUIRED_PTC_SCRIPTS = ("resplit.ptc", "print_flat_file.ptc")
+SCRIPT_BY_LATTICE = {
+    "simplified": "Create_PTC_flat_file.madx",
+    "aperture": "Create_PTC_flat_file_with_aperture.madx",
+}
 
 
 def copytree_contents(source: Path, destination: Path) -> None:
@@ -46,15 +54,15 @@ def copytree_contents(source: Path, destination: Path) -> None:
             shutil.copy2(item, target)
 
 
-def prepare_run_dir(lattice_dir: Path, output_dir: Path) -> Path:
+def prepare_run_dir(lattice_dir: Path, output_dir: Path, script_name: str) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
     copytree_contents(lattice_dir, output_dir / "ISIS_Lattice")
     copytree_contents(MADX_DIR / "ptc_scripts", output_dir / "PTC_Scripts")
-    shutil.copy2(MADX_DIR / "scripts" / "Create_PTC_flat_file.madx", output_dir / "Create_PTC_flat_file.madx")
+    shutil.copy2(MADX_DIR / "scripts" / script_name, output_dir / "Create_PTC_flat_file.madx")
     return output_dir / "Create_PTC_flat_file.madx"
 
 
-def validate_inputs(madx: Path, lattice_dir: Path) -> None:
+def validate_inputs(madx: Path, lattice_dir: Path, lattice: str) -> None:
     if not madx.exists():
         raise FileNotFoundError(f"MAD-X binary not found: {madx}")
     if not madx.is_file():
@@ -63,7 +71,8 @@ def validate_inputs(madx: Path, lattice_dir: Path) -> None:
         raise PermissionError(f"MAD-X binary is not executable: {madx}")
     if not lattice_dir.exists():
         raise FileNotFoundError(f"Lattice directory not found: {lattice_dir}")
-    missing_lattice = [name for name in REQUIRED_LATTICE_FILES if not (lattice_dir / name).exists()]
+    required_lattice = REQUIRED_LATTICE_FILES + EXTRA_REQUIRED_LATTICE_FILES.get(lattice, ())
+    missing_lattice = [name for name in required_lattice if not (lattice_dir / name).exists()]
     if missing_lattice:
         raise FileNotFoundError(f"Missing lattice files in {lattice_dir}: {missing_lattice}")
     missing_scripts = [name for name in REQUIRED_PTC_SCRIPTS if not (MADX_DIR / "ptc_scripts" / name).exists()]
@@ -90,11 +99,12 @@ def generate(args: argparse.Namespace) -> dict:
     lattice_dir = LATTICES[args.lattice].resolve()
     madx = args.madx.resolve()
     output_dir = args.output_dir.resolve()
-    validate_inputs(madx, lattice_dir)
-    script = prepare_run_dir(lattice_dir, output_dir)
+    validate_inputs(madx, lattice_dir, args.lattice)
+    script = prepare_run_dir(lattice_dir, output_dir, SCRIPT_BY_LATTICE[args.lattice])
     result = run_madx(madx, script, output_dir)
     flat_file = output_dir / "PTC-PyORBIT_flat_file.flt"
     twiss_file = output_dir / "optimised_flat_file.tfs"
+    aperture_file = output_dir / "madx_aperture.tfs"
     if result.returncode != 0:
         raise RuntimeError(f"MAD-X failed with status {result.returncode}; see {output_dir / 'madx.log'}")
     if not flat_file.exists() or flat_file.stat().st_size == 0:
@@ -106,6 +116,7 @@ def generate(args: argparse.Namespace) -> dict:
         "output_dir": str(output_dir),
         "flat_file": str(flat_file),
         "twiss_file": str(twiss_file) if twiss_file.exists() else None,
+        "madx_aperture_file": str(aperture_file) if aperture_file.exists() else None,
         "log": str(output_dir / "madx.log"),
         "returncode": result.returncode,
     }
