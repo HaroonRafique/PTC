@@ -2,7 +2,7 @@
 
 ## Current Python APIs
 
-- `pyptc.PTC`: loads `PyPTC/build-pyptc/libpyptc.so`.
+- `pyptc.PTC`: loads `PyPTC/artifacts/build-pyptc/libpyptc.so`.
 - Lattice initialization from a PTC flat file.
 - Machine summary: node count, harmonic number, circumference, transition gamma, mass, charge, kinetic energy.
 - Synchronous-particle scalars: `omega`, `p0c`, `beta0`, kinetic energy through the legacy scalar functions.
@@ -17,7 +17,7 @@
 - `PyPTC/meson.build` is a PyPTC-local overlay build.
 - It compiles parent `source/*.f90` and `interface/ptcinterface.f90` read-only.
 - New additive Python-facing Fortran exports live under `PyPTC/fortran/`.
-- `PyPTC/build_ptc.sh` builds `PyPTC/build-pyptc/libpyptc.so` and verifies both legacy `ptc_*` and new `pyptc_*` symbols.
+- `PyPTC/build/build_ptc.sh` builds `PyPTC/artifacts/build-pyptc/libpyptc.so` and verifies both legacy `ptc_*` and new `pyptc_*` symbols.
 
 ## PTC Functionality Present Internally But Not Yet Cleanly Exposed
 

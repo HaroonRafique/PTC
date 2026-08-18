@@ -13,7 +13,7 @@ from pathlib import Path
 
 
 MADX_DIR = Path(__file__).resolve().parent
-PYPTC_DIR = MADX_DIR.parent
+PYPTC_DIR = MADX_DIR.parents[1]
 DEFAULT_OUTPUT_DIR = MADX_DIR / "outputs" / "simplified"
 MADX_BINARIES = {
     "5_02_00": MADX_DIR / "bin" / "madx-linux64_v5_02_00",

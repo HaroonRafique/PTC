@@ -10,7 +10,7 @@ Build a clean Python-level `PyPTC` library that is independent of PyORBIT3, uses
 - `PyPTC/fortran/pyptc_api.f90` contains the first additive `pyptc_*` C ABI symbol.
 - `PyPTC/pyptc/` is the new package namespace.
 - `PyPTC/pyptc/bunch.py` imports `/home/hr/Codes/pyparticlebunch/src` by default and can be redirected with `PYPARTICLEBUNCH_SRC`.
-- `PyPTC/run_misalignment_experiment.py` now generates bunches through the `pyptc` package and records the PyParticleBunch source path in `summary.json`.
+- `PyPTC/scripts/run_misalignment_experiment.py` now generates bunches through the `pyptc` package and records the PyParticleBunch source path in `summary.json`.
 
 ## Next API Phases
 
@@ -23,6 +23,6 @@ Build a clean Python-level `PyPTC` library that is independent of PyORBIT3, uses
 
 ## Validation Commands
 
-- `bash PyPTC/build_ptc.sh`
+- `bash PyPTC/build/build_ptc.sh`
 - `python3 -m py_compile PyPTC/*.py PyPTC/pyptc/*.py`
-- `python3 PyPTC/run_misalignment_experiment.py --particles 20 --turns 1 --output-dir PyPTC/outputs_pyptc_package_smoke`
+- `python3 PyPTC/scripts/run_misalignment_experiment.py --particles 20 --turns 1 --output-dir PyPTC/artifacts/outputs/pyptc_package_smoke`

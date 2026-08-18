@@ -13,10 +13,10 @@ import numpy as np
 
 
 MADX_DIR = Path(__file__).resolve().parent
-PYPTC_DIR = MADX_DIR.parent
+PYPTC_DIR = MADX_DIR.parents[1]
 REPO_ROOT = PYPTC_DIR.parent
 DEFAULT_OUTPUT_DIR = MADX_DIR / "outputs" / "simplified"
-DEFAULT_LIBRARY = PYPTC_DIR / "build-pyptc" / "libpyptc.so"
+DEFAULT_LIBRARY = PYPTC_DIR / "artifacts" / "build-pyptc" / "libpyptc.so"
 DEFAULT_ERROR_TABLE = MADX_DIR / "reference_errors" / "jan26_survey_corrected.tfs"
 
 
@@ -43,7 +43,7 @@ def require_generated_flat_file(output_dir: Path, regenerate: bool) -> Path:
 
 def run_pyptc_smoke(args: argparse.Namespace, flat_file: Path, output_dir: Path) -> dict:
     if not args.library.exists():
-        raise FileNotFoundError(f"PyPTC shared library not found; run bash PyPTC/build_ptc.sh first: {args.library}")
+        raise FileNotFoundError(f"PyPTC shared library not found; run bash PyPTC/build/build_ptc.sh first: {args.library}")
     if not args.madx_error_table.exists():
         raise FileNotFoundError(f"Reference MAD-X error table not found: {args.madx_error_table}")
 

@@ -13,14 +13,19 @@ from pathlib import Path
 
 import numpy as np
 
+PYPTC_DIR = Path(__file__).resolve().parents[1]
+ROOT = PYPTC_DIR.parent
+if str(PYPTC_DIR) not in sys.path:
+    sys.path.insert(0, str(PYPTC_DIR))
+
 from flatfile_misalign import apply_single_misalignment
 from ptc import DEFAULT_LATTICE, DEFAULT_LIBRARY, PTC
 from pyptc import generate_matched_gaussian_4d, pyparticlebunch_source
 
 
-ROOT = Path(__file__).resolve().parents[1]
-PYPTC_DIR = Path(__file__).resolve().parent
-DEFAULT_OUTPUT = PYPTC_DIR / "outputs"
+DEFAULT_OUTPUT = PYPTC_DIR / "artifacts" / "outputs" / "misalignment_experiment"
+
+
 def write_csv(path: Path, rows: list[dict[str, float | int | str]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if not rows:

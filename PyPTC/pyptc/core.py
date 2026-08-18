@@ -13,7 +13,7 @@ from .lattice import resolve_fibre_index, resolve_fibre_indices
 
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_LIBRARY = ROOT / "PyPTC" / "build-pyptc" / "libpyptc.so"
+DEFAULT_LIBRARY = ROOT / "PyPTC" / "artifacts" / "build-pyptc" / "libpyptc.so"
 DEFAULT_LATTICE = ROOT / "ptc_standalone_readiness" / "inputs" / "PTC-PyORBIT_flat_file.madx.flt"
 C_DOUBLE_P = ctypes.POINTER(ctypes.c_double)
 C_INT_P = ctypes.POINTER(ctypes.c_int)

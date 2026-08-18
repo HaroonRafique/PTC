@@ -18,6 +18,7 @@ from compare_madx_pyptc_closed_orbits import (
     DEFAULT_MADX,
     MADX_DIR,
     MISALIGNMENT_COMPONENTS,
+    REPO_ROOT,
     require_matplotlib,
 )
 
@@ -49,7 +50,7 @@ def run_case(output_dir: Path, component: str, convention: str, flip: bool, args
     ]
     if flip:
         command.extend(["--pyptc-flip-components", component])
-    subprocess.run(command, cwd=MADX_DIR.parent.parent, check=True)
+    subprocess.run(command, cwd=REPO_ROOT, check=True)
     result = json.loads((case_dir / "summary.json").read_text(encoding="utf-8"))
     result["case"] = case_name
     result["component"] = component

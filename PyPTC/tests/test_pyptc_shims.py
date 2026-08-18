@@ -3,7 +3,7 @@
 
 The test writes diagnostic PNGs so failures can be inspected visually:
 
-  python3 PyPTC/tests/test_pyptc_shims.py --output-dir PyPTC/test_outputs/shims
+  python3 PyPTC/tests/test_pyptc_shims.py --output-dir PyPTC/artifacts/test_outputs/shims
 """
 
 from __future__ import annotations
@@ -665,7 +665,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--library", type=Path, default=DEFAULT_LIBRARY)
     parser.add_argument("--lattice", type=Path, default=DEFAULT_LATTICE)
-    parser.add_argument("--output-dir", type=Path, default=PYPTC_DIR / "test_outputs" / "shims")
+    parser.add_argument("--output-dir", type=Path, default=PYPTC_DIR / "artifacts" / "test_outputs" / "shims")
     parser.add_argument("--element", default="SP0_QF")
     parser.add_argument("--occurrence", type=int, default=1)
     parser.add_argument("--dx", type=float, default=0.003)

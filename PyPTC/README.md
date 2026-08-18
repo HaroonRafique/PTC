@@ -8,9 +8,21 @@ The current build creates `libpyptc.so` from the existing PTC sources plus an
 additive shim file, `PyPTC/fortran/pyptc_api.f90`.  Python calls the library
 through `ctypes` in `PyPTC/pyptc/`.
 
+## Directory Layout
+
+- `pyptc/`: importable Python package.
+- `fortran/`: additive Fortran C-ABI shim source.
+- `build/`: build commands and helpers.
+- `scripts/`: standalone user-facing Python scripts.
+- `tests/`: smoke and regression tests.
+- `workflows/madx/`: MAD-X binaries, lattice inputs, flat-file generation, and
+  MAD-X/PyPTC comparison scripts.
+- `docs/`: planning notes and capability summaries.
+- `artifacts/`: ignored generated builds, plots, CSV files, and test outputs.
+
 ## What Is Implemented
 
-- Standalone build script: `./PyPTC/build_ptc.sh`
+- Standalone build script: `./PyPTC/build/build_ptc.sh`
 - Python package entry point: `PyPTC/pyptc/`
 - Backward-compatible import shim: `PyPTC/ptc.py`
 - ISIS RCS default flat-file lattice support
@@ -43,48 +55,49 @@ are required for these new calls.
 Build the standalone shared library:
 
 ```bash
-bash PyPTC/build_ptc.sh
+bash PyPTC/build/build_ptc.sh
 ```
 
 Run the current smoke/physics test and generate diagnostic plots:
 
 ```bash
-python3 PyPTC/tests/test_pyptc_shims.py --output-dir PyPTC/test_outputs/shims
+python3 PyPTC/tests/test_pyptc_shims.py --output-dir PyPTC/artifacts/test_outputs/shims
 ```
 
 Generate a fresh ISIS RCS simplified-lattice PTC flat file with the bundled
 MAD-X binary, then run the repeatable PyPTC smoke comparison:
 
 ```bash
-python3 PyPTC/madx/generate_flat_file.py
-python3 PyPTC/madx/run_generated_flatfile_smoke.py
+python3 PyPTC/workflows/madx/generate_flat_file.py
+python3 PyPTC/workflows/madx/run_generated_flatfile_smoke.py
 ```
 
 Or run the full build/generate/test sequence:
 
 ```bash
-bash PyPTC/madx/run_all.sh
+bash PyPTC/workflows/madx/run_all.sh
 ```
 
 Compare MAD-X and PyPTC closed orbits after applying the same bundled
 misalignment table to the simplified lattice:
 
 ```bash
-python3 PyPTC/madx/compare_madx_pyptc_closed_orbits.py
+python3 PyPTC/workflows/madx/compare_madx_pyptc_closed_orbits.py
 ```
 
 Scan each MAD-X error-table component independently, including raw PTC and
 PyPTC-only sign-flip checks:
 
 ```bash
-python3 PyPTC/madx/scan_misalignment_components.py
+python3 PyPTC/workflows/madx/scan_misalignment_components.py
 ```
 
-The MAD-X workflow writes generated files and plots under `PyPTC/madx/outputs/`;
-the main comparison uses `simplified_closed_orbit_comparison/`, and the
-component/sign scan uses `cscan/`.  The bundled MAD-X binaries are intentionally
-tracked in git so a new checkout can reproduce the flat-file generation without
-finding an external MAD-X installation.
+The MAD-X workflow writes generated files and plots under
+`PyPTC/workflows/madx/outputs/`; the main comparison uses
+`simplified_closed_orbit_comparison/`, and the component/sign scan uses
+`cscan/`.  The bundled MAD-X binaries are intentionally tracked in git so a new
+checkout can reproduce the flat-file generation without finding an external
+MAD-X installation.
 
 Use from Python:
 
@@ -102,7 +115,7 @@ fibre_index = ptc.set_misalignment_by_name("SP0_QF", occurrence=1, dx=0.003)
 ptc.update_twiss()
 
 applied = ptc.apply_madx_error_table(
-    "PyPTC/madx/reference_errors/jan26_survey_corrected.tfs"
+    "PyPTC/workflows/madx/reference_errors/jan26_survey_corrected.tfs"
 )
 ptc.update_twiss()
 
@@ -111,20 +124,22 @@ ptc.set_absolute_aperture(0.005)
 coords, loss = ptc.track_particle_ptc_with_loss([0.004, 0, 0, 0, 0, 0], turns=1)
 ```
 
-For reproducible offline studies, `PyPTC/flatfile_misalign.py` can also write a
-copied flat file containing either one manual six-degree-of-freedom
-misalignment or every nonzero row from a MAD-X error table:
+For reproducible offline studies, `PyPTC/scripts/flatfile_misalign.py` can also
+write a copied flat file containing either one manual six-degree-of-freedom
+misalignment or every nonzero row from a MAD-X error table.  The old
+`PyPTC/flatfile_misalign.py` path remains as a small compatibility wrapper.
 
 ```bash
-python3 PyPTC/flatfile_misalign.py \
+python3 PyPTC/scripts/flatfile_misalign.py \
   --input ptc_standalone_readiness/inputs/PTC-PyORBIT_flat_file.madx.flt \
-  --output PyPTC/outputs/isis_with_jan26_survey_errors.flt \
-  --madx-error-table PyPTC/madx/reference_errors/jan26_survey_corrected.tfs
+  --output PyPTC/artifacts/outputs/isis_with_jan26_survey_errors.flt \
+  --madx-error-table PyPTC/workflows/madx/reference_errors/jan26_survey_corrected.tfs
 ```
 
 ## MAD-X Flat-File Generation
 
-`PyPTC/madx/` contains the reproducible ISIS RCS flat-file generation strand:
+`PyPTC/workflows/madx/` contains the reproducible ISIS RCS flat-file generation
+strand:
 
 - `bin/` contains the committed ISIS MAD-X binaries; the default is
   `madx-linux64_v5_02_00`, matching the PyORBIT flat-file-generation example.

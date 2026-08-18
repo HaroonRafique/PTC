@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 
 MADX_DIR = Path(__file__).resolve().parent
-PYPTC_DIR = MADX_DIR.parent
+PYPTC_DIR = MADX_DIR.parents[1]
 REPO_ROOT = PYPTC_DIR.parent
 if str(PYPTC_DIR) not in sys.path:
     sys.path.insert(0, str(PYPTC_DIR))
@@ -197,7 +197,7 @@ def run_madx_closed_orbits(args: argparse.Namespace, output_dir: Path, error_tab
 
 def run_pyptc_closed_orbits(args: argparse.Namespace, flat_file: Path, error_table: Path) -> tuple[np.ndarray, np.ndarray]:
     if not args.library.exists():
-        raise FileNotFoundError(f"PyPTC shared library not found; run bash PyPTC/build_ptc.sh first: {args.library}")
+        raise FileNotFoundError(f"PyPTC shared library not found; run bash PyPTC/build/build_ptc.sh first: {args.library}")
     ptc = PTC(args.library)
     ptc.init_lattice(flat_file)
     bare_rows = ptc.all_node_twiss_orbit()

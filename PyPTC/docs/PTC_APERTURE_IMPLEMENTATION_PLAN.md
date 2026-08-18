@@ -21,15 +21,15 @@ Each subplot should overlay:
 
 ## Key Changes
 
-- Copy the aperture lattice/data into `PyPTC/madx/` only:
+- Copy the aperture lattice/data into `PyPTC/workflows/madx/` only:
   - Copy `/home/hr/Repositories/isis_2024/Lattice_Files/02_Aperture_Lattice`
-    into `PyPTC/madx/lattices/02_Aperture_Lattice`.
+    into `PyPTC/workflows/madx/lattices/02_Aperture_Lattice`.
   - Copy or reference the design aperture CSV from
     `/home/hr/Repositories/isis_2024/Methods/Aperture/jvt_synch_aperture.csv`.
   - Generate fresh MAD-X aperture output from the copied lattice rather than
     relying only on stale reference files.
 - Extend flat-file generation:
-  - Add a `--lattice aperture` option to `PyPTC/madx/generate_flat_file.py`.
+  - Add a `--lattice aperture` option to `PyPTC/workflows/madx/generate_flat_file.py`.
   - Use an aperture-aware MAD-X script that calls `ISIS.aperture`, runs
     `APERTURE`, writes `madx_aperture.tfs`, and generates the PTC flat file.
 - Add PyPTC aperture APIs:
@@ -60,7 +60,7 @@ PTC tracking check proves they are not meaningful.
 
 ## Comparison Script
 
-Add a repeatable script under `PyPTC/madx/`, for example
+Add a repeatable script under `PyPTC/workflows/madx/`, for example
 `compare_isis_apertures.py`. It should:
 
 - Generate or load the aperture lattice flat file.

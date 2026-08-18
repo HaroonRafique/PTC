@@ -16,7 +16,7 @@ Update `PyPTC` to produce publication-quality static PNG/PDF plots for the stand
 - Add a small PTC export in `interface/ptcinterface.f90`, exposed through `ctypes` as `PTC.particle_tunes(...)`:
   - For each input particle, use PTC's existing normal-form/closed-orbit machinery, track for `--tune-turns`, transform to normalized coordinates, accumulate phase advance, and return `qx`, `qy`, plus a lost/failed flag.
   - Write `tune_footprint.csv` and `tune_footprint.png/.pdf` when `--with-tunes` is passed.
-- Add a short `PyPTC/PTC_CAPABILITIES.md` documenting:
+- Add a short `PyPTC/docs/PTC_CAPABILITIES.md` documenting:
   - what is exposed cleanly in Python now,
   - what exists only through `ptc_script_`,
   - what remains unexposed and would need future shims.
@@ -33,10 +33,10 @@ Update `PyPTC` to produce publication-quality static PNG/PDF plots for the stand
 
 ## Test Plan
 
-- Rebuild with `bash PyPTC/build_ptc.sh` and verify the new exported tune symbol is present.
+- Rebuild with `bash PyPTC/build/build_ptc.sh` and verify the new exported tune symbol is present.
 - Run `python3 -m py_compile PyPTC/*.py`.
 - Run the default experiment and confirm all Twiss/orbit/bunch PNG/PDF outputs are created.
-- Run `python3 PyPTC/run_misalignment_experiment.py --particles 20 --turns 1 --with-tunes --tune-turns 32` as a fast smoke test for exact PTC tune output.
+- Run `python3 PyPTC/scripts/run_misalignment_experiment.py --particles 20 --turns 1 --with-tunes --tune-turns 32` as a fast smoke test for exact PTC tune output.
 - Confirm `summary.json` records plot paths, tune settings, tune means/stds, and any lost/failed tune particles.
 
 ## Assumptions
