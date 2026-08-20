@@ -402,6 +402,39 @@ def run(args: argparse.Namespace) -> dict:
         madx_misaligned = tfs_to_orbit_array(parse_tfs(madx_paths["misaligned"]))
     pyptc_bare, pyptc_misaligned = run_pyptc_closed_orbits(args, flat_file, pyptc_error_table)
 
+    if args.distorted_only:
+        write_csv(output_dir / "madx_distorted_closed_orbit.csv", "s,x,px,y,py", madx_misaligned)
+        write_csv(output_dir / "pyptc_distorted_closed_orbit.csv", "s,x,px,y,py", pyptc_misaligned)
+        comparison = plot_distorted_reference_comparison(output_dir / "madx_vs_pyptc_closed_orbit_comparison.png", madx_misaligned, pyptc_misaligned)
+        write_csv(
+            output_dir / "madx_vs_pyptc_closed_orbit_comparison.csv",
+            "s,madx_distorted_x,pyptc_distorted_x_interp,madx_distorted_y,pyptc_distorted_y_interp,pyptc_minus_madx_x,pyptc_minus_madx_y",
+            comparison,
+        )
+        summary = {
+            "flat_file": str(flat_file),
+            "madx_error_table": str(args.madx_error_table.resolve()),
+            "madx_filtered_error_table": str(madx_error_table),
+            "pyptc_filtered_error_table": str(pyptc_error_table),
+            "components": sorted(keep_components),
+            "pyptc_convention": args.pyptc_convention,
+            "pyptc_flip_components": sorted(pyptc_flip_components),
+            "madx_reference_twiss": None,
+            "madx_distorted_max_x_m": float(np.max(np.abs(madx_misaligned[:, 1]))),
+            "madx_distorted_max_y_m": float(np.max(np.abs(madx_misaligned[:, 3]))),
+            "pyptc_distorted_max_x_m": float(np.max(np.abs(pyptc_misaligned[:, 1]))),
+            "pyptc_distorted_max_y_m": float(np.max(np.abs(pyptc_misaligned[:, 3]))),
+            "residual_max_x_m": float(np.max(np.abs(comparison[:, 5]))),
+            "residual_max_y_m": float(np.max(np.abs(comparison[:, 6]))),
+            "comparison_png": str(output_dir / "madx_vs_pyptc_closed_orbit_comparison.png"),
+        }
+        if args.response_threshold > 0.0 and summary["pyptc_distorted_max_x_m"] <= args.response_threshold and summary["pyptc_distorted_max_y_m"] <= args.response_threshold:
+            raise AssertionError("PyPTC distorted orbit response is below threshold")
+        if args.response_threshold > 0.0 and summary["madx_distorted_max_x_m"] <= args.response_threshold and summary["madx_distorted_max_y_m"] <= args.response_threshold:
+            raise AssertionError("MAD-X distorted orbit response is below threshold")
+        (output_dir / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        return summary
+
     write_csv(output_dir / "madx_bare_closed_orbit.csv", "s,x,px,y,py", madx_bare)
     write_csv(output_dir / "madx_misaligned_closed_orbit.csv", "s,x,px,y,py", madx_misaligned)
     write_csv(output_dir / "pyptc_bare_closed_orbit.csv", "s,x,px,y,py", pyptc_bare)
@@ -455,6 +488,7 @@ def main() -> None:
     parser.add_argument("--components", nargs="+", choices=MISALIGNMENT_COMPONENTS)
     parser.add_argument("--pyptc-convention", choices=("madx", "raw"), default="madx")
     parser.add_argument("--pyptc-flip-components", nargs="+", choices=MISALIGNMENT_COMPONENTS)
+    parser.add_argument("--distorted-only", action="store_true")
     args = parser.parse_args()
     print(json.dumps(run(args), indent=2, sort_keys=True))
 

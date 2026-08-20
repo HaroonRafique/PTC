@@ -7,7 +7,7 @@ top-level build/test output directories, and numbered user-runnable example
 scripts. The examples will build on each other: generate the flat file, plot
 bare optics, track a 1000-particle bunch, add apertures/losses, add a single
 misalignment, then apply the full Jan26 error table and compare to the existing
-`survey_to_lattice` MAD-X Twiss.
+`survey_to_lattice` corrected Jan26 MAD-X error table.
 
 ## Key Changes
 
@@ -44,8 +44,8 @@ misalignment, then apply the full Jan26 error table and compare to the existing
   - `04_single_element_misalignment.py`: copy `03`, add one deterministic
     single-element misalignment, and write the resulting orbit comparison PNG.
   - `05_full_error_table_orbit_comparison.py`: copy `04`, apply the full Jan26
-    error table, plot the PyPTC orbit, and compare against
-    `/home/hr/Repositories/survey_to_lattice/03_Standalone/synchrotron_madx_twiss.tfs`.
+    error table, plot the PyPTC orbit, run MAD-X `SETERR` with the corrected
+    Jan26 `survey_to_lattice` error table, and compare distorted orbits.
 
 - Update plotting behavior:
   - Replace the current combined before/after bunch overlay with two separate
@@ -89,8 +89,8 @@ misalignment, then apply the full Jan26 error table and compare to the existing
   - Full error-table application uses 38 Jan26 records, not the old sliced
     88-application behavior.
   - The full-error-table comparison uses the selected
-    `survey_to_lattice/03_Standalone/synchrotron_madx_twiss.tfs` reference by
-    default.
+    `survey_to_lattice/03_Standalone/cpymad_error_tables/jan26_survey_corrected.tfs`
+    error table by default.
 
 ## Assumptions
 
@@ -98,8 +98,8 @@ misalignment, then apply the full Jan26 error table and compare to the existing
 - Put user-facing scripts in `examples/`.
 - Keep the generated simplified flat file as the default lattice source;
   examples regenerate it if missing.
-- Use `/home/hr/Repositories/survey_to_lattice/03_Standalone/synchrotron_madx_twiss.tfs`
-  as the external MAD-X orbit/Twiss reference for the full-error-table
+- Use `/home/hr/Repositories/survey_to_lattice/03_Standalone/cpymad_error_tables/jan26_survey_corrected.tfs`
+  as the external corrected-Jan26 MAD-X error table for the full-error-table
   comparison.
 - Keep parser/helper pytest tests, but workflow validation should be through the
   example scripts and their stored PNG outputs.

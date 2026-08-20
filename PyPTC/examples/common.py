@@ -17,7 +17,7 @@ PYPTC_DIR = Path(__file__).resolve().parents[1]
 ROOT = PYPTC_DIR.parent
 OUTPUT_ROOT = PYPTC_DIR / "test_outputs"
 MADX_DIR = PYPTC_DIR / "workflows" / "madx"
-SURVEY_TO_LATTICE_MADX_TWISS = Path("/home/hr/Repositories/survey_to_lattice/03_Standalone/synchrotron_madx_twiss.tfs")
+SURVEY_TO_LATTICE_JAN26_CORRECTED_ERROR_TABLE = Path("/home/hr/Repositories/survey_to_lattice/03_Standalone/cpymad_error_tables/jan26_survey_corrected.tfs")
 
 if str(PYPTC_DIR) not in sys.path:
     sys.path.insert(0, str(PYPTC_DIR))
@@ -466,9 +466,12 @@ def copy_madx_comparison_outputs(source_dir: Path, output: Path) -> None:
     for filename in (
         "madx_vs_pyptc_closed_orbit_comparison.png",
         "madx_vs_pyptc_closed_orbit_comparison.csv",
+        "madx_bare_closed_orbit.csv",
+        "madx_misaligned_closed_orbit.csv",
         "madx_distorted_closed_orbit.csv",
         "pyptc_distorted_closed_orbit.csv",
         "pyptc_bare_closed_orbit.csv",
+        "pyptc_misaligned_closed_orbit.csv",
     ):
         source = source_dir / filename
         if source.exists():

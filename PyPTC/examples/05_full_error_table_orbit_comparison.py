@@ -8,9 +8,8 @@ import sys
 import json
 
 from common import (
-    LATEST_SURVEY_REFERENCE_ERROR_TABLE,
     MADX_DIR,
-    SURVEY_TO_LATTICE_MADX_TWISS,
+    SURVEY_TO_LATTICE_JAN26_CORRECTED_ERROR_TABLE,
     copy_madx_comparison_outputs,
     ensure_default_lattice,
     init_ptc,
@@ -27,8 +26,9 @@ def main() -> None:
     out = output_dir("05_full_error_table_orbit_comparison")
     ptc = init_ptc()
     bare_rows = ptc.all_node_twiss_orbit()
-    records = read_madx_error_table(LATEST_SURVEY_REFERENCE_ERROR_TABLE, nonzero=False)
-    applied = ptc.apply_madx_error_table(LATEST_SURVEY_REFERENCE_ERROR_TABLE, nonzero=False)
+    error_table = SURVEY_TO_LATTICE_JAN26_CORRECTED_ERROR_TABLE
+    records = read_madx_error_table(error_table, nonzero=False)
+    applied = ptc.apply_madx_error_table(error_table, nonzero=False)
     if len(records) == 38 and len(applied) != 38:
         raise RuntimeError(f"Jan26 table produced {len(applied)} applications for {len(records)} records")
     ptc.update_twiss()
@@ -43,15 +43,14 @@ def main() -> None:
             sys.executable,
             str(MADX_DIR / "compare_madx_pyptc_closed_orbits.py"),
             "--madx-error-table",
-            str(LATEST_SURVEY_REFERENCE_ERROR_TABLE),
+            str(error_table),
             "--flat-file",
             str(ensure_default_lattice()),
-            "--madx-reference-twiss",
-            str(SURVEY_TO_LATTICE_MADX_TWISS),
             "--output-dir",
             str(comparison_dir),
             "--response-threshold",
             "0.0",
+            "--distorted-only",
         ],
         check=True,
     )
@@ -61,8 +60,7 @@ def main() -> None:
         out / "summary.json",
         {
             "lattice": str(ptc.lattice),
-            "madx_error_table": str(LATEST_SURVEY_REFERENCE_ERROR_TABLE),
-            "madx_reference_twiss": str(SURVEY_TO_LATTICE_MADX_TWISS),
+            "madx_error_table": str(error_table),
             "records": len(records),
             "applied": len(applied),
             "max_abs_delta_x_m": float(abs(orbit[:, 3]).max()),
