@@ -2,12 +2,11 @@ __pycache__/
 **/__pycache__/
 *.py[cod]
 
-artifacts/
 build*/
+build_pyptc/
 .mesonpy-*/
 
 outputs*/
-test_outputs/
 workflows/madx/outputs/
 
 .matplotlib/

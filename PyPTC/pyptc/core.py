@@ -16,7 +16,7 @@ from .lattice import read_flatfile_fibres, resolve_fibre_index, resolve_fibre_in
 
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_LIBRARY = ROOT / "PyPTC" / "artifacts" / "build-pyptc" / "libpyptc.so"
+DEFAULT_LIBRARY = ROOT / "PyPTC" / "build_pyptc" / "libpyptc.so"
 LEGACY_READINESS_LATTICE = ROOT / "ptc_standalone_readiness" / "inputs" / "PTC-PyORBIT_flat_file.madx.flt"
 DEFAULT_SIMPLIFIED_LATTICE = ROOT / "PyPTC" / "workflows" / "madx" / "outputs" / "simplified" / "PTC-PyORBIT_flat_file.flt"
 DEFAULT_LATTICE = DEFAULT_SIMPLIFIED_LATTICE

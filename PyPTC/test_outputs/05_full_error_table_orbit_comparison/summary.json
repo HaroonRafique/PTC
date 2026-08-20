@@ -1,0 +1,9 @@
+{
+  "applied": 38,
+  "lattice": "/home/hr/Codes/PTC/PyPTC/workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt",
+  "madx_error_table": "/home/hr/Codes/PTC/PyPTC/workflows/madx/reference_errors/jan26_survey_corrected.tfs",
+  "madx_reference_twiss": "/home/hr/Repositories/survey_to_lattice/03_Standalone/synchrotron_madx_twiss.tfs",
+  "max_abs_delta_x_m": 0.008739903486859057,
+  "max_abs_delta_y_m": 0.008300933914896587,
+  "records": 38
+}

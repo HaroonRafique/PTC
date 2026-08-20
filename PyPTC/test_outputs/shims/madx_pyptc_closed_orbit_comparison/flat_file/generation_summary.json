@@ -1,0 +1,11 @@
+{
+  "flat_file": "/home/hr/Codes/PTC/PyPTC/test_outputs/shims/madx_pyptc_closed_orbit_comparison/flat_file/PTC-PyORBIT_flat_file.flt",
+  "lattice": "simplified",
+  "lattice_dir": "/home/hr/Codes/PTC/PyPTC/workflows/madx/lattices/00_Simplified_Lattice",
+  "log": "/home/hr/Codes/PTC/PyPTC/test_outputs/shims/madx_pyptc_closed_orbit_comparison/flat_file/madx.log",
+  "madx": "/home/hr/Codes/PTC/PyPTC/workflows/madx/bin/madx-linux64_v5_02_00",
+  "madx_aperture_file": null,
+  "output_dir": "/home/hr/Codes/PTC/PyPTC/test_outputs/shims/madx_pyptc_closed_orbit_comparison/flat_file",
+  "returncode": 0,
+  "twiss_file": "/home/hr/Codes/PTC/PyPTC/test_outputs/shims/madx_pyptc_closed_orbit_comparison/flat_file/optimised_flat_file.tfs"
+}

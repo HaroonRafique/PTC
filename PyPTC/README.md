@@ -18,7 +18,8 @@ through `ctypes` in `PyPTC/pyptc/`.
 - `workflows/madx/`: MAD-X binaries, lattice inputs, flat-file generation, and
   MAD-X/PyPTC comparison scripts.
 - `docs/`: planning notes and capability summaries.
-- `artifacts/`: ignored generated builds, plots, CSV files, and test outputs.
+- `build_pyptc/`: ignored generated build directory for `libpyptc.so`.
+- `test_outputs/`: standard user-facing example/test PNG, CSV, and JSON outputs.
 
 ## What Is Implemented
 
@@ -65,7 +66,7 @@ bash PyPTC/build/build_ptc.sh
 Run the current smoke/physics test and generate diagnostic plots:
 
 ```bash
-python3 PyPTC/tests/test_pyptc_shims.py --output-dir PyPTC/artifacts/test_outputs/shims
+python3 PyPTC/tests/test_pyptc_shims.py --output-dir PyPTC/test_outputs/shims
 ```
 
 Generate a fresh ISIS RCS simplified-lattice PTC flat file with the bundled
@@ -167,7 +168,7 @@ misalignment or every nonzero row from a MAD-X error table.  The old
 
 ```bash
 python3 PyPTC/scripts/flatfile_misalign.py \
-  --output PyPTC/artifacts/outputs/isis_with_jan26_survey_errors.flt \
+  --output PyPTC/test_outputs/isis_with_jan26_survey_errors.flt \
   --madx-error-table PyPTC/workflows/madx/reference_errors/jan26_survey_corrected.tfs
 ```
 

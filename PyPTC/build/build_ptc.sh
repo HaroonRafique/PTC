@@ -2,7 +2,7 @@
 set -euo pipefail
 
 pyptc_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-build_dir="${BUILD_DIR:-${pyptc_dir}/artifacts/build-pyptc}"
+build_dir="${BUILD_DIR:-${pyptc_dir}/build_pyptc}"
 python_cmd="${PYTHON:-python3}"
 
 log() {

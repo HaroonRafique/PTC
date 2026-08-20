@@ -2,7 +2,7 @@
 
 ## Current Python APIs
 
-- `pyptc.PTC`: loads `PyPTC/artifacts/build-pyptc/libpyptc.so`.
+- `pyptc.PTC`: loads `PyPTC/build_pyptc/libpyptc.so`.
 - Lattice initialization from a PTC flat file; `DEFAULT_LATTICE` is the
   generated simplified ISIS file under `workflows/madx/outputs/simplified/`.
 - Machine summary: node count, harmonic number, circumference, transition gamma, mass, charge, kinetic energy.
@@ -45,7 +45,7 @@
 - `PyPTC/meson.build` is a PyPTC-local overlay build.
 - It compiles parent `source/*.f90` and `interface/ptcinterface.f90` read-only.
 - New additive Python-facing Fortran exports live under `PyPTC/fortran/`.
-- `PyPTC/build/build_ptc.sh` builds `PyPTC/artifacts/build-pyptc/libpyptc.so` and verifies both legacy `ptc_*` and new `pyptc_*` symbols.
+- `PyPTC/build/build_ptc.sh` builds `PyPTC/build_pyptc/libpyptc.so` and verifies both legacy `ptc_*` and new `pyptc_*` symbols.
 - Tests and smoke scripts generate `workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt`
   when the default lattice is missing.
 

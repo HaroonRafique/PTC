@@ -1,0 +1,14 @@
+{
+  "applied": {
+    "dphi": 0.0,
+    "dpsi": 0.0,
+    "ds": 0.0,
+    "dtheta": 0.0,
+    "dx": 0.003,
+    "dy": 0.0,
+    "element": "SP0_QF",
+    "occurrence": 1
+  },
+  "lattice": "/home/hr/Codes/PTC/PyPTC/workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt",
+  "misaligned_lattice": "/home/hr/Codes/PTC/PyPTC/test_outputs/04_single_element_misalignment/SP0_QF_occ1_dx0.003.flt"
+}

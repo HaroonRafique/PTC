@@ -53,6 +53,7 @@ def parse_tfs(path: Path) -> dict[str, np.ndarray | list[str]]:
         raise ValueError(f"Could not parse TFS table: {path}")
 
     values: dict[str, list[float] | list[str]] = {column.lower(): [] for column in columns}
+    string_columns: set[str] = set()
     for line in lines[data_start:]:
         stripped = line.strip()
         if not stripped or stripped.startswith(("@", "*", "$", "!")):
@@ -62,14 +63,19 @@ def parse_tfs(path: Path) -> dict[str, np.ndarray | list[str]]:
             continue
         for column, token in zip(columns, parts):
             key = column.lower()
-            if key == "name":
+            if key in {"name", "keyword"}:
                 values[key].append(token.strip('"'))
+                string_columns.add(key)
             else:
-                values[key].append(float(token.replace("D", "E").replace("d", "e")))
+                try:
+                    values[key].append(float(token.replace("D", "E").replace("d", "e")))
+                except ValueError:
+                    values[key].append(token.strip('"'))
+                    string_columns.add(key)
 
     parsed: dict[str, np.ndarray | list[str]] = {}
     for key, value in values.items():
-        parsed[key] = value if key == "name" else np.asarray(value, dtype=float)
+        parsed[key] = value if key in string_columns else np.asarray(value, dtype=float)
     return parsed
 
 
@@ -289,10 +295,13 @@ def run(args: argparse.Namespace) -> dict:
     keep_components = component_set(args.components) or set(MISALIGNMENT_COMPONENTS)
     pyptc_flip_components = component_set(args.pyptc_flip_components)
 
-    flat_output_dir = output_dir / "flat_file"
-    generate_args = argparse.Namespace(lattice=args.lattice, madx=args.madx, output_dir=flat_output_dir)
-    flat_summary = generate(generate_args)
-    flat_file = Path(flat_summary["flat_file"])
+    if args.flat_file is not None:
+        flat_file = args.flat_file.resolve()
+    else:
+        flat_output_dir = output_dir / "flat_file"
+        generate_args = argparse.Namespace(lattice=args.lattice, madx=args.madx, output_dir=flat_output_dir)
+        flat_summary = generate(generate_args)
+        flat_file = Path(flat_summary["flat_file"])
 
     table_dir = output_dir / "error_tables"
     madx_error_table = write_filtered_error_table(args.madx_error_table, table_dir / "madx_errors.tfs", keep_components)
@@ -303,9 +312,17 @@ def run(args: argparse.Namespace) -> dict:
         flip=pyptc_flip_components,
     )
 
-    madx_paths = run_madx_closed_orbits(args, output_dir, madx_error_table)
-    madx_bare = tfs_to_orbit_array(parse_tfs(madx_paths["bare"]))
-    madx_misaligned = tfs_to_orbit_array(parse_tfs(madx_paths["misaligned"]))
+    if args.madx_reference_twiss is not None:
+        if not args.madx_reference_twiss.exists():
+            raise FileNotFoundError(f"MAD-X reference Twiss not found: {args.madx_reference_twiss}")
+        madx_misaligned = tfs_to_orbit_array(parse_tfs(args.madx_reference_twiss))
+        madx_bare = madx_misaligned.copy()
+        madx_bare[:, 1:] = 0.0
+        madx_paths = {"reference": args.madx_reference_twiss.resolve()}
+    else:
+        madx_paths = run_madx_closed_orbits(args, output_dir, madx_error_table)
+        madx_bare = tfs_to_orbit_array(parse_tfs(madx_paths["bare"]))
+        madx_misaligned = tfs_to_orbit_array(parse_tfs(madx_paths["misaligned"]))
     pyptc_bare, pyptc_misaligned = run_pyptc_closed_orbits(args, flat_file, pyptc_error_table)
 
     write_csv(output_dir / "madx_bare_closed_orbit.csv", "s,x,px,y,py", madx_bare)
@@ -322,6 +339,7 @@ def run(args: argparse.Namespace) -> dict:
     summary = {
         "flat_file": str(flat_file),
         "madx_error_table": str(args.madx_error_table.resolve()),
+        "madx_reference_twiss": str(args.madx_reference_twiss.resolve()) if args.madx_reference_twiss is not None else None,
         "madx_filtered_error_table": str(madx_error_table),
         "pyptc_filtered_error_table": str(pyptc_error_table),
         "components": sorted(keep_components),
@@ -352,7 +370,9 @@ def main() -> None:
     parser.add_argument("--lattice", choices=sorted(LATTICES), default="simplified")
     parser.add_argument("--madx", type=Path, default=DEFAULT_MADX)
     parser.add_argument("--library", type=Path, default=DEFAULT_LIBRARY)
+    parser.add_argument("--flat-file", type=Path)
     parser.add_argument("--madx-error-table", type=Path, default=DEFAULT_ERROR_TABLE)
+    parser.add_argument("--madx-reference-twiss", type=Path)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--response-threshold", type=float, default=1.0e-4)
     parser.add_argument("--components", nargs="+", choices=MISALIGNMENT_COMPONENTS)

@@ -1,0 +1,23 @@
+{
+  "lattice": "/home/hr/Codes/PTC/PyPTC/workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt",
+  "outputs": {
+    "diagnostics_csv": "/home/hr/Codes/PTC/PyPTC/test_outputs/02_track_bunch_dashboard/bunch_diagnostics.csv",
+    "final_dashboard": "/home/hr/Codes/PTC/PyPTC/test_outputs/02_track_bunch_dashboard/bunch_final_dashboard.png",
+    "initial_dashboard": "/home/hr/Codes/PTC/PyPTC/test_outputs/02_track_bunch_dashboard/bunch_initial_dashboard.png",
+    "summary": {
+      "lost": 0,
+      "particles": 1000,
+      "qx_mean": 0.33600976072528693,
+      "qx_std": 6.832786832678029e-06,
+      "qy_mean": 0.8303824387128784,
+      "qy_std": 0.00020428667436662217,
+      "survived": 1000,
+      "valid_lost_tunes": 0,
+      "valid_survivor_tunes": 1000,
+      "valid_tunes": 1000
+    },
+    "tune_csv": "/home/hr/Codes/PTC/PyPTC/test_outputs/02_track_bunch_dashboard/bunch_tune_action.csv"
+  },
+  "particles": 1000,
+  "tune_turns": 64
+}

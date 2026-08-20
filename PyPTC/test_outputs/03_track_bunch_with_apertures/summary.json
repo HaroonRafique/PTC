@@ -1,0 +1,26 @@
+{
+  "applied_apertures": 350,
+  "lattice": "/home/hr/Codes/PTC/PyPTC/workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt",
+  "lost_particles": 34,
+  "outputs": {
+    "diagnostics_csv": "/home/hr/Codes/PTC/PyPTC/test_outputs/03_track_bunch_with_apertures/bunch_diagnostics.csv",
+    "final_dashboard": "/home/hr/Codes/PTC/PyPTC/test_outputs/03_track_bunch_with_apertures/bunch_final_dashboard.png",
+    "initial_dashboard": "/home/hr/Codes/PTC/PyPTC/test_outputs/03_track_bunch_with_apertures/bunch_initial_dashboard.png",
+    "summary": {
+      "lost": 0,
+      "particles": 1000,
+      "qx_mean": 0.33600976072528693,
+      "qx_std": 6.832786832678029e-06,
+      "qy_mean": 0.8303824387128784,
+      "qy_std": 0.00020428667436662217,
+      "survived": 1000,
+      "valid_lost_tunes": 0,
+      "valid_survivor_tunes": 1000,
+      "valid_tunes": 1000
+    },
+    "tune_csv": "/home/hr/Codes/PTC/PyPTC/test_outputs/03_track_bunch_with_apertures/bunch_tune_action.csv"
+  },
+  "particles": 1000,
+  "peak_loss_node": 1,
+  "skipped_apertures": 1640
+}

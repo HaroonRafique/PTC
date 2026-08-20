@@ -32,7 +32,7 @@ from pyptc import (
 from scripts.flatfile_misalign import apply_single_misalignment
 
 
-DEFAULT_OUTPUT = PYPTC_DIR / "artifacts" / "outputs" / "misalignment_experiment"
+DEFAULT_OUTPUT = PYPTC_DIR / "test_outputs" / "misalignment_experiment"
 
 
 def write_csv(path: Path, rows: list[dict[str, float | int | str]]) -> None:

@@ -1,0 +1,21 @@
+{
+  "chromaticities": {
+    "chromx": -4.9553035708473105,
+    "chromy": -4.934982977661852
+  },
+  "lattice": "/home/hr/Codes/PTC/PyPTC/workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt",
+  "machine": {
+    "charge": 1,
+    "circumference_m": 163.36281999999989,
+    "gamma_t": 5.156726629547425,
+    "harmonic": 71,
+    "kinetic_energy_gev": 0.07044002991247011,
+    "mass_gev": 0.9999999986892394,
+    "n_nodes": 375
+  },
+  "tunes": {
+    "qs": 0.0,
+    "qx": 0.33600568786642,
+    "qy": 0.83036108234562
+  }
+}

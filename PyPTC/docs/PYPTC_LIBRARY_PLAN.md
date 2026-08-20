@@ -25,4 +25,4 @@ Build a clean Python-level `PyPTC` library that is independent of PyORBIT3, uses
 
 - `bash PyPTC/build/build_ptc.sh`
 - `python3 -m py_compile PyPTC/*.py PyPTC/pyptc/*.py`
-- `python3 PyPTC/scripts/run_misalignment_experiment.py --particles 20 --turns 1 --output-dir PyPTC/artifacts/outputs/pyptc_package_smoke`
+- `python3 PyPTC/scripts/run_misalignment_experiment.py --particles 20 --turns 1 --output-dir PyPTC/test_outputs/pyptc_package_smoke`

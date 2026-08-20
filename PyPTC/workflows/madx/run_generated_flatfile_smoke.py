@@ -16,7 +16,7 @@ MADX_DIR = Path(__file__).resolve().parent
 PYPTC_DIR = MADX_DIR.parents[1]
 REPO_ROOT = PYPTC_DIR.parent
 DEFAULT_OUTPUT_DIR = MADX_DIR / "outputs" / "simplified"
-DEFAULT_LIBRARY = PYPTC_DIR / "artifacts" / "build-pyptc" / "libpyptc.so"
+DEFAULT_LIBRARY = PYPTC_DIR / "build_pyptc" / "libpyptc.so"
 DEFAULT_ERROR_TABLE = MADX_DIR / "reference_errors" / "jan26_survey_corrected.tfs"
 
 
