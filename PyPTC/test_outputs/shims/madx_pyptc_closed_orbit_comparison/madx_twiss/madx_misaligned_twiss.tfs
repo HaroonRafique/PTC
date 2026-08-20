@@ -42,7 +42,7 @@
 @ TITLE            %39s "MAD-X closed orbit comparison for PyPTC"
 @ ORIGIN           %22s "MAD-X 5.02.00 Linux 64"
 @ DATE             %08s "20/08/26"
-@ TIME             %08s "15.40.53"
+@ TIME             %08s "18.14.43"
 * NAME                                S                  X                 PX                  Y                 PY               BETX               BETY               ALFX               ALFY                 DX                DPX                 DY                DPY                MUX                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "SYNCHROTRON$START"                   0   -0.0006209294098   -0.0001142139681     0.005098091118      0.00108045633        10.45592043        5.959541438       0.7050551845       -1.120913856        3.222311599        0.478580368      -0.3339558303     -0.08781846447                  0                  0

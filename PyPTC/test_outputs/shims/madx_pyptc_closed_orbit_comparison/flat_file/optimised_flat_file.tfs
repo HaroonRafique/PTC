@@ -85,7 +85,7 @@
 @ TITLE            %30s "Flat file generation for PyPTC"
 @ ORIGIN           %22s "MAD-X 5.02.00 Linux 64"
 @ DATE             %08s "20/08/26"
-@ TIME             %08s "15.40.53"
+@ TIME             %08s "18.14.43"
 * NAME                                S               BETX               BETY               ALFX               ALFY              DISP1              DISP2              DISP3              DISP4                MU1                MU2                  X                 PX                  Y                 PY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "SYNCHROTRON$START"                   0        10.44086685        5.965542698       0.7059951175        -1.12172716        3.281908291       0.4699779671                  0                  0                  0                  0    1.026344305e-13    1.041274174e-14                  0                  0

@@ -1,5 +1,31 @@
 {
   "applied": 38,
+  "comparison": {
+    "comparison_png": "/home/hr/Codes/PTC/PyPTC/test_outputs/05_full_error_table_orbit_comparison/madx_pyptc_closed_orbit_comparison/madx_vs_pyptc_closed_orbit_comparison.png",
+    "components": [
+      "DPHI",
+      "DPSI",
+      "DS",
+      "DTHETA",
+      "DX",
+      "DY"
+    ],
+    "flat_file": "/home/hr/Codes/PTC/PyPTC/workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt",
+    "madx_distorted_max_x_m": 7.1668961e-05,
+    "madx_distorted_max_y_m": 0.005123818262,
+    "madx_distorted_source": "/home/hr/Repositories/survey_to_lattice/03_Standalone/synchrotron_madx_twiss.tfs",
+    "madx_error_table": "/home/hr/Codes/PTC/PyPTC/workflows/madx/reference_errors/jan26_survey_corrected.tfs",
+    "madx_reference_twiss": "/home/hr/Repositories/survey_to_lattice/03_Standalone/synchrotron_madx_twiss.tfs",
+    "pyptc_bare_max_x_m": 2.1241018807226758e-13,
+    "pyptc_bare_max_y_m": 0.0,
+    "pyptc_convention": "madx",
+    "pyptc_distorted_max_x_m": 0.008739903486746978,
+    "pyptc_distorted_max_y_m": 0.008300933914896587,
+    "pyptc_filtered_error_table": "/home/hr/Codes/PTC/PyPTC/test_outputs/05_full_error_table_orbit_comparison/madx_pyptc_closed_orbit_comparison/error_tables/pyptc_errors.tfs",
+    "pyptc_flip_components": [],
+    "residual_max_x_m": 0.008754728302746968,
+    "residual_max_y_m": 0.005903677745693677
+  },
   "lattice": "/home/hr/Codes/PTC/PyPTC/workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt",
   "madx_error_table": "/home/hr/Codes/PTC/PyPTC/workflows/madx/reference_errors/jan26_survey_corrected.tfs",
   "madx_reference_twiss": "/home/hr/Repositories/survey_to_lattice/03_Standalone/synchrotron_madx_twiss.tfs",

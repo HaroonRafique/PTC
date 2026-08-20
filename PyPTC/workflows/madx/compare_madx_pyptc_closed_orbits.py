@@ -283,13 +283,55 @@ def plot_comparison(path: Path, madx_bare: np.ndarray, madx_misaligned: np.ndarr
     return comparison
 
 
+def plot_distorted_reference_comparison(path: Path, madx_distorted: np.ndarray, pyptc_distorted: np.ndarray) -> np.ndarray:
+    plt = require_matplotlib(path.parent)
+    pyptc_on_madx = interpolate_to(madx_distorted[:, 0], pyptc_distorted)
+    residual = pyptc_on_madx - madx_distorted[:, 1:]
+    comparison = np.column_stack(
+        [
+            madx_distorted[:, 0],
+            madx_distorted[:, 1],
+            pyptc_on_madx[:, 0],
+            madx_distorted[:, 3],
+            pyptc_on_madx[:, 2],
+            residual[:, 0],
+            residual[:, 2],
+        ]
+    )
+
+    fig, axes = plt.subplots(3, 1, figsize=(11, 10), sharex=True)
+    axes[0].plot(madx_distorted[:, 0], madx_distorted[:, 1] * 1.0e3, label="MAD-X Jan26 corrected x")
+    axes[0].plot(pyptc_distorted[:, 0], pyptc_distorted[:, 1] * 1.0e3, "--", label="PyPTC Jan26 corrected x")
+    axes[0].set_ylabel("x orbit [mm]")
+    axes[0].legend(loc="upper right")
+
+    axes[1].plot(madx_distorted[:, 0], madx_distorted[:, 3] * 1.0e3, label="MAD-X Jan26 corrected y")
+    axes[1].plot(pyptc_distorted[:, 0], pyptc_distorted[:, 3] * 1.0e3, "--", label="PyPTC Jan26 corrected y")
+    axes[1].set_ylabel("y orbit [mm]")
+    axes[1].legend(loc="upper right")
+
+    axes[2].plot(madx_distorted[:, 0], residual[:, 0] * 1.0e3, label="PyPTC - MAD-X x")
+    axes[2].plot(madx_distorted[:, 0], residual[:, 2] * 1.0e3, label="PyPTC - MAD-X y")
+    axes[2].set_xlabel("s [m]")
+    axes[2].set_ylabel("residual [mm]")
+    axes[2].legend(loc="upper right")
+    for ax in axes:
+        ax.grid(which="both", ls=":", lw=0.5)
+    fig.tight_layout()
+    fig.savefig(path, dpi=170)
+    plt.close(fig)
+    return comparison
+
+
 def run(args: argparse.Namespace) -> dict:
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-    if not args.madx.exists():
-        raise FileNotFoundError(f"MAD-X binary not found: {args.madx}")
-    if not os.access(args.madx, os.X_OK):
-        raise PermissionError(f"MAD-X binary is not executable: {args.madx}")
+    needs_madx = args.flat_file is None or args.madx_reference_twiss is None
+    if needs_madx:
+        if not args.madx.exists():
+            raise FileNotFoundError(f"MAD-X binary not found: {args.madx}")
+        if not os.access(args.madx, os.X_OK):
+            raise PermissionError(f"MAD-X binary is not executable: {args.madx}")
     if not args.madx_error_table.exists():
         raise FileNotFoundError(f"MAD-X error table not found: {args.madx_error_table}")
     keep_components = component_set(args.components) or set(MISALIGNMENT_COMPONENTS)
@@ -315,10 +357,45 @@ def run(args: argparse.Namespace) -> dict:
     if args.madx_reference_twiss is not None:
         if not args.madx_reference_twiss.exists():
             raise FileNotFoundError(f"MAD-X reference Twiss not found: {args.madx_reference_twiss}")
-        madx_misaligned = tfs_to_orbit_array(parse_tfs(args.madx_reference_twiss))
-        madx_bare = madx_misaligned.copy()
-        madx_bare[:, 1:] = 0.0
+        madx_distorted = tfs_to_orbit_array(parse_tfs(args.madx_reference_twiss))
         madx_paths = {"reference": args.madx_reference_twiss.resolve()}
+        pyptc_bare, pyptc_distorted = run_pyptc_closed_orbits(args, flat_file, pyptc_error_table)
+
+        write_csv(output_dir / "madx_distorted_closed_orbit.csv", "s,x,px,y,py", madx_distorted)
+        write_csv(output_dir / "pyptc_distorted_closed_orbit.csv", "s,x,px,y,py", pyptc_distorted)
+        write_csv(output_dir / "pyptc_bare_closed_orbit.csv", "s,x,px,y,py", pyptc_bare)
+        comparison = plot_distorted_reference_comparison(output_dir / "madx_vs_pyptc_closed_orbit_comparison.png", madx_distorted, pyptc_distorted)
+        write_csv(
+            output_dir / "madx_vs_pyptc_closed_orbit_comparison.csv",
+            "s,madx_distorted_x,pyptc_distorted_x_interp,madx_distorted_y,pyptc_distorted_y_interp,pyptc_minus_madx_x,pyptc_minus_madx_y",
+            comparison,
+        )
+
+        summary = {
+            "flat_file": str(flat_file),
+            "madx_error_table": str(args.madx_error_table.resolve()),
+            "madx_reference_twiss": str(args.madx_reference_twiss.resolve()),
+            "madx_distorted_source": str(args.madx_reference_twiss.resolve()),
+            "pyptc_filtered_error_table": str(pyptc_error_table),
+            "components": sorted(keep_components),
+            "pyptc_convention": args.pyptc_convention,
+            "pyptc_flip_components": sorted(pyptc_flip_components),
+            "madx_distorted_max_x_m": float(np.max(np.abs(madx_distorted[:, 1]))),
+            "madx_distorted_max_y_m": float(np.max(np.abs(madx_distorted[:, 3]))),
+            "pyptc_bare_max_x_m": float(np.max(np.abs(pyptc_bare[:, 1]))),
+            "pyptc_bare_max_y_m": float(np.max(np.abs(pyptc_bare[:, 3]))),
+            "pyptc_distorted_max_x_m": float(np.max(np.abs(pyptc_distorted[:, 1]))),
+            "pyptc_distorted_max_y_m": float(np.max(np.abs(pyptc_distorted[:, 3]))),
+            "residual_max_x_m": float(np.max(np.abs(comparison[:, 5]))),
+            "residual_max_y_m": float(np.max(np.abs(comparison[:, 6]))),
+            "comparison_png": str(output_dir / "madx_vs_pyptc_closed_orbit_comparison.png"),
+        }
+        if args.response_threshold > 0.0 and summary["pyptc_distorted_max_x_m"] <= args.response_threshold and summary["pyptc_distorted_max_y_m"] <= args.response_threshold:
+            raise AssertionError("PyPTC distorted orbit response is below threshold")
+        if args.response_threshold > 0.0 and summary["madx_distorted_max_x_m"] <= args.response_threshold and summary["madx_distorted_max_y_m"] <= args.response_threshold:
+            raise AssertionError("MAD-X distorted orbit response is below threshold")
+        (output_dir / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        return summary
     else:
         madx_paths = run_madx_closed_orbits(args, output_dir, madx_error_table)
         madx_bare = tfs_to_orbit_array(parse_tfs(madx_paths["bare"]))

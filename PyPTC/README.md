@@ -192,8 +192,10 @@ The repeatable smoke script regenerates `PTC-PyORBIT_flat_file.flt`, loads it
 through PyPTC, applies the full reference MAD-X error table, and asserts that
 the bare orbit is near zero while the misaligned orbit response is measurable.
 The comparison script also runs a native MAD-X bare/misaligned `TWISS` pair and
-writes `madx_vs_pyptc_closed_orbit_comparison.png`. Jan26 full-table tests use
-this generated simplified lattice; the older readiness flat file has a
+writes `madx_vs_pyptc_closed_orbit_comparison.png`. Example `05` compares the
+PyPTC full Jan26 corrected error-table orbit directly with the existing
+corrected-Jan26 MAD-X Twiss from `survey_to_lattice`. Jan26 full-table tests
+use this generated simplified lattice; the older readiness flat file has a
 different sliced fibre structure and is kept only for explicit compatibility
 studies.
 
@@ -217,6 +219,9 @@ currently include:
 - `07_madx_vs_pyptc_closed_orbit_comparison.png`
   - MAD-X and PyPTC bare/misaligned closed orbits plus residuals for the Jan26
     table on the generated simplified lattice
+- `test_outputs/05_full_error_table_orbit_comparison/madx_vs_pyptc_closed_orbit_comparison.png`
+  - existing corrected-Jan26 MAD-X distorted orbit from `survey_to_lattice`
+    against the PyPTC distorted orbit from the same corrected error table
 - `pyptc_bare_vs_jan26_error_table_generated_lattice.png`
   - PyPTC-only bare vs full Jan26 table response on the same generated lattice
 - `workflows/madx/outputs/aperture_comparison/isis_rcs_aperture_overlay.png`

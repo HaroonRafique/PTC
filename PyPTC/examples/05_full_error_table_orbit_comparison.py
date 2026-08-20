@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import json
 
 from common import (
     LATEST_SURVEY_REFERENCE_ERROR_TABLE,
@@ -55,6 +56,7 @@ def main() -> None:
         check=True,
     )
     copy_madx_comparison_outputs(comparison_dir, out)
+    comparison_summary = json.loads((comparison_dir / "summary.json").read_text(encoding="utf-8"))
     write_json(
         out / "summary.json",
         {
@@ -65,6 +67,7 @@ def main() -> None:
             "applied": len(applied),
             "max_abs_delta_x_m": float(abs(orbit[:, 3]).max()),
             "max_abs_delta_y_m": float(abs(orbit[:, 6]).max()),
+            "comparison": comparison_summary,
         },
     )
 

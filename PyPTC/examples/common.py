@@ -167,66 +167,79 @@ def dashboard_limits(rows: list[dict[str, object]]) -> dict[str, tuple[float, fl
     }
 
 
+def finite_pair(x: np.ndarray, y: np.ndarray, mask: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
+    selected = np.isfinite(x) & np.isfinite(y)
+    if mask is not None:
+        selected &= mask
+    return x[selected], y[selected]
+
+
+def dashboard_heatmap(
+    axis,
+    x: np.ndarray,
+    y: np.ndarray,
+    xlabel: str,
+    ylabel: str,
+    title: str,
+    xlim: tuple[float, float],
+    ylim: tuple[float, float],
+    bins: int = 96,
+) -> None:
+    hx, hy = finite_pair(x, y)
+    if hx.size:
+        axis.hist2d(hx, hy, bins=bins, range=[xlim, ylim])
+    axis.set_xlabel(xlabel)
+    axis.set_ylabel(ylabel)
+    axis.set_title(title)
+    axis.set_xlim(*xlim)
+    axis.set_ylim(*ylim)
+    from matplotlib.ticker import MaxNLocator
+
+    axis.xaxis.set_major_locator(MaxNLocator(5))
+    axis.yaxis.set_major_locator(MaxNLocator(5))
+    axis.grid(which="both", ls=":", lw=0.5, alpha=0.7)
+
+
+def overlay_lost(axis, x: np.ndarray, y: np.ndarray, mask: np.ndarray) -> None:
+    lx, ly = finite_pair(x, y, mask)
+    if lx.size:
+        axis.scatter(lx, ly, s=20, marker="x", c="tab:red", alpha=0.9, label="lost")
+        axis.legend(loc="best")
+
+
 def plot_bunch_dashboard(path: Path, rows: list[dict[str, object]], stage: str, limits: dict[str, tuple[float, float]]) -> None:
     plt = require_matplotlib(path.parent)
     data = diagnostic_arrays(rows, stage)
     valid = data["valid"] & np.isfinite(data["qx"]) & np.isfinite(data["qy"])
-    survived = valid & data["survived"]
-    lost = valid & data["lost"]
-    phase_survived = data["survived"] if stage == "final" else np.ones_like(data["survived"], dtype=bool)
-    phase_lost = data["lost"] if stage == "final" else np.zeros_like(data["lost"], dtype=bool)
+    lost = data["lost"] if stage == "final" else np.zeros_like(data["lost"], dtype=bool)
 
-    fig, axes = plt.subplots(2, 3, figsize=(14, 8))
+    fig, axes = plt.subplots(2, 4, figsize=(16, 8))
     fig.suptitle(f"{stage.title()} 1000-particle PyPTC bunch dashboard")
 
-    axes[0, 0].scatter(data["qx"][survived], data["qy"][survived], s=10, alpha=0.7, label="survived")
-    axes[0, 0].scatter(data["qx"][lost], data["qy"][lost], s=22, marker="x", alpha=0.9, label="lost")
-    axes[0, 0].set_xlabel("qx")
-    axes[0, 0].set_ylabel("qy")
-    axes[0, 0].set_xlim(*limits["qx"])
-    axes[0, 0].set_ylim(*limits["qy"])
-    axes[0, 0].legend(loc="best")
+    dashboard_heatmap(axes[0, 0], data["qx"][valid], data["qy"][valid], "qx", "qy", "tune footprint", (0.0, 1.0), (0.0, 1.0))
+    overlay_lost(axes[0, 0], data["qx"], data["qy"], valid & lost)
 
-    axes[0, 1].scatter(data["jx"][survived], data["qx"][survived], s=10, alpha=0.7)
-    axes[0, 1].scatter(data["jx"][lost], data["qx"][lost], s=22, marker="x", alpha=0.9)
-    axes[0, 1].set_xlabel("Jx")
-    axes[0, 1].set_ylabel("qx")
-    axes[0, 1].set_xlim(*limits["jx"])
-    axes[0, 1].set_ylim(*limits["qx"])
+    dashboard_heatmap(axes[0, 1], data["qx"][valid], data["jx"][valid], "qx", "Jx", "horizontal tune vs action", limits["qx"], limits["jx"])
+    overlay_lost(axes[0, 1], data["qx"], data["jx"], valid & lost)
 
-    axes[0, 2].scatter(data["jy"][survived], data["qy"][survived], s=10, alpha=0.7)
-    axes[0, 2].scatter(data["jy"][lost], data["qy"][lost], s=22, marker="x", alpha=0.9)
-    axes[0, 2].set_xlabel("Jy")
-    axes[0, 2].set_ylabel("qy")
-    axes[0, 2].set_xlim(*limits["jy"])
-    axes[0, 2].set_ylim(*limits["qy"])
+    dashboard_heatmap(axes[0, 2], data["x"], data["xp"], "x [mm]", "xp [mrad]", "horizontal phase space", limits["x"], limits["xp"])
+    overlay_lost(axes[0, 2], data["x"], data["xp"], lost)
 
-    axes[1, 0].scatter(data["x"][phase_survived], data["xp"][phase_survived], s=8, alpha=0.65, label="particles")
-    axes[1, 0].scatter(data["x"][phase_lost], data["xp"][phase_lost], s=20, marker="x", alpha=0.9, label="lost")
-    axes[1, 0].set_xlabel("x [mm]")
-    axes[1, 0].set_ylabel("xp [mrad]")
-    axes[1, 0].set_xlim(*limits["x"])
-    axes[1, 0].set_ylim(*limits["xp"])
-    axes[1, 0].legend(loc="best")
+    dashboard_heatmap(axes[0, 3], data["x"], data["y"], "x [mm]", "y [mm]", "real space", limits["x"], limits["y"])
+    overlay_lost(axes[0, 3], data["x"], data["y"], lost)
 
-    axes[1, 1].scatter(data["y"][phase_survived], data["yp"][phase_survived], s=8, alpha=0.65, label="particles")
-    axes[1, 1].scatter(data["y"][phase_lost], data["yp"][phase_lost], s=20, marker="x", alpha=0.9, label="lost")
-    axes[1, 1].set_xlabel("y [mm]")
-    axes[1, 1].set_ylabel("yp [mrad]")
-    axes[1, 1].set_xlim(*limits["y"])
-    axes[1, 1].set_ylim(*limits["yp"])
-    axes[1, 1].legend(loc="best")
+    dashboard_heatmap(axes[1, 0], data["qx"][valid], data["qy"][valid], "qx", "qy", "tune footprint zoom", (0.25, 0.45), (0.45, 0.85))
+    overlay_lost(axes[1, 0], data["qx"], data["qy"], valid & lost)
 
-    axes[1, 2].scatter(data["z"][phase_survived], data["dE"][phase_survived], s=8, alpha=0.65, label="particles")
-    axes[1, 2].scatter(data["z"][phase_lost], data["dE"][phase_lost], s=20, marker="x", alpha=0.9, label="lost")
-    axes[1, 2].set_xlabel("z [m]")
-    axes[1, 2].set_ylabel("dE [MeV]")
-    axes[1, 2].set_xlim(*limits["z"])
-    axes[1, 2].set_ylim(*limits["dE"])
-    axes[1, 2].legend(loc="best")
+    dashboard_heatmap(axes[1, 1], data["qy"][valid], data["jy"][valid], "qy", "Jy", "vertical tune vs action", limits["qy"], limits["jy"])
+    overlay_lost(axes[1, 1], data["qy"], data["jy"], valid & lost)
 
-    for axis in axes.ravel():
-        axis.grid(which="both", ls=":", lw=0.5, alpha=0.7)
+    dashboard_heatmap(axes[1, 2], data["y"], data["yp"], "y [mm]", "yp [mrad]", "vertical phase space", limits["y"], limits["yp"])
+    overlay_lost(axes[1, 2], data["y"], data["yp"], lost)
+
+    dashboard_heatmap(axes[1, 3], data["z"], data["dE"], "z [m]", "dE [MeV]", "longitudinal phase space", limits["z"], limits["dE"])
+    overlay_lost(axes[1, 3], data["z"], data["dE"], lost)
+
     fig.tight_layout()
     fig.savefig(path, dpi=170)
     plt.close(fig)
@@ -450,5 +463,13 @@ def generate_flat_file(output: Path) -> dict:
 
 
 def copy_madx_comparison_outputs(source_dir: Path, output: Path) -> None:
-    shutil.copy2(source_dir / "madx_vs_pyptc_closed_orbit_comparison.png", output / "madx_vs_pyptc_closed_orbit_comparison.png")
-    shutil.copy2(source_dir / "madx_vs_pyptc_closed_orbit_comparison.csv", output / "madx_vs_pyptc_closed_orbit_comparison.csv")
+    for filename in (
+        "madx_vs_pyptc_closed_orbit_comparison.png",
+        "madx_vs_pyptc_closed_orbit_comparison.csv",
+        "madx_distorted_closed_orbit.csv",
+        "pyptc_distorted_closed_orbit.csv",
+        "pyptc_bare_closed_orbit.csv",
+    ):
+        source = source_dir / filename
+        if source.exists():
+            shutil.copy2(source, output / filename)
