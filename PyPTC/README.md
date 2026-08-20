@@ -25,7 +25,7 @@ through `ctypes` in `PyPTC/pyptc/`.
 - Standalone build script: `./PyPTC/build/build_ptc.sh`
 - Python package entry point: `PyPTC/pyptc/`
 - Backward-compatible import shim: `PyPTC/ptc.py`
-- ISIS RCS default flat-file lattice support
+- ISIS RCS generated simplified flat-file lattice support
 - Bunch generation through `/home/hr/Codes/pyparticlebunch`
 - Existing PyORBIT-style PTC tracking wrappers:
   - initialise lattice
@@ -43,6 +43,8 @@ through `ctypes` in `PyPTC/pyptc/`.
     and per-fibre PTC aperture readback
   - global absolute aperture getter/setter
   - loss-aware ring tracking
+  - per-particle tune/action/survival diagnostics from turn-by-turn phase
+    advance
   - acceleration, ramping, modulation, and cavity state toggles
   - orbit state store/use
   - orbit time and lattice energisation
@@ -74,6 +76,10 @@ python3 PyPTC/workflows/madx/generate_flat_file.py
 python3 PyPTC/workflows/madx/run_generated_flatfile_smoke.py
 ```
 
+`pyptc.DEFAULT_LATTICE` points to the generated simplified flat file at
+`PyPTC/workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt`. If it is
+missing, test and smoke scripts regenerate it with the bundled MAD-X workflow.
+
 Or run the full build/generate/test sequence:
 
 ```bash
@@ -100,6 +106,14 @@ half apertures:
 
 ```bash
 python3 PyPTC/workflows/madx/compare_isis_apertures.py
+```
+
+Run a tune-spread diagnostic for the misaligned case, writing enriched particle
+rows, tune-footprint CSVs, and static plots:
+
+```bash
+python3 PyPTC/scripts/run_misalignment_experiment.py \
+  --with-tunes --tune-turns 256 --tune-case misaligned
 ```
 
 The MAD-X workflow writes generated files and plots under
@@ -138,6 +152,12 @@ applied_apertures = ptc.apply_madx_aperture_file(
     "PyPTC/workflows/madx/lattices/02_Aperture_Lattice/ISIS.aperture"
 )
 queried_apertures = ptc.all_fibre_apertures()
+
+diagnostics = ptc.particle_diagnostics(
+    [[0.001, 0.0, 0.001, 0.0, 0.0, 0.0]],
+    turns=256,
+    min_tune_turns=16,
+)
 ```
 
 For reproducible offline studies, `PyPTC/scripts/flatfile_misalign.py` can also
@@ -147,7 +167,6 @@ misalignment or every nonzero row from a MAD-X error table.  The old
 
 ```bash
 python3 PyPTC/scripts/flatfile_misalign.py \
-  --input ptc_standalone_readiness/inputs/PTC-PyORBIT_flat_file.madx.flt \
   --output PyPTC/artifacts/outputs/isis_with_jan26_survey_errors.flt \
   --madx-error-table PyPTC/workflows/madx/reference_errors/jan26_survey_corrected.tfs
 ```
@@ -172,7 +191,10 @@ The repeatable smoke script regenerates `PTC-PyORBIT_flat_file.flt`, loads it
 through PyPTC, applies the full reference MAD-X error table, and asserts that
 the bare orbit is near zero while the misaligned orbit response is measurable.
 The comparison script also runs a native MAD-X bare/misaligned `TWISS` pair and
-writes `madx_vs_pyptc_closed_orbit_comparison.png`.
+writes `madx_vs_pyptc_closed_orbit_comparison.png`. Jan26 full-table tests use
+this generated simplified lattice; the older readiness flat file has a
+different sliced fibre structure and is kept only for explicit compatibility
+studies.
 
 ## Diagnostic Plots
 
@@ -191,15 +213,22 @@ currently include:
   - rectangular aperture and particle positions at the node with most losses
 - `06_madx_error_table_misalignments.png`
   - translations and rotations from the latest survey-to-lattice MAD-X table
-- `07_closed_orbit_bare_vs_madx_error_table.png`
-  - bare closed orbit compared with the orbit after applying the full table
+- `07_madx_vs_pyptc_closed_orbit_comparison.png`
+  - MAD-X and PyPTC bare/misaligned closed orbits plus residuals for the Jan26
+    table on the generated simplified lattice
+- `pyptc_bare_vs_jan26_error_table_generated_lattice.png`
+  - PyPTC-only bare vs full Jan26 table response on the same generated lattice
 - `workflows/madx/outputs/aperture_comparison/isis_rcs_aperture_overlay.png`
   - design JVT, MAD-X, and queried PyPTC rectangular half apertures
+- `misaligned_tune_footprint.png`, `misaligned_tune_vs_action.png`,
+  `misaligned_tune_dashboard.png`
+  - per-particle tune spread, tune/action correlations, and survival-aware
+    phase-space diagnostics from `run_misalignment_experiment.py --with-tunes`
 
 The dashboard follows the layout used in
 `/home/hr/Repositories/pyorbit_examples/03_PTC_PyORBIT_Examples/.../pyorbit_bunch_dashplotter.py`.
-PyPTC does not yet expose per-particle tune footprints, so the tune panels use
-the lattice tune marker and action correlations for now.
+Tune-enabled dashboards use the per-particle diagnostic table when
+`--with-tunes` is passed.
 
 ## Notes And Current Limits
 
@@ -214,15 +243,15 @@ the lattice tune marker and action correlations for now.
   normal form provides it.
 - Loss-aware tracking reports losses from PTC stability/aperture state and
   from the exposed absolute-aperture check.
-- Per-particle phase/tune attributes like PyORBIT's `ParticlePhaseAttributes`
-  are not exposed yet.
+- Per-particle tune diagnostics use entrance Twiss normalization and unwrapped
+  turn-by-turn phase advance; lost particles are flagged and only receive tunes
+  if they survive at least `--min-tune-turns`.
 - The full MAD-X `APERTURE` command was too slow for the repeatable full-ring
   aperture overlay, so `compare_isis_apertures.py` writes the MAD-X comparison
   table from `TWISS` columns `APER_1/APER_2`.
 
 ## Planned Next Work
 
-- Per-particle phase advance and tune-footprint/tune-spread tracking.
 - Direct element metadata from PTC rather than flat-file parsing.
 - Family and knob controls for tune/chromaticity matching.
 - Direct normal-form and one-turn-map access.

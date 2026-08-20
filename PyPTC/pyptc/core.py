@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import ctypes
+import subprocess
+import sys
 from pathlib import Path
 from typing import Iterable
 
@@ -15,9 +17,28 @@ from .lattice import read_flatfile_fibres, resolve_fibre_index, resolve_fibre_in
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_LIBRARY = ROOT / "PyPTC" / "artifacts" / "build-pyptc" / "libpyptc.so"
-DEFAULT_LATTICE = ROOT / "ptc_standalone_readiness" / "inputs" / "PTC-PyORBIT_flat_file.madx.flt"
+LEGACY_READINESS_LATTICE = ROOT / "ptc_standalone_readiness" / "inputs" / "PTC-PyORBIT_flat_file.madx.flt"
+DEFAULT_SIMPLIFIED_LATTICE = ROOT / "PyPTC" / "workflows" / "madx" / "outputs" / "simplified" / "PTC-PyORBIT_flat_file.flt"
+DEFAULT_LATTICE = DEFAULT_SIMPLIFIED_LATTICE
 C_DOUBLE_P = ctypes.POINTER(ctypes.c_double)
 C_INT_P = ctypes.POINTER(ctypes.c_int)
+
+
+def ensure_default_lattice(regenerate: bool = False) -> Path:
+    """Return the generated simplified flat file, creating it if needed."""
+
+    if regenerate or not DEFAULT_SIMPLIFIED_LATTICE.exists() or DEFAULT_SIMPLIFIED_LATTICE.stat().st_size == 0:
+        subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "PyPTC" / "workflows" / "madx" / "generate_flat_file.py"),
+                "--output-dir",
+                str(DEFAULT_SIMPLIFIED_LATTICE.parent),
+            ],
+            cwd=ROOT,
+            check=True,
+        )
+    return DEFAULT_SIMPLIFIED_LATTICE.resolve()
 
 
 class PTC:
@@ -507,6 +528,148 @@ class PTC:
             ]
             loss_info.append({"particle": particle_index, **info})
         return rows, loss_info
+
+    @staticmethod
+    def _twiss_action_phase(
+        x: float,
+        xp: float,
+        alpha: float,
+        beta: float,
+        orbit_x: float = 0.0,
+        orbit_xp: float = 0.0,
+    ) -> tuple[float, float]:
+        coord = float(x) - float(orbit_x)
+        angle = float(xp) - float(orbit_xp)
+        gamma = (1.0 + alpha**2) / beta
+        action = 0.5 * (gamma * coord**2 + 2.0 * alpha * coord * angle + beta * angle**2)
+        u = coord / np.sqrt(beta)
+        up = alpha * coord / np.sqrt(beta) + np.sqrt(beta) * angle
+        phase = np.arctan2(up, u) / (2.0 * np.pi)
+        return float(action), float(phase)
+
+    @staticmethod
+    def _phase_tune(phases: list[float], reference_tune: float) -> tuple[float, float, float]:
+        if len(phases) < 2:
+            return float("nan"), float("nan"), float("nan")
+        unwrapped = np.unwrap(np.asarray(phases, dtype=float) * 2.0 * np.pi) / (2.0 * np.pi)
+        raw = float((unwrapped[-1] - unwrapped[0]) / (len(unwrapped) - 1))
+        candidates = [raw % 1.0, (-raw) % 1.0]
+        reference = float(reference_tune) % 1.0
+        tune = min(candidates, key=lambda value: abs(value - reference))
+        return float(tune), float(unwrapped[0]), float(unwrapped[-1])
+
+    def particle_diagnostics(
+        self,
+        bunch: np.ndarray,
+        turns: int = 256,
+        min_tune_turns: int = 16,
+        include_turn_phases: bool = False,
+    ) -> list[dict[str, float | int | bool | str]]:
+        """Track particles turn-by-turn and return tune/action/survival rows.
+
+        Input and final coordinates use the Python/PyParticleBunch convention
+        ``x, xp, y, yp, z, dE``. Tunes are derived from unwrapped transverse
+        normalized phase at the lattice entrance.
+        """
+
+        rows = np.asarray(bunch, dtype=float).copy()
+        if rows.ndim != 2 or rows.shape[1] != 6:
+            raise ValueError(f"Expected an N x 6 bunch array, got {rows.shape}")
+        if turns < 1:
+            raise ValueError("turns must be at least 1")
+        if min_tune_turns < 1:
+            raise ValueError("min_tune_turns must be at least 1")
+
+        twiss0 = self.node_twiss_orbit(0)
+        alpha_x = float(twiss0["alphax"])
+        beta_x = float(twiss0["betax"])
+        alpha_y = float(twiss0["alphay"])
+        beta_y = float(twiss0["betay"])
+        orbit_x = float(twiss0["orbitx"])
+        orbit_xp = float(twiss0["orbitpx"])
+        orbit_y = float(twiss0["orbity"])
+        orbit_yp = float(twiss0["orbitpy"])
+        reference_tunes = self.tunes()
+        p0c = self.scalar("ptc_get_p0c_")
+        beta0 = self.scalar("ptc_get_beta0_")
+
+        diagnostics: list[dict[str, float | int | bool | str]] = []
+        for particle_index, initial in enumerate(rows):
+            initial = np.asarray(initial, dtype=float)
+            jx0, phase_x0 = self._twiss_action_phase(initial[0], initial[1], alpha_x, beta_x, orbit_x, orbit_xp)
+            jy0, phase_y0 = self._twiss_action_phase(initial[2], initial[3], alpha_y, beta_y, orbit_y, orbit_yp)
+            phases_x = [phase_x0]
+            phases_y = [phase_y0]
+            ptc_coords = np.array(
+                [initial[0], initial[1], initial[2], initial[3], initial[5] / p0c, -initial[4] / beta0],
+                dtype=float,
+            )
+            lost = False
+            lost_turn = 0
+            lost_pos = 0
+            completed_turns = 0
+            for turn in range(1, int(turns) + 1):
+                ptc_coords, info = self.track_particle_ptc_with_loss(ptc_coords, turns=1)
+                if bool(info["lost"]):
+                    lost = True
+                    lost_turn = turn
+                    lost_pos = int(info["lost_pos"])
+                    break
+                completed_turns = turn
+                py_coords = np.array(
+                    [ptc_coords[0], ptc_coords[1], ptc_coords[2], ptc_coords[3], -ptc_coords[5] * beta0, ptc_coords[4] * p0c],
+                    dtype=float,
+                )
+                _jx, phase_x = self._twiss_action_phase(py_coords[0], py_coords[1], alpha_x, beta_x, orbit_x, orbit_xp)
+                _jy, phase_y = self._twiss_action_phase(py_coords[2], py_coords[3], alpha_y, beta_y, orbit_y, orbit_yp)
+                phases_x.append(phase_x)
+                phases_y.append(phase_y)
+
+            final = np.array(
+                [ptc_coords[0], ptc_coords[1], ptc_coords[2], ptc_coords[3], -ptc_coords[5] * beta0, ptc_coords[4] * p0c],
+                dtype=float,
+            )
+            jx, _phase_x_final_now = self._twiss_action_phase(final[0], final[1], alpha_x, beta_x, orbit_x, orbit_xp)
+            jy, _phase_y_final_now = self._twiss_action_phase(final[2], final[3], alpha_y, beta_y, orbit_y, orbit_yp)
+            valid_tune = completed_turns >= int(min_tune_turns)
+            qx, phase_x_initial, phase_x_final = self._phase_tune(phases_x, float(reference_tunes["qx"])) if valid_tune else (float("nan"), phase_x0, float("nan"))
+            qy, phase_y_initial, phase_y_final = self._phase_tune(phases_y, float(reference_tunes["qy"])) if valid_tune else (float("nan"), phase_y0, float("nan"))
+            row: dict[str, float | int | bool | str] = {
+                "particle": particle_index,
+                "x0": float(initial[0]),
+                "xp0": float(initial[1]),
+                "y0": float(initial[2]),
+                "yp0": float(initial[3]),
+                "z0": float(initial[4]),
+                "dE0": float(initial[5]),
+                "x": float(final[0]),
+                "xp": float(final[1]),
+                "y": float(final[2]),
+                "yp": float(final[3]),
+                "z": float(final[4]),
+                "dE": float(final[5]),
+                "jx0": jx0,
+                "jy0": jy0,
+                "jx": jx,
+                "jy": jy,
+                "phase_x0": phase_x_initial,
+                "phase_y0": phase_y_initial,
+                "phase_x_final": phase_x_final,
+                "phase_y_final": phase_y_final,
+                "qx": qx,
+                "qy": qy,
+                "survived": not lost,
+                "lost": lost,
+                "lost_turn": lost_turn,
+                "lost_pos": lost_pos,
+                "completed_turns": completed_turns,
+                "valid_tune": valid_tune,
+            }
+            if include_turn_phases:
+                row["phase_x_turns"] = " ".join(f"{value:.17g}" for value in phases_x)
+                row["phase_y_turns"] = " ".join(f"{value:.17g}" for value in phases_y)
+            diagnostics.append(row)
+        return diagnostics
 
     def set_acceleration(self, enabled: bool) -> None:
         self._set_flag("pyptc_set_acceleration", enabled)

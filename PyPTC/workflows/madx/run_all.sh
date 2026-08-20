@@ -4,6 +4,9 @@ set -euo pipefail
 pyptc_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 repo_root="$(cd "${pyptc_dir}/.." && pwd)"
 
+cd "${pyptc_dir}"
+
 bash "${pyptc_dir}/build/build_ptc.sh"
 python3 "${pyptc_dir}/workflows/madx/run_generated_flatfile_smoke.py" "$@"
+python3 "${pyptc_dir}/workflows/madx/compare_madx_pyptc_closed_orbits.py"
 python3 "${pyptc_dir}/workflows/madx/compare_isis_apertures.py"

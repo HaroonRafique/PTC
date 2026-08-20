@@ -3,7 +3,8 @@
 ## Current Python APIs
 
 - `pyptc.PTC`: loads `PyPTC/artifacts/build-pyptc/libpyptc.so`.
-- Lattice initialization from a PTC flat file.
+- Lattice initialization from a PTC flat file; `DEFAULT_LATTICE` is the
+  generated simplified ISIS file under `workflows/madx/outputs/simplified/`.
 - Machine summary: node count, harmonic number, circumference, transition gamma, mass, charge, kinetic energy.
 - Synchronous-particle scalars: `omega`, `p0c`, `beta0`, kinetic energy through the legacy scalar functions.
 - Node-level Twiss and closed orbit through `ptc_get_twiss_for_node_`.
@@ -19,6 +20,14 @@
   - apply a full MAD-X aperture assignment file from Python
   - query per-fibre aperture metadata back from PTC
   - one-particle and bunch tracking with loss flags, turn, and lattice position
+- Per-particle tune/action/survival diagnostics:
+  - track each particle turn-by-turn through the active PTC lattice
+  - compute transverse actions and tunes from entrance Twiss-normalized,
+    unwrapped phase advance
+  - preserve lost-particle flags and exclude invalid/lost particles from
+    survivor tune statistics
+  - write enriched bunch diagnostic CSVs and tune-footprint/action plots through
+    `run_misalignment_experiment.py --with-tunes`
 - Ramp, AC magnet, cavity, acceleration, modulation, timing, and orbit-state
   controls through focused `pyptc_*` ABI wrappers.
 - Particle and bunch tracking using the same coordinate convention as PyORBIT3:
@@ -37,6 +46,8 @@
 - It compiles parent `source/*.f90` and `interface/ptcinterface.f90` read-only.
 - New additive Python-facing Fortran exports live under `PyPTC/fortran/`.
 - `PyPTC/build/build_ptc.sh` builds `PyPTC/artifacts/build-pyptc/libpyptc.so` and verifies both legacy `ptc_*` and new `pyptc_*` symbols.
+- Tests and smoke scripts generate `workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt`
+  when the default lattice is missing.
 
 ## PTC Functionality Present Internally But Not Yet Cleanly Exposed
 
@@ -49,7 +60,7 @@ These features exist in PTC internals and/or the `read_ptc_command` script-comma
 - Family and knob controls.
 - Beam allocation/statistics tools from PTC's internal beam machinery.
 - Survey, layout translation, layout rotation, and patch transforms.
-- Normalized aperture and tune-smear tracking.
+- Normalized aperture scans.
 
 ## ISIS RCS Aperture Workflow
 

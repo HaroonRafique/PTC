@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -27,6 +28,7 @@ from pyptc import (
     DEFAULT_LIBRARY,
     LATEST_SURVEY_REFERENCE_ERROR_TABLE,
     PTC,
+    ensure_default_lattice,
     generate_matched_gaussian_4d,
     read_madx_error_table,
     resolve_fibre_index,
@@ -151,12 +153,19 @@ def run_madx_error_table_case(args: argparse.Namespace) -> dict:
     applied_errors = ptc.apply_madx_error_table(args.madx_error_table, nonzero=False)
     ptc.update_twiss()
     table_rows = ptc.all_node_twiss_orbit()
-    full_table_orbit = plot_orbit_response(output_dir / "07_closed_orbit_bare_vs_madx_error_table.png", bare_rows, table_rows)
+    full_table_orbit = plot_orbit_response(output_dir / "pyptc_bare_vs_jan26_error_table_generated_lattice.png", bare_rows, table_rows)
     max_delta_x = float(np.max(np.abs(full_table_orbit[:, 5])))
     max_delta_y = float(np.max(np.abs(full_table_orbit[:, 6])))
     assert max_delta_x > 1.0e-4 or max_delta_y > 1.0e-4
+    if len(records) == 38 and len(applied_errors) != 38:
+        raise AssertionError(
+            "Jan26 error table resolved to "
+            f"{len(applied_errors)} fibre applications for {len(records)} records; "
+            "this usually means the legacy sliced readiness lattice was used instead "
+            "of the generated simplified lattice."
+        )
     write_array_csv(
-        output_dir / "closed_orbit_bare_vs_madx_error_table.csv",
+        output_dir / "pyptc_bare_vs_jan26_error_table_generated_lattice.csv",
         full_table_orbit,
         "s,bare_orbitx,error_table_orbitx,bare_orbity,error_table_orbity,delta_orbitx,delta_orbity",
     )
@@ -192,7 +201,7 @@ def run_madx_error_table_case(args: argparse.Namespace) -> dict:
         "max_abs_rotation_rad": float(max(max(abs(record.dtheta), abs(record.dphi), abs(record.dpsi)) for record in records)),
         "max_orbit_delta_x_m": max_delta_x,
         "max_orbit_delta_y_m": max_delta_y,
-        "orbit_png": "07_closed_orbit_bare_vs_madx_error_table.png",
+        "orbit_png": "pyptc_bare_vs_jan26_error_table_generated_lattice.png",
     }
 
 
@@ -210,8 +219,35 @@ def run_madx_error_table_case_subprocess(args: argparse.Namespace) -> dict:
         "--madx-error-table",
         str(args.madx_error_table),
     ]
-    subprocess.run(cmd, check=True, cwd=REPO_ROOT)
+    subprocess.run(cmd, check=True, cwd=PYPTC_DIR)
     return json.loads((args.output_dir / "madx_error_table_summary.json").read_text(encoding="utf-8"))
+
+
+def run_madx_pyptc_comparison_artifact(args: argparse.Namespace, output_dir: Path) -> dict:
+    comparison_dir = output_dir / "madx_pyptc_closed_orbit_comparison"
+    cmd = [
+        sys.executable,
+        str(PYPTC_DIR / "workflows" / "madx" / "compare_madx_pyptc_closed_orbits.py"),
+        "--library",
+        str(args.library),
+        "--madx-error-table",
+        str(args.madx_error_table),
+        "--output-dir",
+        str(comparison_dir),
+        "--response-threshold",
+        "0.0",
+    ]
+    subprocess.run(cmd, check=True, cwd=PYPTC_DIR)
+    summary = json.loads((comparison_dir / "summary.json").read_text(encoding="utf-8"))
+    shutil.copy2(
+        comparison_dir / "madx_vs_pyptc_closed_orbit_comparison.png",
+        output_dir / "07_madx_vs_pyptc_closed_orbit_comparison.png",
+    )
+    shutil.copy2(
+        comparison_dir / "madx_vs_pyptc_closed_orbit_comparison.csv",
+        output_dir / "07_madx_vs_pyptc_closed_orbit_comparison.csv",
+    )
+    return summary
 
 
 def plot_orbit_response(path: Path, bare: list[dict[str, float | int]], edited: list[dict[str, float | int]]) -> np.ndarray:
@@ -603,6 +639,7 @@ def run(args: argparse.Namespace) -> dict:
     ptc.configure_ac_magnet(fibre_index, dc=1.0, amplitude=0.0, phase_turns=0.0, d_ac=0.0, bn=[0.0], an=[0.0])
 
     madx_error_table_summary = run_madx_error_table_case_subprocess(args)
+    madx_pyptc_comparison_summary = run_madx_pyptc_comparison_artifact(args, output_dir)
 
     write_array_csv(output_dir / "initial_bunch.csv", bunch, "x,xp,y,yp,z,dE")
     write_array_csv(output_dir / "final_bunch.csv", final_bunch, "x,xp,y,yp,z,dE")
@@ -618,7 +655,8 @@ def run(args: argparse.Namespace) -> dict:
         "04_aperture_loss_map.png",
         "05_aperture_at_peak_loss_node.png",
         "06_madx_error_table_misalignments.png",
-        "07_closed_orbit_bare_vs_madx_error_table.png",
+        "07_madx_vs_pyptc_closed_orbit_comparison.png",
+        "pyptc_bare_vs_jan26_error_table_generated_lattice.png",
     }
     missing_pngs = sorted(required_pngs.difference(pngs))
     assert not missing_pngs, f"Missing required PNG test outputs: {missing_pngs}"
@@ -632,6 +670,7 @@ def run(args: argparse.Namespace) -> dict:
         "misalignment": {"element": args.element, "occurrence": args.occurrence, "fibre_index": fibre_index, "dx_m": args.dx},
         "tracking": {"particles": args.particles, "turns": args.turns, "lost_in_bunch": sum(bool(info["lost"]) for info in losses)},
         "madx_error_table": madx_error_table_summary,
+        "madx_pyptc_closed_orbit_comparison": madx_pyptc_comparison_summary,
         "loss_map": {
             "absolute_aperture_m": args.loss_map_aperture,
             "particles": args.loss_map_particles,
@@ -654,6 +693,11 @@ def main() -> None:
         parser.add_argument("--output-dir", type=Path, required=True)
         parser.add_argument("--madx-error-table", type=Path, required=True)
         args = parser.parse_args()
+        args.library = args.library.resolve()
+        args.output_dir = args.output_dir.resolve()
+        args.madx_error_table = args.madx_error_table.resolve()
+        args.lattice = ensure_default_lattice() if args.lattice == DEFAULT_LATTICE else args.lattice.resolve()
+        os.chdir(PYPTC_DIR)
         result = run_madx_error_table_case(args)
         (args.output_dir / "madx_error_table_summary.json").write_text(
             json.dumps(result, indent=2, sort_keys=True) + "\n",
@@ -679,6 +723,11 @@ def main() -> None:
     parser.add_argument("--loss-map-particles", type=int, default=81)
     parser.add_argument("--madx-error-table", type=Path, default=LATEST_SURVEY_REFERENCE_ERROR_TABLE)
     args = parser.parse_args()
+    args.library = args.library.resolve()
+    args.output_dir = args.output_dir.resolve()
+    args.madx_error_table = args.madx_error_table.resolve()
+    args.lattice = ensure_default_lattice() if args.lattice == DEFAULT_LATTICE else args.lattice.resolve()
+    os.chdir(PYPTC_DIR)
 
     result = run(args)
     print(json.dumps(result, indent=2, sort_keys=True))

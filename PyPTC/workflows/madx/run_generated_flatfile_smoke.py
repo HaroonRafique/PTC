@@ -68,13 +68,13 @@ def run_pyptc_smoke(args: argparse.Namespace, flat_file: Path, output_dir: Path)
             "--madx-error-table",
             str(args.madx_error_table),
         ],
-        REPO_ROOT,
+        PYPTC_DIR,
     )
     return json.loads((smoke_dir / "summary.json").read_text(encoding="utf-8"))
 
 
 def validate_orbits(smoke_dir: Path, bare_threshold: float, response_threshold: float) -> dict:
-    orbit_csv = smoke_dir / "closed_orbit_bare_vs_madx_error_table.csv"
+    orbit_csv = smoke_dir / "pyptc_bare_vs_jan26_error_table_generated_lattice.csv"
     if not orbit_csv.exists():
         raise FileNotFoundError(f"Expected orbit comparison CSV was not produced: {orbit_csv}")
     data = np.loadtxt(orbit_csv, delimiter=",", skiprows=1)

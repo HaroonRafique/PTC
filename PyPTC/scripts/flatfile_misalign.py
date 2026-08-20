@@ -12,7 +12,7 @@ if str(PYPTC_DIR) not in sys.path:
     sys.path.insert(0, str(PYPTC_DIR))
 
 from pyptc.error_table import MadxErrorRecord, read_madx_error_table
-from ptc import DEFAULT_LATTICE
+from ptc import DEFAULT_LATTICE, ensure_default_lattice
 
 
 FIBRE_MARK = "@@@@@@@@@@@@@@@@@@@@ FIBRE"
@@ -264,6 +264,7 @@ def main() -> None:
     parser.add_argument("--dpsi", type=float, default=0.0)
     parser.add_argument("--madx-error-table", type=Path)
     args = parser.parse_args()
+    args.input = ensure_default_lattice() if args.input == DEFAULT_LATTICE else args.input.resolve()
 
     if args.madx_error_table:
         applied = apply_madx_error_table(args.input, args.output, args.madx_error_table)

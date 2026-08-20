@@ -18,9 +18,18 @@ ROOT = PYPTC_DIR.parent
 if str(PYPTC_DIR) not in sys.path:
     sys.path.insert(0, str(PYPTC_DIR))
 
-from flatfile_misalign import apply_single_misalignment
-from ptc import DEFAULT_LATTICE, DEFAULT_LIBRARY, PTC
-from pyptc import generate_matched_gaussian_4d, pyparticlebunch_source
+from ptc import DEFAULT_LATTICE, DEFAULT_LIBRARY, PTC, ensure_default_lattice
+from pyptc import (
+    generate_matched_gaussian_4d,
+    plot_diagnostic_dashboard,
+    plot_tune_footprints,
+    plot_tune_vs_action,
+    pyparticlebunch_source,
+    tune_summary,
+    write_diagnostic_csv,
+    write_tune_csv,
+)
+from scripts.flatfile_misalign import apply_single_misalignment
 
 
 DEFAULT_OUTPUT = PYPTC_DIR / "artifacts" / "outputs" / "misalignment_experiment"
@@ -40,6 +49,29 @@ def write_csv(path: Path, rows: list[dict[str, float | int | str]]) -> None:
 def write_array_csv(path: Path, array: np.ndarray) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     np.savetxt(path, np.asarray(array, dtype=float), delimiter=",", header="x,xp,y,yp,z,dE", comments="")
+
+
+def read_diagnostic_csv(path: Path) -> list[dict[str, object]]:
+    bool_keys = {"survived", "lost", "valid_tune"}
+    int_keys = {"particle", "lost_turn", "lost_pos", "completed_turns"}
+    rows: list[dict[str, object]] = []
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            parsed: dict[str, object] = {}
+            for key, value in row.items():
+                if value == "":
+                    parsed[key] = value
+                elif key in bool_keys:
+                    parsed[key] = value.lower() in {"1", "true", "yes"}
+                elif key in int_keys:
+                    parsed[key] = int(float(value))
+                else:
+                    try:
+                        parsed[key] = float(value)
+                    except ValueError:
+                        parsed[key] = value
+            rows.append(parsed)
+    return rows
 
 
 def plot_results(output_dir: Path) -> None:
@@ -96,7 +128,18 @@ def make_bunch(args: argparse.Namespace, twiss0: dict[str, float | int]) -> np.n
     )
 
 
-def run_case(lattice: Path, library: Path, initial_bunch: Path, output_dir: Path, turns: int) -> dict[str, object]:
+def run_case(
+    lattice: Path,
+    library: Path,
+    initial_bunch: Path,
+    output_dir: Path,
+    turns: int,
+    with_tunes: bool = False,
+    tune_turns: int = 256,
+    min_tune_turns: int = 16,
+    include_turn_phases: bool = False,
+    separate_tune_file: bool = True,
+) -> dict[str, object]:
     ptc = PTC(library)
     ptc.init_lattice(lattice)
     summary = ptc.machine_summary()
@@ -106,7 +149,23 @@ def run_case(lattice: Path, library: Path, initial_bunch: Path, output_dir: Path
     output_dir.mkdir(parents=True, exist_ok=True)
     write_csv(output_dir / "orbit_nodes.csv", orbit_rows)
     write_array_csv(output_dir / "bunch_final.csv", final)
-    return {"summary": summary, "orbit_rows": orbit_rows, "final_bunch": np.asarray(final).tolist()}
+    result: dict[str, object] = {"summary": summary, "orbit_rows": orbit_rows, "final_bunch": np.asarray(final).tolist()}
+    if with_tunes:
+        diagnostics = ptc.particle_diagnostics(
+            bunch0,
+            turns=tune_turns,
+            min_tune_turns=min_tune_turns,
+            include_turn_phases=include_turn_phases,
+        )
+        diagnostics_path = output_dir / "bunch_diagnostics.csv"
+        write_diagnostic_csv(diagnostics_path, diagnostics)
+        result["diagnostics_csv"] = str(diagnostics_path)
+        result["tune_summary"] = tune_summary(diagnostics)
+        if separate_tune_file:
+            tune_path = output_dir / "tune_footprint.csv"
+            write_tune_csv(tune_path, diagnostics)
+            result["tune_csv"] = str(tune_path)
+    return result
 
 
 def load_bunch_csv(path: Path) -> np.ndarray:
@@ -116,7 +175,19 @@ def load_bunch_csv(path: Path) -> np.ndarray:
     return np.asarray(bunch, dtype=float)
 
 
-def run_case_subprocess(case_name: str, lattice: Path, library: Path, initial_bunch: Path, output_dir: Path, turns: int) -> dict:
+def run_case_subprocess(
+    case_name: str,
+    lattice: Path,
+    library: Path,
+    initial_bunch: Path,
+    output_dir: Path,
+    turns: int,
+    with_tunes: bool = False,
+    tune_turns: int = 256,
+    min_tune_turns: int = 16,
+    include_turn_phases: bool = False,
+    separate_tune_file: bool = True,
+) -> dict:
     case_dir = output_dir / "_cases" / case_name
     cmd = [
         sys.executable,
@@ -133,9 +204,38 @@ def run_case_subprocess(case_name: str, lattice: Path, library: Path, initial_bu
         "--turns",
         str(turns),
     ]
+    if with_tunes:
+        cmd.extend(["--with-tunes", "--tune-turns", str(tune_turns), "--min-tune-turns", str(min_tune_turns)])
+    if include_turn_phases:
+        cmd.append("--include-turn-phases")
+    if not separate_tune_file:
+        cmd.append("--no-separate-tune-file")
     env = os.environ.copy()
     subprocess.run(cmd, check=True, cwd=PYPTC_DIR, env=env)
     return json.loads((case_dir / "case_summary.json").read_text(encoding="utf-8"))
+
+
+def write_case_tune_outputs(case_name: str, case_dir: Path, output_dir: Path, formats: list[str], separate_tune_file: bool) -> dict[str, object]:
+    diagnostics_path = case_dir / "bunch_diagnostics.csv"
+    if not diagnostics_path.exists():
+        return {}
+    diagnostics = read_diagnostic_csv(diagnostics_path)
+    top_diagnostics = output_dir / f"{case_name}_bunch_diagnostics.csv"
+    write_diagnostic_csv(top_diagnostics, diagnostics)
+    outputs: dict[str, object] = {
+        "diagnostics_csv": str(top_diagnostics),
+        "summary": tune_summary(diagnostics),
+        "plots": {
+            "footprint": plot_tune_footprints(output_dir / f"{case_name}_tune_footprint", diagnostics, formats),
+            "tune_vs_action": plot_tune_vs_action(output_dir / f"{case_name}_tune_vs_action", diagnostics, formats),
+            "dashboard": plot_diagnostic_dashboard(output_dir / f"{case_name}_tune_dashboard", diagnostics, formats),
+        },
+    }
+    if separate_tune_file:
+        tune_path = output_dir / f"{case_name}_tune_footprint.csv"
+        write_tune_csv(tune_path, diagnostics)
+        outputs["tune_csv"] = str(tune_path)
+    return outputs
 
 
 def compare_orbits(bare_rows: list[dict], mis_rows: list[dict]) -> list[dict[str, float | int]]:
@@ -172,6 +272,11 @@ def main() -> None:
     case_parser.add_argument("--initial-bunch", type=Path, required=True)
     case_parser.add_argument("--output-dir", type=Path, required=True)
     case_parser.add_argument("--turns", type=int, required=True)
+    case_parser.add_argument("--with-tunes", action="store_true")
+    case_parser.add_argument("--tune-turns", type=int, default=256)
+    case_parser.add_argument("--min-tune-turns", type=int, default=16)
+    case_parser.add_argument("--include-turn-phases", action="store_true")
+    case_parser.add_argument("--no-separate-tune-file", action="store_true")
 
     parser.add_argument("--library", type=Path, default=DEFAULT_LIBRARY)
     parser.add_argument("--lattice", type=Path, default=DEFAULT_LATTICE)
@@ -187,21 +292,43 @@ def main() -> None:
     parser.add_argument("--emit-y", type=float, default=1.0e-6)
     parser.add_argument("--limit", type=float, default=5.0)
     parser.add_argument("--seed", type=int, default=12345)
+    parser.add_argument("--with-tunes", action="store_true")
+    parser.add_argument("--tune-turns", type=int, default=256)
+    parser.add_argument("--min-tune-turns", type=int, default=16)
+    parser.add_argument("--tune-case", choices=("bare", "misaligned", "both"), default="misaligned")
+    parser.add_argument("--formats", default="png,pdf")
+    parser.add_argument("--include-turn-phases", action="store_true")
+    parser.add_argument("--separate-tune-file", action=argparse.BooleanOptionalAction, default=True)
 
     args = parser.parse_args()
 
     args.library = args.library.resolve()
-    args.lattice = args.lattice.resolve()
+    args.lattice = ensure_default_lattice() if args.lattice == DEFAULT_LATTICE else args.lattice.resolve()
     args.output_dir = args.output_dir.resolve()
     if hasattr(args, "initial_bunch"):
         args.initial_bunch = args.initial_bunch.resolve()
+    os.chdir(PYPTC_DIR)
 
     if args.command == "_run_case":
-        result = run_case(args.lattice, args.library, args.initial_bunch, args.output_dir, args.turns)
+        result = run_case(
+            args.lattice,
+            args.library,
+            args.initial_bunch,
+            args.output_dir,
+            args.turns,
+            with_tunes=args.with_tunes,
+            tune_turns=args.tune_turns,
+            min_tune_turns=args.min_tune_turns,
+            include_turn_phases=args.include_turn_phases,
+            separate_tune_file=not args.no_separate_tune_file,
+        )
         slim = {
             "summary": result["summary"],
             "orbit_rows": result["orbit_rows"],
         }
+        for key in ("diagnostics_csv", "tune_csv", "tune_summary"):
+            if key in result:
+                slim[key] = result[key]
         (args.output_dir / "case_summary.json").write_text(
             json.dumps(slim, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
@@ -230,8 +357,34 @@ def main() -> None:
     initial_path = args.output_dir / "bare_bunch_initial.csv"
     write_array_csv(initial_path, initial_bunch)
 
-    bare_case = run_case_subprocess("bare", args.lattice, args.library, initial_path, args.output_dir, args.turns)
-    mis_case = run_case_subprocess("misaligned", mis_lattice, args.library, initial_path, args.output_dir, args.turns)
+    run_tunes_bare = args.with_tunes and args.tune_case in {"bare", "both"}
+    run_tunes_misaligned = args.with_tunes and args.tune_case in {"misaligned", "both"}
+    bare_case = run_case_subprocess(
+        "bare",
+        args.lattice,
+        args.library,
+        initial_path,
+        args.output_dir,
+        args.turns,
+        with_tunes=run_tunes_bare,
+        tune_turns=args.tune_turns,
+        min_tune_turns=args.min_tune_turns,
+        include_turn_phases=args.include_turn_phases,
+        separate_tune_file=args.separate_tune_file,
+    )
+    mis_case = run_case_subprocess(
+        "misaligned",
+        mis_lattice,
+        args.library,
+        initial_path,
+        args.output_dir,
+        args.turns,
+        with_tunes=run_tunes_misaligned,
+        tune_turns=args.tune_turns,
+        min_tune_turns=args.min_tune_turns,
+        include_turn_phases=args.include_turn_phases,
+        separate_tune_file=args.separate_tune_file,
+    )
 
     bare_orbit = bare_case["orbit_rows"]
     mis_orbit = mis_case["orbit_rows"]
@@ -268,6 +421,32 @@ def main() -> None:
         "max_abs_delta_orbity_m": max_dy,
         "rms_final_bunch_delta_x_xp_y_yp_z_dE": rms_final_delta,
     }
+    if args.with_tunes:
+        formats = [item.strip().lstrip(".").lower() for item in args.formats.split(",") if item.strip()]
+        tune_outputs: dict[str, object] = {}
+        if run_tunes_bare:
+            tune_outputs["bare"] = write_case_tune_outputs(
+                "bare",
+                args.output_dir / "_cases" / "bare",
+                args.output_dir,
+                formats,
+                args.separate_tune_file,
+            )
+        if run_tunes_misaligned:
+            tune_outputs["misaligned"] = write_case_tune_outputs(
+                "misaligned",
+                args.output_dir / "_cases" / "misaligned",
+                args.output_dir,
+                formats,
+                args.separate_tune_file,
+            )
+        summary["tune_diagnostics"] = {
+            "turns": args.tune_turns,
+            "min_tune_turns": args.min_tune_turns,
+            "case": args.tune_case,
+            "formats": formats,
+            "outputs": tune_outputs,
+        }
     (args.output_dir / "summary.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
