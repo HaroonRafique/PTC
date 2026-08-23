@@ -74,6 +74,22 @@ extern "C" void ptc_get_twiss_for_node_(int* node_index, double* length,
                                         double* cox,    double* copx,
                                         double* coy,    double* copy);
 
+// Get native PTC fibre and aperture state
+
+extern "C" void ptc_get_fibre_count_(int* n_fibres, int* status);
+
+extern "C" void ptc_get_fibre_name_(int* fibre_index, char* fibre_name,
+                                    int* status, int fibre_name_len);
+
+extern "C" void ptc_get_fibre_aperture_(int* fibre_index, int* kindaper,
+                                        double* r, double* x, double* y,
+                                        double* dx, double* dy, double* s,
+                                        int* status);
+
+extern "C" void ptc_set_fibre_aperture_(int* fibre_index, int* kindaper,
+                                        double* r, double* x, double* y,
+                                        double* dx, double* dy, int* status);
+
 // Track 6D coordinates through a PTC-ORBIT node
 
 extern "C" void ptc_track_particle_(int* node_index,
