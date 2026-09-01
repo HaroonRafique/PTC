@@ -141,7 +141,7 @@ fibre_index = ptc.set_misalignment_by_name("SP0_QF", occurrence=1, dx=0.003)
 ptc.update_twiss()
 
 applied = ptc.apply_madx_error_table(
-    "PyPTC/workflows/madx/reference_errors/jan26_survey_corrected.tfs"
+    "PyPTC/workflows/madx/reference_errors/apr_2026_survey_corrected.tfs"
 )
 ptc.update_twiss()
 
@@ -168,8 +168,8 @@ misalignment or every nonzero row from a MAD-X error table.  The old
 
 ```bash
 python3 PyPTC/scripts/flatfile_misalign.py \
-  --output PyPTC/test_outputs/isis_with_jan26_survey_errors.flt \
-  --madx-error-table PyPTC/workflows/madx/reference_errors/jan26_survey_corrected.tfs
+  --output PyPTC/test_outputs/isis_with_apr_2026_survey_errors.flt \
+  --madx-error-table PyPTC/workflows/madx/reference_errors/apr_2026_survey_corrected.tfs
 ```
 
 ## MAD-X Flat-File Generation
@@ -185,17 +185,18 @@ strand:
   `/home/hr/Repositories/isis_2024/Lattice_Files/00_Simplified_Lattice`.
 - `ptc_scripts/` is copied from the PyORBIT MAD-X flat-file example.
 - `scripts/Create_PTC_flat_file.madx` is the PyPTC-adapted flat-file generator.
-- `reference_errors/jan26_survey_corrected.tfs` is copied from the latest
-  survey-to-lattice reference output.
+- `reference_errors/apr_2026_survey_corrected.tfs` and the component
+  `df_apr_2026_*_misalignments*.txt` tables are copied from the latest
+  survey-to-lattice Apr 2026 output.
 
 The repeatable smoke script regenerates `PTC-PyORBIT_flat_file.flt`, loads it
 through PyPTC, applies the full reference MAD-X error table, and asserts that
 the bare orbit is near zero while the misaligned orbit response is measurable.
 The comparison script also runs a native MAD-X bare/misaligned `TWISS` pair and
 writes `madx_vs_pyptc_closed_orbit_comparison.png`. Example `05` uses the
-existing corrected-Jan26 `survey_to_lattice` MAD-X error table, runs MAD-X
+copied latest `survey_to_lattice` MAD-X error table, runs MAD-X
 `SETERR`, and compares that distorted MAD-X orbit with the PyPTC distorted
-orbit from the same error table. Jan26 full-table tests use this generated
+orbit from the same error table. Full-table tests use this generated
 simplified lattice; the older readiness flat file has a different sliced fibre
 structure and is kept only for explicit compatibility studies.
 
@@ -217,14 +218,14 @@ currently include:
 - `06_madx_error_table_misalignments.png`
   - translations and rotations from the latest survey-to-lattice MAD-X table
 - `07_madx_vs_pyptc_closed_orbit_comparison.png`
-  - MAD-X and PyPTC bare/misaligned closed orbits plus residuals for the Jan26
+  - MAD-X and PyPTC bare/misaligned closed orbits plus residuals for the latest
     table on the generated simplified lattice
 - `test_outputs/05_full_error_table_orbit_comparison/madx_vs_pyptc_closed_orbit_comparison.png`
-  - MAD-X `SETERR` distorted orbit from the corrected-Jan26
+  - MAD-X `SETERR` distorted orbit from the latest corrected
     `survey_to_lattice` error table against the PyPTC distorted orbit from the
     same corrected error table
-- `pyptc_bare_vs_jan26_error_table_generated_lattice.png`
-  - PyPTC-only bare vs full Jan26 table response on the same generated lattice
+- `pyptc_bare_vs_latest_survey_error_table_generated_lattice.png`
+  - historical PyPTC-only bare vs full table response on the same generated lattice
 - `workflows/madx/outputs/aperture_comparison/isis_rcs_aperture_overlay.png`
   - design JVT, MAD-X, and queried PyPTC rectangular half apertures
 - `misaligned_tune_footprint.png`, `misaligned_tune_vs_action.png`,

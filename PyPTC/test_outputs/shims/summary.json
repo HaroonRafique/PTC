@@ -3,8 +3,8 @@
     "chromx": -4.9553035708473105,
     "chromy": -4.934982977661852
   },
-  "lattice": "/home/hr/Codes/PTC/PyPTC/workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt",
-  "library": "/home/hr/Codes/PTC/PyPTC/build_pyptc/libpyptc.so",
+  "lattice": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt",
+  "library": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/build_pyptc/libpyptc.so",
   "loss_map": {
     "absolute_aperture_m": 0.005,
     "loss_positions": [
@@ -39,17 +39,17 @@
   },
   "madx_error_table": {
     "applied": 38,
-    "max_abs_dx_m": 0.003981439575,
-    "max_abs_dy_m": 0.000973,
-    "max_abs_rotation_rad": 0.001001283704,
-    "max_orbit_delta_x_m": 0.008739903486859057,
-    "max_orbit_delta_y_m": 0.008300933914896587,
-    "orbit_png": "pyptc_bare_vs_jan26_error_table_generated_lattice.png",
+    "max_abs_dx_m": 0.003971297759,
+    "max_abs_dy_m": 0.000722,
+    "max_abs_rotation_rad": 0.000998646488,
+    "max_orbit_delta_x_m": 0.008651762881775176,
+    "max_orbit_delta_y_m": 0.005957305435577061,
+    "orbit_png": "pyptc_bare_vs_latest_survey_error_table_generated_lattice.png",
     "records": 38,
-    "table": "/home/hr/Codes/PTC/PyPTC/workflows/madx/reference_errors/jan26_survey_corrected.tfs"
+    "table": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/reference_errors/apr_2026_survey_corrected.tfs"
   },
   "madx_pyptc_closed_orbit_comparison": {
-    "comparison_png": "/home/hr/Codes/PTC/PyPTC/test_outputs/shims/madx_pyptc_closed_orbit_comparison/madx_vs_pyptc_closed_orbit_comparison.png",
+    "comparison_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/shims/madx_pyptc_closed_orbit_comparison/madx_vs_pyptc_closed_orbit_comparison.png",
     "components": [
       "DPHI",
       "DPSI",
@@ -58,23 +58,23 @@
       "DX",
       "DY"
     ],
-    "flat_file": "/home/hr/Codes/PTC/PyPTC/test_outputs/shims/madx_pyptc_closed_orbit_comparison/flat_file/PTC-PyORBIT_flat_file.flt",
+    "flat_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/shims/madx_pyptc_closed_orbit_comparison/flat_file/PTC-PyORBIT_flat_file.flt",
     "madx_bare_max_x_m": 0.0,
     "madx_bare_max_y_m": 0.0,
-    "madx_error_table": "/home/hr/Codes/PTC/PyPTC/workflows/madx/reference_errors/jan26_survey_corrected.tfs",
-    "madx_filtered_error_table": "/home/hr/Codes/PTC/PyPTC/test_outputs/shims/madx_pyptc_closed_orbit_comparison/error_tables/madx_errors.tfs",
-    "madx_misaligned_max_x_m": 0.008838512873,
-    "madx_misaligned_max_y_m": 0.008486098232,
+    "madx_error_table": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/reference_errors/apr_2026_survey_corrected.tfs",
+    "madx_filtered_error_table": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/shims/madx_pyptc_closed_orbit_comparison/error_tables/madx_errors.tfs",
+    "madx_misaligned_max_x_m": 0.008749641171,
+    "madx_misaligned_max_y_m": 0.005842507051,
     "madx_reference_twiss": null,
     "pyptc_bare_max_x_m": 2.1241018807226758e-13,
     "pyptc_bare_max_y_m": 0.0,
     "pyptc_convention": "madx",
-    "pyptc_filtered_error_table": "/home/hr/Codes/PTC/PyPTC/test_outputs/shims/madx_pyptc_closed_orbit_comparison/error_tables/pyptc_errors.tfs",
+    "pyptc_filtered_error_table": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/shims/madx_pyptc_closed_orbit_comparison/error_tables/pyptc_errors.tfs",
     "pyptc_flip_components": [],
-    "pyptc_misaligned_max_x_m": 0.008739903486746978,
-    "pyptc_misaligned_max_y_m": 0.008300933914896587,
-    "residual_max_x_m": 0.0025167990235704357,
-    "residual_max_y_m": 0.0008055582254703139
+    "pyptc_misaligned_max_x_m": 0.008651762881663097,
+    "pyptc_misaligned_max_y_m": 0.005957305435577061,
+    "residual_max_x_m": 0.0025109742665759666,
+    "residual_max_y_m": 0.00053813095526986
   },
   "misalignment": {
     "dx_m": 0.003,
@@ -90,11 +90,11 @@
     "05_aperture_at_peak_loss_node.png",
     "06_madx_error_table_misalignments.png",
     "07_madx_vs_pyptc_closed_orbit_comparison.png",
-    "pyptc_bare_vs_jan26_error_table_generated_lattice.png"
+    "pyptc_bare_vs_latest_survey_error_table_generated_lattice.png"
   ],
   "tracking": {
     "lost_in_bunch": 0,
-    "particles": 1000,
+    "particles": 32,
     "turns": 1
   },
   "tunes": {

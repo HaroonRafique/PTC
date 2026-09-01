@@ -17,8 +17,6 @@ PYPTC_DIR = Path(__file__).resolve().parents[1]
 ROOT = PYPTC_DIR.parent
 OUTPUT_ROOT = PYPTC_DIR / "test_outputs"
 MADX_DIR = PYPTC_DIR / "workflows" / "madx"
-SURVEY_TO_LATTICE_JAN26_CORRECTED_ERROR_TABLE = Path("/home/hr/Repositories/survey_to_lattice/03_Standalone/cpymad_error_tables/jan26_survey_corrected.tfs")
-
 if str(PYPTC_DIR) not in sys.path:
     sys.path.insert(0, str(PYPTC_DIR))
 
@@ -35,6 +33,8 @@ from pyptc import (  # noqa: E402
     write_diagnostic_csv,
     write_tune_csv,
 )
+
+SURVEY_TO_LATTICE_LATEST_CORRECTED_ERROR_TABLE = LATEST_SURVEY_REFERENCE_ERROR_TABLE
 from pyptc.aperture import read_madx_aperture_file  # noqa: E402
 from pyptc.lattice import read_flatfile_fibres, resolve_fibre_index  # noqa: E402
 from scripts.flatfile_misalign import apply_single_misalignment  # noqa: E402

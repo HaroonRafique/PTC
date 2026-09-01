@@ -24,7 +24,7 @@ from pyptc import DEFAULT_LIBRARY, PTC
 
 
 DEFAULT_OUTPUT_DIR = MADX_DIR / "outputs" / "simplified_closed_orbit_comparison"
-DEFAULT_ERROR_TABLE = MADX_DIR / "reference_errors" / "jan26_survey_corrected.tfs"
+DEFAULT_ERROR_TABLE = MADX_DIR / "reference_errors" / "apr_2026_survey_corrected.tfs"
 MISALIGNMENT_COMPONENTS = ("DX", "DY", "DS", "DTHETA", "DPHI", "DPSI")
 
 
@@ -300,13 +300,13 @@ def plot_distorted_reference_comparison(path: Path, madx_distorted: np.ndarray, 
     )
 
     fig, axes = plt.subplots(3, 1, figsize=(11, 10), sharex=True)
-    axes[0].plot(madx_distorted[:, 0], madx_distorted[:, 1] * 1.0e3, label="MAD-X Jan26 corrected x")
-    axes[0].plot(pyptc_distorted[:, 0], pyptc_distorted[:, 1] * 1.0e3, "--", label="PyPTC Jan26 corrected x")
+    axes[0].plot(madx_distorted[:, 0], madx_distorted[:, 1] * 1.0e3, label="MAD-X latest survey corrected x")
+    axes[0].plot(pyptc_distorted[:, 0], pyptc_distorted[:, 1] * 1.0e3, "--", label="PyPTC latest survey corrected x")
     axes[0].set_ylabel("x orbit [mm]")
     axes[0].legend(loc="upper right")
 
-    axes[1].plot(madx_distorted[:, 0], madx_distorted[:, 3] * 1.0e3, label="MAD-X Jan26 corrected y")
-    axes[1].plot(pyptc_distorted[:, 0], pyptc_distorted[:, 3] * 1.0e3, "--", label="PyPTC Jan26 corrected y")
+    axes[1].plot(madx_distorted[:, 0], madx_distorted[:, 3] * 1.0e3, label="MAD-X latest survey corrected y")
+    axes[1].plot(pyptc_distorted[:, 0], pyptc_distorted[:, 3] * 1.0e3, "--", label="PyPTC latest survey corrected y")
     axes[1].set_ylabel("y orbit [mm]")
     axes[1].legend(loc="upper right")
 
