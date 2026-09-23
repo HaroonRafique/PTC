@@ -8,6 +8,8 @@
 - Machine summary: node count, harmonic number, circumference, transition gamma, mass, charge, kinetic energy.
 - Synchronous-particle scalars: `omega`, `p0c`, `beta0`, kinetic energy through the legacy scalar functions.
 - Node-level Twiss and closed orbit through `ptc_get_twiss_for_node_`.
+- Node-level horizontal/vertical phase-advance curves through the additive
+  `pyptc_get_node_phase_advances` ABI shim.
 - Exact tune/chromaticity getters through `pyptc_get_tunes` and
   `pyptc_get_chromaticities`.
 - Name-based and index-based misalignment application:

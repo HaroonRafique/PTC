@@ -93,6 +93,8 @@ class PTC:
             self.lib.pyptc_get_tunes.restype = None
             self.lib.pyptc_get_chromaticities.argtypes = [C_DOUBLE_P, C_DOUBLE_P, C_INT_P]
             self.lib.pyptc_get_chromaticities.restype = None
+            self.lib.pyptc_get_node_phase_advances.argtypes = [C_DOUBLE_P, C_DOUBLE_P, ctypes.c_int, C_INT_P]
+            self.lib.pyptc_get_node_phase_advances.restype = None
             self.lib.pyptc_set_misalignment.argtypes = [ctypes.c_int, C_DOUBLE_P, C_INT_P]
             self.lib.pyptc_set_misalignment.restype = None
             self.lib.pyptc_set_madx_misalignment.argtypes = [ctypes.c_int, C_DOUBLE_P, C_INT_P]
@@ -227,6 +229,18 @@ class PTC:
         self.lib.pyptc_get_chromaticities(ctypes.byref(chromx), ctypes.byref(chromy), ctypes.byref(status))
         self._check_status("pyptc_get_chromaticities", status)
         return {"chromx": chromx.value, "chromy": chromy.value}
+
+    def node_phase_advances(self) -> np.ndarray:
+        """Return cumulative horizontal and vertical phase advances at node exits."""
+        count = int(self.machine_summary()["n_nodes"])
+        mux = np.empty(count, dtype=np.float64)
+        muy = np.empty(count, dtype=np.float64)
+        status = ctypes.c_int()
+        self.lib.pyptc_get_node_phase_advances(
+            mux.ctypes.data_as(C_DOUBLE_P), muy.ctypes.data_as(C_DOUBLE_P), count, ctypes.byref(status)
+        )
+        self._check_status("pyptc_get_node_phase_advances", status)
+        return np.column_stack([mux, muy])
 
     def set_misalignment(
         self,
@@ -845,7 +859,12 @@ class PTC:
         return row
 
     def all_node_twiss_orbit(self) -> list[dict[str, float | int]]:
-        return [self.node_twiss_orbit(index) for index in range(int(self.machine_summary()["n_nodes"]))]
+        rows = [self.node_twiss_orbit(index) for index in range(int(self.machine_summary()["n_nodes"]))]
+        phases = self.node_phase_advances()
+        for row, (mux, muy) in zip(rows, phases):
+            row["mux"] = float(mux)
+            row["muy"] = float(muy)
+        return rows
 
     def task_type(self, node_index: int) -> int:
         idx = ctypes.c_int(int(node_index))
