@@ -153,19 +153,19 @@ def run_madx_error_table_case(args: argparse.Namespace) -> dict:
     applied_errors = ptc.apply_madx_error_table(args.madx_error_table, nonzero=False)
     ptc.update_twiss()
     table_rows = ptc.all_node_twiss_orbit()
-    full_table_orbit = plot_orbit_response(output_dir / "pyptc_bare_vs_jan26_error_table_generated_lattice.png", bare_rows, table_rows)
+    full_table_orbit = plot_orbit_response(output_dir / "pyptc_bare_vs_latest_survey_error_table_generated_lattice.png", bare_rows, table_rows)
     max_delta_x = float(np.max(np.abs(full_table_orbit[:, 5])))
     max_delta_y = float(np.max(np.abs(full_table_orbit[:, 6])))
     assert max_delta_x > 1.0e-4 or max_delta_y > 1.0e-4
     if len(records) == 38 and len(applied_errors) != 38:
         raise AssertionError(
-            "Jan26 error table resolved to "
+            "Survey error table resolved to "
             f"{len(applied_errors)} fibre applications for {len(records)} records; "
             "this usually means the legacy sliced readiness lattice was used instead "
             "of the generated simplified lattice."
         )
     write_array_csv(
-        output_dir / "pyptc_bare_vs_jan26_error_table_generated_lattice.csv",
+        output_dir / "pyptc_bare_vs_latest_survey_error_table_generated_lattice.csv",
         full_table_orbit,
         "s,bare_orbitx,error_table_orbitx,bare_orbity,error_table_orbity,delta_orbitx,delta_orbity",
     )
@@ -201,7 +201,7 @@ def run_madx_error_table_case(args: argparse.Namespace) -> dict:
         "max_abs_rotation_rad": float(max(max(abs(record.dtheta), abs(record.dphi), abs(record.dpsi)) for record in records)),
         "max_orbit_delta_x_m": max_delta_x,
         "max_orbit_delta_y_m": max_delta_y,
-        "orbit_png": "pyptc_bare_vs_jan26_error_table_generated_lattice.png",
+        "orbit_png": "pyptc_bare_vs_latest_survey_error_table_generated_lattice.png",
     }
 
 
@@ -656,7 +656,7 @@ def run(args: argparse.Namespace) -> dict:
         "05_aperture_at_peak_loss_node.png",
         "06_madx_error_table_misalignments.png",
         "07_madx_vs_pyptc_closed_orbit_comparison.png",
-        "pyptc_bare_vs_jan26_error_table_generated_lattice.png",
+        "pyptc_bare_vs_latest_survey_error_table_generated_lattice.png",
     }
     missing_pngs = sorted(required_pngs.difference(pngs))
     assert not missing_pngs, f"Missing required PNG test outputs: {missing_pngs}"

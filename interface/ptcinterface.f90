@@ -8,7 +8,7 @@
 !        use accel_ptc
         IMPLICIT NONE
 
-        character p_in_file*128 
+        character p_in_file*1024
         TYPE(LAYOUT), POINTER :: o_ring
         integer i,j
         real(dp) x(6)
@@ -88,7 +88,7 @@ CAVITY_TOTALPATH=0
         USE pointer_lattice
         IMPLICIT NONE
 
-        character p_in_file*128 
+        character p_in_file*1024
 
         CALL read_ptc_command(p_in_file)
 
@@ -164,6 +164,134 @@ CAVITY_TOTALPATH=0
         INTEGER i
         i = node_index + 1
         call GET_info(i,node_length,bx,by,ax,ay,ex,epx,ey,epy,ox,oxp,oy,oyp)
+
+      return
+      end
+
+!===================================================
+!get number of native PTC fibres in the active layout
+!===================================================
+      subroutine ptc_get_fibre_count(n_fibres,status)
+
+        USE pointer_lattice
+        IMPLICIT NONE
+        INTEGER n_fibres,status
+
+        n_fibres = 0
+        status = 0
+        if(.NOT.ASSOCIATED(my_ering)) call set_lattice_pointers()
+        if(.NOT.ASSOCIATED(my_ering)) then
+          status = 1
+          return
+        endif
+        n_fibres = my_ering%n
+
+      return
+      end
+
+!===================================================
+!get native PTC fibre name
+!===================================================
+      subroutine ptc_get_fibre_name(pos, fibre_name, status)
+
+        USE pointer_lattice
+        IMPLICIT NONE
+        INTEGER pos,status
+        CHARACTER*(*) fibre_name
+        type(fibre), pointer :: p
+
+        fibre_name = ' '
+        status = 0
+        if(.NOT.ASSOCIATED(my_ering)) call set_lattice_pointers()
+        if(.NOT.ASSOCIATED(my_ering)) then
+          status = 1
+          return
+        endif
+        if(pos < 1 .OR. pos > my_ering%n) then
+          status = 1
+          return
+        endif
+
+        call move_to(my_ering,p,pos)
+        fibre_name = p%mag%name
+
+      return
+      end
+
+!===================================================
+!get native PTC aperture data for one fibre
+!===================================================
+      subroutine ptc_get_fibre_aperture(pos, kindaper, r, x, y, dx, dy, s, status)
+
+        USE pointer_lattice
+        IMPLICIT NONE
+        INTEGER pos,kindaper,status
+        REAL(DP) R(2),X,Y,dx,dy,s
+        type(fibre), pointer :: p
+
+        kindaper = 0
+        r = 0.0_dp
+        x = 0.0_dp
+        y = 0.0_dp
+        dx = 0.0_dp
+        dy = 0.0_dp
+        s = 0.0_dp
+        status = 0
+        if(.NOT.ASSOCIATED(my_ering)) call set_lattice_pointers()
+        if(.NOT.ASSOCIATED(my_ering)) then
+          status = 1
+          return
+        endif
+        if(pos < 1 .OR. pos > my_ering%n) then
+          status = 1
+          return
+        endif
+
+        call move_to(my_ering,p,pos)
+        if(ASSOCIATED(p%t2)) then
+          s = p%t2%s(1)
+        elseif(ASSOCIATED(p%t1)) then
+          s = p%t1%s(1)
+        endif
+        if(.NOT.ASSOCIATED(P%MAG%p%aperture)) then
+          status = 2
+          return
+        endif
+
+        kindaper = P%MAG%p%aperture%kind
+        r = P%MAG%p%aperture%r
+        x = P%MAG%p%aperture%x
+        y = P%MAG%p%aperture%y
+        dx = P%MAG%p%aperture%dx
+        dy = P%MAG%p%aperture%dy
+        if(kindaper <= 0) status = 3
+
+      return
+      end
+
+!===================================================
+!set native PTC aperture data for one fibre
+!===================================================
+      subroutine ptc_set_fibre_aperture(pos, kindaper, r, x, y, dx, dy, status)
+
+        USE pointer_lattice
+        USE S_fitting, ONLY: assign_one_aperture
+        IMPLICIT NONE
+        INTEGER pos,kindaper,status
+        REAL(DP) R(2),X,Y,dx,dy
+
+        status = 0
+        if(.NOT.ASSOCIATED(my_ering)) call set_lattice_pointers()
+        if(.NOT.ASSOCIATED(my_ering)) then
+          status = 1
+          return
+        endif
+        if(pos < 1 .OR. pos > my_ering%n) then
+          status = 1
+          return
+        endif
+
+        call assign_one_aperture(my_ering,pos,kindaper,r,x,y,dx,dy)
 
       return
       end
@@ -251,7 +379,7 @@ CAVITY_TOTALPATH=0
    subroutine ptc_read_accel_table(p_in_file)
 
      IMPLICIT NONE
-     character p_in_file*128 
+        character p_in_file*1024
      write(6,*) " This is just an ordinary Script now! "
      
      call read_ptc_command77(p_in_file)

@@ -17,7 +17,7 @@ PYPTC_DIR = MADX_DIR.parents[1]
 REPO_ROOT = PYPTC_DIR.parent
 DEFAULT_OUTPUT_DIR = MADX_DIR / "outputs" / "simplified"
 DEFAULT_LIBRARY = PYPTC_DIR / "build_pyptc" / "libpyptc.so"
-DEFAULT_ERROR_TABLE = MADX_DIR / "reference_errors" / "jan26_survey_corrected.tfs"
+DEFAULT_ERROR_TABLE = MADX_DIR / "reference_errors" / "apr_2026_survey_corrected.tfs"
 
 
 def run_command(command: list[str], cwd: Path) -> None:
@@ -74,7 +74,7 @@ def run_pyptc_smoke(args: argparse.Namespace, flat_file: Path, output_dir: Path)
 
 
 def validate_orbits(smoke_dir: Path, bare_threshold: float, response_threshold: float) -> dict:
-    orbit_csv = smoke_dir / "pyptc_bare_vs_jan26_error_table_generated_lattice.csv"
+    orbit_csv = smoke_dir / "pyptc_bare_vs_latest_survey_error_table_generated_lattice.csv"
     if not orbit_csv.exists():
         raise FileNotFoundError(f"Expected orbit comparison CSV was not produced: {orbit_csv}")
     data = np.loadtxt(orbit_csv, delimiter=",", skiprows=1)

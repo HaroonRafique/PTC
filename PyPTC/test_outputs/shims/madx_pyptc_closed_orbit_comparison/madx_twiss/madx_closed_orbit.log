@@ -3,7 +3,7 @@
   +    MAD-X 5.02.00  (64 bit, Linux)       +
   +           Production Version            +
   + Code Modification Date: 2014.03.05      +
-  + Execution Time Stamp: 20.08.26 18.14.43 +
+  + Execution Time Stamp: 02.09.26 00.05.32 +
   +++++++++++++++++++++++++++++++++++++++++++
 TITLE, "MAD-X closed orbit comparison for PyPTC";
 
@@ -3509,31 +3509,28 @@ enter Twiss module
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
   
-iteration:   1 error:   3.267296E-03 deltap:   0.000000E+00
-orbit:  -6.190707E-04 -1.141237E-04  5.099090E-03  1.080775E-03  0.000000E+00  0.000000E+00
+iteration:   1 error:   1.159463E-03 deltap:   0.000000E+00
+orbit:  -2.186478E-04 -1.333194E-04  8.814686E-04  2.997692E-04  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.204028E-06 deltap:   0.000000E+00
-orbit:  -6.209294E-04 -1.142140E-04  5.098091E-03  1.080456E-03  0.000000E+00  0.000000E+00
-  
-iteration:   3 error:   1.076030E-12 deltap:   0.000000E+00
-orbit:  -6.209294E-04 -1.142140E-04  5.098091E-03  1.080456E-03  0.000000E+00  0.000000E+00
+iteration:   2 error:   2.787233E-07 deltap:   0.000000E+00
+orbit:  -2.189262E-04 -1.333362E-04  8.812890E-04  2.996996E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-         163.36282                 -0      0.03756890986        5.159239671 
+         163.36282                 -0      0.03758324262        5.158255812 
 
                 q1                dq1            betxmax              dxmax 
-        4.33612217       -13.49911065        18.51206794        8.978582481 
+        4.33612866       -13.49919053        18.50783418        8.965400927 
 
              dxrms             xcomax             xcorms                 q2 
-       5.496356173     0.008838512873     0.003026536865        3.830251939 
+       5.496143831     0.008749641171     0.003015760938        3.830251559 
 
                dq2            betymax              dymax              dyrms 
-      -13.44078074        16.73962672        0.640237402       0.3222357245 
+      -13.44072187        16.73841818       0.3405103775       0.1650480849 
 
             ycomax             ycorms             deltap            synch_1 
-    0.008486098232     0.004241287643                  0                  0 
+    0.005842507051      0.00217561989                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
