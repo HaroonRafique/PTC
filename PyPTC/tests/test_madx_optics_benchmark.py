@@ -17,7 +17,7 @@ if str(MADX_DIR) not in sys.path:
     sys.path.insert(0, str(MADX_DIR))
 
 from compare_isis_apertures import aperture_residual_rows
-from compare_madx_pyptc_closed_orbits import LINEAR_COLUMNS, LINEAR_TOPICS, residual_metrics
+from compare_madx_pyptc_closed_orbits import LINEAR_COLUMNS, LINEAR_TOPICS, madx_lorentz_beta, residual_metrics
 
 
 class MadxOpticsBenchmarkTests(unittest.TestCase):
@@ -31,6 +31,9 @@ class MadxOpticsBenchmarkTests(unittest.TestCase):
         metrics = residual_metrics(records)
         self.assertAlmostEqual(metrics["betx"]["max_abs"], 0.2)
         self.assertAlmostEqual(metrics["betx"]["rms"], np.sqrt(0.025))
+
+    def test_madx_dispersion_scale_uses_relativistic_beta(self) -> None:
+        self.assertAlmostEqual(madx_lorentz_beta({"gamma": 2.0}), np.sqrt(0.75))
 
     def test_aperture_residuals_interpolate_madx_at_pyptc_positions(self) -> None:
         class Record:

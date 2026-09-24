@@ -287,6 +287,15 @@ LINEAR_LABELS = {
     "x": ("x", "mm", 1.0e3), "px": ("px", "1", 1.0),
     "y": ("y", "mm", 1.0e3), "py": ("py", "1", 1.0),
 }
+DISPERSION_COLUMNS = frozenset(("dx", "dpx", "dy", "dpy"))
+
+
+def madx_lorentz_beta(table: dict[str, np.ndarray | list[str]]) -> float:
+    """Return the synchronous-particle beta from a MAD-X TWISS header."""
+    gamma = float(table["gamma"])
+    if gamma <= 1.0:
+        raise ValueError(f"MAD-X TWISS GAMMA must exceed one, got {gamma}")
+    return float(np.sqrt(1.0 - gamma**-2))
 
 
 def rows_to_linear_table(rows: list[dict[str, float | int]]) -> dict[str, np.ndarray]:
@@ -304,6 +313,8 @@ def plot_linear_topic(path: Path, title: str, quantities: tuple[str, ...], madx:
     for row_axes, name in zip(axes, quantities):
         overlay, residual_axis = row_axes
         values = np.asarray(madx[name], dtype=float)
+        if name in DISPERSION_COLUMNS:
+            values = values * madx_lorentz_beta(madx)
         compared = compare_series(np.asarray(madx["s"], dtype=float), values, pyptc[name])
         label, unit, scale = LINEAR_LABELS[name]
         overlay.plot(compared[:, 0], compared[:, 1] * scale, label="MAD-X")
@@ -598,8 +609,9 @@ def run(args: argparse.Namespace) -> dict:
     if not args.skip_linear_optics:
         pyptc_bare_rows, pyptc_misaligned_rows, pyptc_bare_scalars, pyptc_misaligned_scalars = pyptc_result[2:]
         for topic, quantities in LINEAR_TOPICS.items():
-            bare = plot_linear_topic(output_dir / f"madx_vs_pyptc_{topic}_bare.png", f"{topic.replace('_', ' ')}: bare lattice", quantities, madx_bare_table, pyptc_bare_rows)
-            full = plot_linear_topic(output_dir / f"madx_vs_pyptc_{topic}_full_error_table.png", f"{topic.replace('_', ' ')}: Apr-2026 corrected full error table", quantities, madx_misaligned_table, pyptc_misaligned_rows)
+            scale_note = f" (MAD-X dispersion × β={madx_lorentz_beta(madx_bare_table):.9f})" if topic == "dispersion" else ""
+            bare = plot_linear_topic(output_dir / f"madx_vs_pyptc_{topic}_bare.png", f"{topic.replace('_', ' ')}: bare lattice{scale_note}", quantities, madx_bare_table, pyptc_bare_rows)
+            full = plot_linear_topic(output_dir / f"madx_vs_pyptc_{topic}_full_error_table.png", f"{topic.replace('_', ' ')}: Apr-2026 corrected full error table{scale_note}", quantities, madx_misaligned_table, pyptc_misaligned_rows)
             write_csv(output_dir / f"madx_vs_pyptc_{topic}_bare.csv", "quantity_index,s,madx,pyptc,pyptc_minus_madx", bare)
             write_csv(output_dir / f"madx_vs_pyptc_{topic}_full_error_table.csv", "quantity_index,s,madx,pyptc,pyptc_minus_madx", full)
             optics_artifacts[topic] = {
@@ -612,6 +624,7 @@ def run(args: argparse.Namespace) -> dict:
     summary = {
         "flat_file": str(flat_file),
         "madx_error_table": str(args.madx_error_table.resolve()),
+        "madx_lorentz_beta": madx_lorentz_beta(madx_bare_table),
         "madx_reference_twiss": str(args.madx_reference_twiss.resolve()) if args.madx_reference_twiss is not None else None,
         "madx_filtered_error_table": str(madx_error_table),
         "pyptc_filtered_error_table": str(pyptc_error_table),

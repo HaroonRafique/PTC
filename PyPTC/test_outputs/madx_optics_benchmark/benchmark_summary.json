@@ -123,16 +123,16 @@
       "dispersion": {
         "bare_metrics": {
           "dpx": {
-            "max_abs": 1.968092578439122,
-            "rms": 0.9109708594940316
+            "max_abs": 0.1611161370281876,
+            "rms": 0.04767677951411605
           },
           "dpy": {
             "max_abs": 0.0,
             "rms": 0.0
           },
           "dx": {
-            "max_abs": 5.623802220565992,
-            "rms": 3.4808310669568705
+            "max_abs": 0.06884113314324525,
+            "rms": 0.013042833158917036
           },
           "dy": {
             "max_abs": 0.0,
@@ -142,20 +142,20 @@
         "bare_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_dispersion_bare.png",
         "full_error_table_metrics": {
           "dpx": {
-            "max_abs": 1.9798275550816045,
-            "rms": 0.9112031700810262
+            "max_abs": 0.162402204862774,
+            "rms": 0.0476610979717963
           },
           "dpy": {
-            "max_abs": 0.07420290014350452,
-            "rms": 0.02702503681171933
+            "max_abs": 0.005901687508339776,
+            "rms": 0.001388961761017524
           },
           "dx": {
-            "max_abs": 5.720908684846192,
-            "rms": 3.4803813593790953
+            "max_abs": 0.07009951573806306,
+            "rms": 0.013069250817855515
           },
           "dy": {
-            "max_abs": 0.2165212458088638,
-            "rms": 0.10447660611917871
+            "max_abs": 0.005228706771531753,
+            "rms": 0.0004891739946656698
           }
         },
         "full_error_table_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_dispersion_full_error_table.png"
@@ -189,6 +189,7 @@
     "madx_bare_max_y_m": 0.0,
     "madx_error_table": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/reference_errors/apr_2026_survey_corrected.tfs",
     "madx_filtered_error_table": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/error_tables/madx_errors.tfs",
+    "madx_lorentz_beta": 0.3671331999295232,
     "madx_misaligned_max_x_m": 0.008749641171,
     "madx_misaligned_max_y_m": 0.005842507051,
     "madx_reference_twiss": null,
