@@ -1,0 +1,20 @@
+TITLE, "MAD-X closed orbit comparison for PyPTC";
+CALL, FILE = "ISIS_Lattice/ISIS.injected_beam";
+CALL, FILE = "ISIS_Lattice/ISIS.elements";
+CALL, FILE = "ISIS_Lattice/ISIS.strength";
+CALL, FILE = "ISIS_Lattice/ISIS.sequence";
+
+USE, SEQUENCE=synchrotron;
+SELECT, FLAG=TWISS, CLEAR;
+SELECT, FLAG=TWISS, COLUMN=name, s, x, px, y, py, betx, bety, alfx, alfy, dx, dpx, dy, dpy, mux, muy;
+TWISS, SAVE, FILE="madx_bare_twiss.tfs";
+
+EOPTION, ADD=false;
+READMYTABLE, FILE="ErrorTables/madx_errors.tfs", TABLE=efield;
+SETERR, TABLE=efield;
+ESAVE, FILE="madx_applied_errors.tfs";
+
+SELECT, FLAG=TWISS, CLEAR;
+SELECT, FLAG=TWISS, COLUMN=name, s, x, px, y, py, betx, bety, alfx, alfy, dx, dpx, dy, dpy, mux, muy;
+TWISS, SAVE, FILE="madx_misaligned_twiss.tfs";
+STOP;

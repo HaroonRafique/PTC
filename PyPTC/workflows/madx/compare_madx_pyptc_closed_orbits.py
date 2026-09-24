@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -20,7 +21,7 @@ if str(PYPTC_DIR) not in sys.path:
     sys.path.insert(0, str(PYPTC_DIR))
 
 from generate_flat_file import DEFAULT_MADX, LATTICES, copytree_contents, generate
-from pyptc import DEFAULT_LIBRARY, PTC
+from pyptc import DEFAULT_LIBRARY, PTC, read_flatfile_fibres, read_madx_error_table
 
 
 DEFAULT_OUTPUT_DIR = MADX_DIR / "outputs" / "simplified_closed_orbit_comparison"
@@ -211,12 +212,13 @@ def run_madx_closed_orbits(args: argparse.Namespace, output_dir: Path, error_tab
     return paths
 
 
-def run_pyptc_closed_orbits(args: argparse.Namespace, flat_file: Path, error_table: Path) -> tuple[np.ndarray, np.ndarray]:
+def run_pyptc_closed_orbits(args: argparse.Namespace, flat_file: Path, error_table: Path, include_optics: bool = False):
     if not args.library.exists():
         raise FileNotFoundError(f"PyPTC shared library not found; run bash PyPTC/build/build_ptc.sh first: {args.library}")
     ptc = PTC(args.library)
     ptc.init_lattice(flat_file)
     bare_rows = ptc.all_node_twiss_orbit()
+    bare_scalars = ptc.tunes() | ptc.chromaticities()
     if args.pyptc_convention == "madx":
         ptc.apply_madx_error_table(error_table, nonzero=False)
     elif args.pyptc_convention == "raw":
@@ -229,25 +231,11 @@ def run_pyptc_closed_orbits(args: argparse.Namespace, flat_file: Path, error_tab
         raise ValueError(f"Unknown PyPTC convention: {args.pyptc_convention}")
     ptc.update_twiss()
     misaligned_rows = ptc.all_node_twiss_orbit()
-    return rows_to_orbit_array(bare_rows), rows_to_orbit_array(misaligned_rows)
-
-
-def run_pyptc_linear_rows(args: argparse.Namespace, flat_file: Path, error_table: Path) -> tuple[list[dict[str, float | int]], list[dict[str, float | int]]]:
-    ptc = PTC(args.library)
-    ptc.init_lattice(flat_file)
-    bare_rows = ptc.all_node_twiss_orbit()
-    ptc.apply_madx_error_table(error_table, nonzero=False)
-    ptc.update_twiss()
-    return bare_rows, ptc.all_node_twiss_orbit()
-
-
-def run_pyptc_scalar_optics(args: argparse.Namespace, flat_file: Path, error_table: Path) -> tuple[dict[str, float], dict[str, float]]:
-    ptc = PTC(args.library)
-    ptc.init_lattice(flat_file)
-    bare = ptc.tunes() | ptc.chromaticities()
-    ptc.apply_madx_error_table(error_table, nonzero=False)
-    ptc.update_twiss()
-    return bare, ptc.tunes() | ptc.chromaticities()
+    misaligned_scalars = ptc.tunes() | ptc.chromaticities()
+    result = (rows_to_orbit_array(bare_rows), rows_to_orbit_array(misaligned_rows))
+    if include_optics:
+        return result + (bare_rows, misaligned_rows, bare_scalars, misaligned_scalars)
+    return result
 
 
 def rows_to_orbit_array(rows: list[dict[str, float | int]]) -> np.ndarray:
@@ -284,6 +272,21 @@ def compare_series(madx_s: np.ndarray, madx_values: np.ndarray, pyptc_series: np
 
 
 LINEAR_COLUMNS = ("betx", "bety", "alfx", "alfy", "dx", "dpx", "dy", "dpy", "mux", "muy", "x", "px", "y", "py")
+LINEAR_TOPICS = {
+    "beta_alpha": ("betx", "bety", "alfx", "alfy"),
+    "dispersion": ("dx", "dpx", "dy", "dpy"),
+    "phase_advances": ("mux", "muy"),
+    "closed_orbit": ("x", "px", "y", "py"),
+}
+LINEAR_LABELS = {
+    "betx": ("βx", "m", 1.0), "bety": ("βy", "m", 1.0),
+    "alfx": ("αx", "1", 1.0), "alfy": ("αy", "1", 1.0),
+    "dx": ("Dx", "m", 1.0), "dpx": ("Dpx", "1", 1.0),
+    "dy": ("Dy", "m", 1.0), "dpy": ("Dpy", "1", 1.0),
+    "mux": ("μx", "turns", 1.0), "muy": ("μy", "turns", 1.0),
+    "x": ("x", "mm", 1.0e3), "px": ("px", "1", 1.0),
+    "y": ("y", "mm", 1.0e3), "py": ("py", "1", 1.0),
+}
 
 
 def rows_to_linear_table(rows: list[dict[str, float | int]]) -> dict[str, np.ndarray]:
@@ -292,34 +295,80 @@ def rows_to_linear_table(rows: list[dict[str, float | int]]) -> dict[str, np.nda
     return {name: np.column_stack([s, [float(row[names[name]]) for row in rows]]) for name in LINEAR_COLUMNS}
 
 
-def plot_linear_optics(path: Path, madx: dict[str, np.ndarray | list[str]], pyptc_rows: list[dict[str, float | int]]) -> np.ndarray:
-    """Plot all common node/TWISS linear quantities and return long-form residual data."""
+def plot_linear_topic(path: Path, title: str, quantities: tuple[str, ...], madx: dict[str, np.ndarray | list[str]], pyptc_rows: list[dict[str, float | int]]) -> np.ndarray:
+    """Plot a readable optics topic, with an overlay and residual for each quantity."""
     plt = require_matplotlib(path.parent)
     pyptc = rows_to_linear_table(pyptc_rows)
-    panels = (("betx", "bety"), ("alfx", "alfy"), ("dx", "dpx"), ("dy", "dpy"), ("mux", "muy"), ("x", "px"), ("y", "py"))
-    fig, axes = plt.subplots(len(panels), 2, figsize=(13, 20), sharex=True)
+    fig, axes = plt.subplots(len(quantities), 2, figsize=(13, 2.8 * len(quantities)), sharex=True, squeeze=False)
     records = []
-    for row_axes, pair in zip(axes, panels):
-        for axis, name in zip(row_axes, pair):
-            values = np.asarray(madx[name], dtype=float)
-            compared = compare_series(np.asarray(madx["s"], dtype=float), values, pyptc[name])
-            scale = 1.0e3 if name in {"x", "y"} else 1.0
-            axis.plot(compared[:, 0], compared[:, 1] * scale, label=f"MAD-X {name}")
-            axis.plot(compared[:, 0], compared[:, 2] * scale, "--", label=f"PyPTC {name}")
-            axis.set_ylabel(f"{name}{' [mm]' if scale != 1.0 else ''}")
+    for row_axes, name in zip(axes, quantities):
+        overlay, residual_axis = row_axes
+        values = np.asarray(madx[name], dtype=float)
+        compared = compare_series(np.asarray(madx["s"], dtype=float), values, pyptc[name])
+        label, unit, scale = LINEAR_LABELS[name]
+        overlay.plot(compared[:, 0], compared[:, 1] * scale, label="MAD-X")
+        overlay.plot(compared[:, 0], compared[:, 2] * scale, "--", label="PyPTC")
+        overlay.set_ylabel(f"{label} [{unit}]")
+        overlay.legend(loc="best", fontsize=8)
+        residual_axis.plot(compared[:, 0], compared[:, 3] * scale, color="tab:red")
+        residual_axis.axhline(0.0, color="black", lw=0.7)
+        residual_axis.set_ylabel(f"Δ{label} [{unit}]")
+        for axis in row_axes:
             axis.grid(which="both", ls=":", lw=0.5)
-            axis.legend(loc="best", fontsize=8)
-            records.extend(np.column_stack([np.full(len(compared), LINEAR_COLUMNS.index(name)), compared]).tolist())
+        records.extend(np.column_stack([np.full(len(compared), LINEAR_COLUMNS.index(name)), compared]).tolist())
     axes[-1, 0].set_xlabel("s [m]"); axes[-1, 1].set_xlabel("s [m]")
+    fig.suptitle(title, y=1.0)
     fig.tight_layout(); fig.savefig(path, dpi=170); plt.close(fig)
     return np.asarray(records, dtype=float)
 
 
+def residual_metrics(records: np.ndarray) -> dict[str, dict[str, float]]:
+    """Return native-unit max/RMS residual metrics keyed by linear quantity."""
+    result = {}
+    for index, name in enumerate(LINEAR_COLUMNS):
+        residual = records[records[:, 0] == index, 4]
+        if len(residual):
+            result[name] = {"max_abs": float(np.max(np.abs(residual))), "rms": float(np.sqrt(np.mean(residual**2)))}
+    return result
+
+
+def write_case_manifest(path: Path, flat_file: Path, error_table: Path, applied, components: set[str], convention: str, flip_components: set[str]) -> None:
+    """Write slide-readable provenance, including every signed applied error."""
+    source_hash = hashlib.sha256(error_table.read_bytes()).hexdigest()
+    s_end = 0.0
+    fibre_s = {}
+    for fibre in read_flatfile_fibres(flat_file):
+        s_end += fibre.length
+        fibre_s[fibre.index] = s_end
+    records = {record.name: record for record in read_madx_error_table(error_table, nonzero=True)}
+    lines = [
+        "# MAD-X / PyPTC comparison case", "",
+        f"- Flat file: `{flat_file}`", f"- MAD-X error table: `{error_table}`", f"- Error-table SHA-256: `{source_hash}`",
+        f"- PyPTC convention: `{convention}`", f"- Retained components: {', '.join(sorted(components))}",
+        f"- PyPTC-only flipped components: {', '.join(sorted(flip_components)) or 'none'}",
+        "- Translations are shown in mm and rotations in mrad; leading signs are the values applied.", "",
+        "| Element | Occurrence | Fibre | s end [m] | DX [mm] | DY [mm] | DS [mm] | DTHETA [mrad] | DPHI [mrad] | DPSI [mrad] |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for entry in applied:
+        record = records[entry.name]
+        lines.append("| {name} | {occurrence} | {fibre} | {s:.6f} | {dx:+.6f} | {dy:+.6f} | {ds:+.6f} | {dtheta:+.6f} | {dphi:+.6f} | {dpsi:+.6f} |".format(
+            name=entry.name, occurrence=entry.occurrence, fibre=entry.fibre_index, s=float(fibre_s.get(entry.fibre_index, float("nan"))),
+            dx=1e3 * record.dx, dy=1e3 * record.dy, ds=1e3 * record.ds,
+            dtheta=1e3 * record.dtheta, dphi=1e3 * record.dphi, dpsi=1e3 * record.dpsi,
+        ))
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def plot_scalar_optics(path: Path, madx_bare: dict[str, np.ndarray | list[str]], madx_error: dict[str, np.ndarray | list[str]], pyptc_bare: dict[str, float], pyptc_error: dict[str, float]) -> dict[str, dict[str, float]]:
     plt = require_matplotlib(path.parent)
-    sources = (("bare", madx_bare, pyptc_bare), ("jan26", madx_error, pyptc_error))
+    sources = (("bare", madx_bare, pyptc_bare), ("full error table", madx_error, pyptc_error))
     mapping = (("qx", "q1"), ("qy", "q2"), ("chromx", "dq1"), ("chromy", "dq2"))
-    result = {case: {name: float(table[key]) for name, key in mapping} | {f"pyptc_{name}": float(values[name]) for name, _ in mapping} for case, table, values in sources}
+    result = {
+        case: {name: float(table[key]) % 1.0 if name in {"qx", "qy"} else float(table[key]) for name, key in mapping}
+        | {f"pyptc_{name}": float(values[name]) for name, _ in mapping}
+        for case, table, values in sources
+    }
     fig, axes = plt.subplots(1, 2, figsize=(10, 4))
     for axis, (case, _table, _values) in zip(axes, sources):
         data = result[case]
@@ -329,10 +378,13 @@ def plot_scalar_optics(path: Path, madx_bare: dict[str, np.ndarray | list[str]],
         axis.bar(x + 0.18, [data[f"pyptc_{name}"] for name in names], 0.36, label="PyPTC")
         axis.set_title(case); axis.set_xticks(x, names); axis.grid(axis="y", ls=":", lw=0.5); axis.legend()
     fig.tight_layout(); fig.savefig(path, dpi=170); plt.close(fig)
+    for data in result.values():
+        for name, _ in mapping:
+            data[f"pyptc_minus_madx_{name}"] = data[f"pyptc_{name}"] - data[name]
     return result
 
 
-def plot_comparison(path: Path, madx_bare: np.ndarray, madx_misaligned: np.ndarray, pyptc_bare: np.ndarray, pyptc_misaligned: np.ndarray) -> np.ndarray:
+def plot_comparison(path: Path, madx_bare: np.ndarray, madx_misaligned: np.ndarray, pyptc_bare: np.ndarray, pyptc_misaligned: np.ndarray, title: str | None = None) -> np.ndarray:
     plt = require_matplotlib(path.parent)
     pyptc_on_madx_bare = interpolate_to(madx_bare[:, 0], pyptc_bare)
     pyptc_on_madx_misaligned = interpolate_to(madx_misaligned[:, 0], pyptc_misaligned)
@@ -361,6 +413,8 @@ def plot_comparison(path: Path, madx_bare: np.ndarray, madx_misaligned: np.ndarr
     axes[2].legend(loc="upper right")
     for ax in axes:
         ax.grid(which="both", ls=":", lw=0.5)
+    if title:
+        fig.suptitle(title, y=0.995)
     fig.tight_layout()
     fig.savefig(path, dpi=170)
     plt.close(fig)
@@ -486,7 +540,8 @@ def run(args: argparse.Namespace) -> dict:
         madx_misaligned_table = parse_tfs(madx_paths["misaligned"])
         madx_bare = tfs_to_orbit_array(madx_bare_table)
         madx_misaligned = tfs_to_orbit_array(madx_misaligned_table)
-    pyptc_bare, pyptc_misaligned = run_pyptc_closed_orbits(args, flat_file, pyptc_error_table)
+    pyptc_result = run_pyptc_closed_orbits(args, flat_file, pyptc_error_table, include_optics=not args.skip_linear_optics)
+    pyptc_bare, pyptc_misaligned = pyptc_result[:2]
 
     if args.distorted_only:
         write_csv(output_dir / "madx_distorted_closed_orbit.csv", "s,x,px,y,py", madx_misaligned)
@@ -525,19 +580,34 @@ def run(args: argparse.Namespace) -> dict:
     write_csv(output_dir / "madx_misaligned_closed_orbit.csv", "s,x,px,y,py", madx_misaligned)
     write_csv(output_dir / "pyptc_bare_closed_orbit.csv", "s,x,px,y,py", pyptc_bare)
     write_csv(output_dir / "pyptc_misaligned_closed_orbit.csv", "s,x,px,y,py", pyptc_misaligned)
-    comparison = plot_comparison(output_dir / "madx_vs_pyptc_closed_orbit_comparison.png", madx_bare, madx_misaligned, pyptc_bare, pyptc_misaligned)
+    case_label = args.case_label or "Bare and full error-table MAD-X/PyPTC comparison"
+    comparison = plot_comparison(output_dir / "madx_vs_pyptc_closed_orbit_comparison.png", madx_bare, madx_misaligned, pyptc_bare, pyptc_misaligned, case_label)
     write_csv(
         output_dir / "madx_vs_pyptc_closed_orbit_comparison.csv",
         "s,madx_bare_x,madx_misaligned_x,pyptc_bare_x_interp,pyptc_misaligned_x_interp,madx_bare_y,madx_misaligned_y,pyptc_bare_y_interp,pyptc_misaligned_y_interp,pyptc_minus_madx_x,pyptc_minus_madx_y",
         comparison,
     )
-    pyptc_bare_rows, pyptc_misaligned_rows = run_pyptc_linear_rows(args, flat_file, pyptc_error_table)
-    pyptc_bare_scalars, pyptc_misaligned_scalars = run_pyptc_scalar_optics(args, flat_file, pyptc_error_table)
-    bare_linear = plot_linear_optics(output_dir / "madx_vs_pyptc_linear_optics_bare.png", madx_bare_table, pyptc_bare_rows)
-    misaligned_linear = plot_linear_optics(output_dir / "madx_vs_pyptc_linear_optics_jan26.png", madx_misaligned_table, pyptc_misaligned_rows)
-    write_csv(output_dir / "madx_vs_pyptc_linear_optics_bare.csv", "quantity_index,s,madx,pyptc,pyptc_minus_madx", bare_linear)
-    write_csv(output_dir / "madx_vs_pyptc_linear_optics_jan26.csv", "quantity_index,s,madx,pyptc,pyptc_minus_madx", misaligned_linear)
-    scalar_optics = plot_scalar_optics(output_dir / "madx_vs_pyptc_scalar_optics.png", madx_bare_table, madx_misaligned_table, pyptc_bare_scalars, pyptc_misaligned_scalars)
+    manifest_ptc = PTC(args.library)
+    manifest_ptc.init_lattice(flat_file)
+    applied_errors = manifest_ptc.apply_madx_error_table(pyptc_error_table, nonzero=True)
+    manifest_path = output_dir / "case_manifest.md"
+    write_case_manifest(manifest_path, flat_file, pyptc_error_table, applied_errors, keep_components, args.pyptc_convention, pyptc_flip_components)
+
+    optics_artifacts = {}
+    scalar_optics = {}
+    if not args.skip_linear_optics:
+        pyptc_bare_rows, pyptc_misaligned_rows, pyptc_bare_scalars, pyptc_misaligned_scalars = pyptc_result[2:]
+        for topic, quantities in LINEAR_TOPICS.items():
+            bare = plot_linear_topic(output_dir / f"madx_vs_pyptc_{topic}_bare.png", f"{topic.replace('_', ' ')}: bare lattice", quantities, madx_bare_table, pyptc_bare_rows)
+            full = plot_linear_topic(output_dir / f"madx_vs_pyptc_{topic}_full_error_table.png", f"{topic.replace('_', ' ')}: Apr-2026 corrected full error table", quantities, madx_misaligned_table, pyptc_misaligned_rows)
+            write_csv(output_dir / f"madx_vs_pyptc_{topic}_bare.csv", "quantity_index,s,madx,pyptc,pyptc_minus_madx", bare)
+            write_csv(output_dir / f"madx_vs_pyptc_{topic}_full_error_table.csv", "quantity_index,s,madx,pyptc,pyptc_minus_madx", full)
+            optics_artifacts[topic] = {
+                "bare_png": str(output_dir / f"madx_vs_pyptc_{topic}_bare.png"),
+                "full_error_table_png": str(output_dir / f"madx_vs_pyptc_{topic}_full_error_table.png"),
+                "bare_metrics": residual_metrics(bare), "full_error_table_metrics": residual_metrics(full),
+            }
+        scalar_optics = plot_scalar_optics(output_dir / "madx_vs_pyptc_scalar_optics.png", madx_bare_table, madx_misaligned_table, pyptc_bare_scalars, pyptc_misaligned_scalars)
 
     summary = {
         "flat_file": str(flat_file),
@@ -559,10 +629,11 @@ def run(args: argparse.Namespace) -> dict:
         "residual_max_x_m": float(np.max(np.abs(comparison[:, 9]))),
         "residual_max_y_m": float(np.max(np.abs(comparison[:, 10]))),
         "comparison_png": str(output_dir / "madx_vs_pyptc_closed_orbit_comparison.png"),
-        "linear_optics_bare_png": str(output_dir / "madx_vs_pyptc_linear_optics_bare.png"),
-        "linear_optics_jan26_png": str(output_dir / "madx_vs_pyptc_linear_optics_jan26.png"),
+        "case_label": case_label,
+        "case_manifest": str(manifest_path),
+        "linear_optics": optics_artifacts,
         "scalar_optics": scalar_optics,
-        "scalar_optics_png": str(output_dir / "madx_vs_pyptc_scalar_optics.png"),
+        "scalar_optics_png": str(output_dir / "madx_vs_pyptc_scalar_optics.png") if scalar_optics else None,
     }
     if args.response_threshold > 0.0 and summary["pyptc_misaligned_max_x_m"] <= args.response_threshold and summary["pyptc_misaligned_max_y_m"] <= args.response_threshold:
         raise AssertionError("PyPTC misaligned orbit response is below threshold")
@@ -585,6 +656,8 @@ def main() -> None:
     parser.add_argument("--components", nargs="+", choices=MISALIGNMENT_COMPONENTS)
     parser.add_argument("--pyptc-convention", choices=("madx", "raw"), default="madx")
     parser.add_argument("--pyptc-flip-components", nargs="+", choices=MISALIGNMENT_COMPONENTS)
+    parser.add_argument("--case-label", help="Human-readable case description used in plot titles and provenance.")
+    parser.add_argument("--skip-linear-optics", action="store_true", help="Only create the closed-orbit comparison (used by cscan diagnostics).")
     parser.add_argument("--distorted-only", action="store_true")
     args = parser.parse_args()
     print(json.dumps(run(args), indent=2, sort_keys=True))

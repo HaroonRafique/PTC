@@ -1,0 +1,236 @@
+{
+  "aperture": {
+    "applied_fibre_apertures": 1990,
+    "assignment_records": 1990,
+    "design_csv": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/design_aperture.csv",
+    "drift_probe": {
+      "fibre_index": 8,
+      "length_m": 0.1,
+      "lost": true,
+      "lost_pos": 1,
+      "lost_turn": 1,
+      "name": "SP0_D0_00",
+      "stored": true
+    },
+    "flat_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/flat_file/PTC-PyORBIT_flat_file.flt",
+    "madx_aperture_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/flat_file/madx_aperture.tfs",
+    "madx_csv": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/madx_aperture.csv",
+    "missing_csv": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/missing_pyptc_apertures.csv",
+    "missing_records": 0,
+    "plot": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/isis_rcs_aperture_overlay.png",
+    "pyptc_csv": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/pyptc_apertures.csv",
+    "queried_fibre_apertures": 1990,
+    "residual_csv": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/madx_vs_pyptc_aperture_residuals.csv",
+    "residual_max_half_x_m": 4.853434321105965e-11,
+    "residual_max_half_y_m": 5.016390081102884e-12,
+    "residual_plot": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/madx_vs_pyptc_aperture_residuals.png"
+  },
+  "description": "MAD-X/PyPTC slide benchmark: bare and full-error-table optics/orbits plus aperture state.",
+  "optics": {
+    "case_label": "Slide benchmark: bare lattice and Apr-2026 corrected full error table",
+    "case_manifest": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/case_manifest.md",
+    "comparison_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_closed_orbit_comparison.png",
+    "components": [
+      "DPHI",
+      "DPSI",
+      "DS",
+      "DTHETA",
+      "DX",
+      "DY"
+    ],
+    "flat_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/flat_file/PTC-PyORBIT_flat_file.flt",
+    "linear_optics": {
+      "beta_alpha": {
+        "bare_metrics": {
+          "alfx": {
+            "max_abs": 0.9801942277339482,
+            "rms": 0.25143012680110594
+          },
+          "alfy": {
+            "max_abs": 0.8862526104072401,
+            "rms": 0.28936143261856906
+          },
+          "betx": {
+            "max_abs": 0.5408508092932962,
+            "rms": 0.13181003702432892
+          },
+          "bety": {
+            "max_abs": 0.9392395612604032,
+            "rms": 0.1402493979188593
+          }
+        },
+        "bare_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_beta_alpha_bare.png",
+        "full_error_table_metrics": {
+          "alfx": {
+            "max_abs": 0.9823049250873024,
+            "rms": 0.25146820424005756
+          },
+          "alfy": {
+            "max_abs": 0.8869698690944081,
+            "rms": 0.28931235752932666
+          },
+          "betx": {
+            "max_abs": 0.5402576513678916,
+            "rms": 0.13179317715720554
+          },
+          "bety": {
+            "max_abs": 0.9386209970308892,
+            "rms": 0.1402126495184615
+          }
+        },
+        "full_error_table_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_beta_alpha_full_error_table.png"
+      },
+      "closed_orbit": {
+        "bare_metrics": {
+          "px": {
+            "max_abs": 5.806174114863571e-14,
+            "rms": 2.6920167693972833e-14
+          },
+          "py": {
+            "max_abs": 0.0,
+            "rms": 0.0
+          },
+          "x": {
+            "max_abs": 2.0897492969799484e-13,
+            "rms": 1.0863531688757769e-13
+          },
+          "y": {
+            "max_abs": 0.0,
+            "rms": 0.0
+          }
+        },
+        "bare_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_closed_orbit_bare.png",
+        "full_error_table_metrics": {
+          "px": {
+            "max_abs": 0.0007008991238289521,
+            "rms": 0.00012292655623658452
+          },
+          "py": {
+            "max_abs": 0.0008534089110205875,
+            "rms": 0.00013395200631950314
+          },
+          "x": {
+            "max_abs": 0.0025109742665759666,
+            "rms": 0.0002427148731458816
+          },
+          "y": {
+            "max_abs": 0.00053813095526986,
+            "rms": 0.00011055646234390602
+          }
+        },
+        "full_error_table_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_closed_orbit_full_error_table.png"
+      },
+      "dispersion": {
+        "bare_metrics": {
+          "dpx": {
+            "max_abs": 1.968092578439122,
+            "rms": 0.9109708594940316
+          },
+          "dpy": {
+            "max_abs": 0.0,
+            "rms": 0.0
+          },
+          "dx": {
+            "max_abs": 5.623802220565992,
+            "rms": 3.4808310669568705
+          },
+          "dy": {
+            "max_abs": 0.0,
+            "rms": 0.0
+          }
+        },
+        "bare_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_dispersion_bare.png",
+        "full_error_table_metrics": {
+          "dpx": {
+            "max_abs": 1.9798275550816045,
+            "rms": 0.9112031700810262
+          },
+          "dpy": {
+            "max_abs": 0.07420290014350452,
+            "rms": 0.02702503681171933
+          },
+          "dx": {
+            "max_abs": 5.720908684846192,
+            "rms": 3.4803813593790953
+          },
+          "dy": {
+            "max_abs": 0.2165212458088638,
+            "rms": 0.10447660611917871
+          }
+        },
+        "full_error_table_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_dispersion_full_error_table.png"
+      },
+      "phase_advances": {
+        "bare_metrics": {
+          "mux": {
+            "max_abs": 3.7161499467592507,
+            "rms": 2.1967020248765516
+          },
+          "muy": {
+            "max_abs": 5.311343092429115,
+            "rms": 2.552673864103194
+          }
+        },
+        "bare_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_phase_advances_bare.png",
+        "full_error_table_metrics": {
+          "mux": {
+            "max_abs": 3.7180096442488586,
+            "rms": 2.195839834845762
+          },
+          "muy": {
+            "max_abs": 5.312743573469141,
+            "rms": 2.5523468942491903
+          }
+        },
+        "full_error_table_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_phase_advances_full_error_table.png"
+      }
+    },
+    "madx_bare_max_x_m": 0.0,
+    "madx_bare_max_y_m": 0.0,
+    "madx_error_table": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/reference_errors/apr_2026_survey_corrected.tfs",
+    "madx_filtered_error_table": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/error_tables/madx_errors.tfs",
+    "madx_misaligned_max_x_m": 0.008749641171,
+    "madx_misaligned_max_y_m": 0.005842507051,
+    "madx_reference_twiss": null,
+    "pyptc_bare_max_x_m": 2.1241018807226758e-13,
+    "pyptc_bare_max_y_m": 0.0,
+    "pyptc_convention": "madx",
+    "pyptc_filtered_error_table": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/error_tables/pyptc_errors.tfs",
+    "pyptc_flip_components": [],
+    "pyptc_misaligned_max_x_m": 0.008651762881663097,
+    "pyptc_misaligned_max_y_m": 0.005957305435577061,
+    "residual_max_x_m": 0.0025109742665759666,
+    "residual_max_y_m": 0.00053813095526986,
+    "scalar_optics": {
+      "bare": {
+        "chromx": -13.49757891,
+        "chromy": -13.44202055,
+        "pyptc_chromx": -4.9553035708473105,
+        "pyptc_chromy": -4.934982977661852,
+        "pyptc_minus_madx_chromx": 8.542275339152688,
+        "pyptc_minus_madx_chromy": 8.507037572338149,
+        "pyptc_minus_madx_qx": 5.2529866420292226e-05,
+        "pyptc_minus_madx_qy": 0.00010518334562004128,
+        "pyptc_qx": 0.33600568786642,
+        "pyptc_qy": 0.83036108234562,
+        "qx": 0.3359531579999997,
+        "qy": 0.830255899
+      },
+      "full error table": {
+        "chromx": -13.49919053,
+        "chromy": -13.44072187,
+        "pyptc_chromx": -4.9568869436351335,
+        "pyptc_chromy": -4.935075900456704,
+        "pyptc_minus_madx_chromx": 8.542303586364866,
+        "pyptc_minus_madx_chromy": 8.505645969543297,
+        "pyptc_minus_madx_qx": 5.8009804090042305e-05,
+        "pyptc_minus_madx_qy": 0.0001099989566898385,
+        "pyptc_qx": 0.33618666980409,
+        "pyptc_qy": 0.83036155795669,
+        "qx": 0.33612865999999997,
+        "qy": 0.8302515590000001
+      }
+    },
+    "scalar_optics_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_scalar_optics.png"
+  }
+}

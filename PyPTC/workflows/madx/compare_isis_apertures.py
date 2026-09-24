@@ -153,6 +153,37 @@ def plot_overlay(path: Path, design, madx, pyptc_rows: list[dict[str, object]]) 
     plt.close(fig)
 
 
+def aperture_residual_rows(madx, pyptc_rows: list[dict[str, object]]) -> np.ndarray:
+    """Interpolate MAD-X half apertures to queried PyPTC aperture positions."""
+    madx_s = np.asarray([record.s for record in madx], dtype=float)
+    madx_x = np.asarray([record.half_x for record in madx], dtype=float)
+    madx_y = np.asarray([record.half_y for record in madx], dtype=float)
+    keep = [row for row in pyptc_rows if float(row["x"]) > 0.0 and float(row["y"]) > 0.0]
+    s = np.asarray([float(row["s"]) for row in keep], dtype=float)
+    pyptc_x = np.asarray([float(row["x"]) for row in keep], dtype=float)
+    pyptc_y = np.asarray([float(row["y"]) for row in keep], dtype=float)
+    order = np.argsort(madx_s)
+    return np.column_stack([s, np.interp(s, madx_s[order], madx_x[order]), pyptc_x, np.interp(s, madx_s[order], madx_y[order]), pyptc_y])
+
+
+def plot_residuals(path: Path, rows: np.ndarray) -> None:
+    plt = require_matplotlib(path.parent)
+    fig, axes = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+    axes[0].plot(rows[:, 0], (rows[:, 2] - rows[:, 1]) * 1e3, label="PyPTC − MAD-X")
+    axes[1].plot(rows[:, 0], (rows[:, 4] - rows[:, 3]) * 1e3, label="PyPTC − MAD-X")
+    axes[0].set_ylabel("Δ horizontal half aperture [mm]")
+    axes[1].set_ylabel("Δ vertical half aperture [mm]")
+    axes[1].set_xlabel("s [m]")
+    for axis in axes:
+        axis.axhline(0.0, color="black", lw=0.7)
+        axis.grid(True, alpha=0.25)
+        axis.legend(loc="best")
+    fig.suptitle("ISIS aperture comparison residuals (MAD-X interpolated to PyPTC positions)")
+    fig.tight_layout()
+    fig.savefig(path, dpi=180)
+    plt.close(fig)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--library", type=Path, default=DEFAULT_LIBRARY)
@@ -177,12 +208,17 @@ def main() -> None:
     pyptc_csv = output_dir / "pyptc_apertures.csv"
     missing_csv = output_dir / "missing_pyptc_apertures.csv"
     plot_path = output_dir / "isis_rcs_aperture_overlay.png"
+    residual_csv = output_dir / "madx_vs_pyptc_aperture_residuals.csv"
+    residual_plot = output_dir / "madx_vs_pyptc_aperture_residuals.png"
 
     write_records_csv(design_csv, aperture_rows(design), ["name", "s", "half_x_m", "half_y_m"])
     write_records_csv(madx_csv, aperture_rows(madx), ["name", "s", "half_x_m", "half_y_m"])
     write_records_csv(pyptc_csv, pyptc_rows, ["fibre_index", "name", "s_start", "s_end", "s", "kind", "r1", "r2", "x", "y", "dx", "dy"])
     write_records_csv(missing_csv, missing_rows, ["name", "reason"])
     plot_overlay(plot_path, design, madx, pyptc_rows)
+    residuals = aperture_residual_rows(madx, pyptc_rows)
+    np.savetxt(residual_csv, residuals, delimiter=",", header="s,madx_half_x_m,pyptc_half_x_m,madx_half_y_m,pyptc_half_y_m", comments="")
+    plot_residuals(residual_plot, residuals)
 
     summary.update(
         {
@@ -193,6 +229,10 @@ def main() -> None:
             "pyptc_csv": str(pyptc_csv),
             "missing_csv": str(missing_csv),
             "plot": str(plot_path),
+            "residual_csv": str(residual_csv),
+            "residual_plot": str(residual_plot),
+            "residual_max_half_x_m": float(np.max(np.abs(residuals[:, 2] - residuals[:, 1]))),
+            "residual_max_half_y_m": float(np.max(np.abs(residuals[:, 4] - residuals[:, 3]))),
         }
     )
     (output_dir / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")

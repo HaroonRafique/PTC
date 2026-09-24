@@ -130,6 +130,15 @@ The MAD-X workflow writes generated files and plots under
 tracked in git so a new checkout can reproduce the flat-file generation without
 finding an external MAD-X installation.
 
+Generate the tracked, slide-ready benchmark bundle (bare and full-table optics,
+closed orbit, aperture overlay/residuals, signed error manifest, and CSV data):
+
+```bash
+python3 PyPTC/workflows/madx/generate_optics_benchmark.py
+```
+
+The bundle is written to `PyPTC/test_outputs/madx_optics_benchmark/`.
+
 Use from Python:
 
 ```python

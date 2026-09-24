@@ -21,6 +21,7 @@ from compare_madx_pyptc_closed_orbits import (
     REPO_ROOT,
     require_matplotlib,
 )
+from pyptc import read_madx_error_table
 
 
 DEFAULT_OUTPUT_DIR = MADX_DIR / "outputs" / "cscan"
@@ -30,6 +31,10 @@ def run_case(output_dir: Path, component: str, convention: str, flip: bool, args
     convention_tag = "m" if convention == "madx" else "r"
     case_name = f"{component.lower()}_{convention_tag}{'f' if flip else ''}"
     case_dir = output_dir / case_name
+    convention_text = "MAD-X convention, same signed values" if convention == "madx" else "raw PyPTC convention, same signed values"
+    if flip:
+        convention_text = f"MAD-X convention; PyPTC {component} signs deliberately reversed"
+    affected = sum(getattr(record, component.lower()) != 0.0 for record in read_madx_error_table(args.madx_error_table, nonzero=True))
     command = [
         sys.executable,
         str(MADX_DIR / "compare_madx_pyptc_closed_orbits.py"),
@@ -47,6 +52,9 @@ def run_case(output_dir: Path, component: str, convention: str, flip: bool, args
         convention,
         "--response-threshold",
         "0.0",
+        "--skip-linear-optics",
+        "--case-label",
+        f"cscan diagnostic: {component}; {affected} affected elements; {convention_text}",
     ]
     if flip:
         command.extend(["--pyptc-flip-components", component])
@@ -88,7 +96,7 @@ def write_summary_csv(path: Path, rows: list[dict]) -> None:
 
 def plot_summary(path: Path, rows: list[dict]) -> None:
     plt = require_matplotlib(path.parent)
-    labels = [row["case"] for row in rows]
+    labels = [f"{row['component']}\n{'MAD-X' if row['convention'] == 'madx' else 'raw'}{' / flip' if row['pyptc_flip'] else ''}" for row in rows]
     x = np.arange(len(rows))
     residual_x = np.array([1.0e3 * row["residual_max_x_m"] for row in rows])
     residual_y = np.array([1.0e3 * row["residual_max_y_m"] for row in rows])
@@ -119,17 +127,47 @@ def plot_summary(path: Path, rows: list[dict]) -> None:
     plt.close(fig)
 
 
+def write_manifest(path: Path, rows: list[dict], error_table: Path) -> None:
+    """Explain the scan conventions and retain all signed source values."""
+    records = read_madx_error_table(error_table, nonzero=True)
+    lines = [
+        "# Misalignment component/sign scan", "",
+        "Each case retains only the named component from the corrected Apr-2026 error table.",
+        "`m` uses the same signed MAD-X convention in PyPTC; `r` uses raw PyPTC values;",
+        "`mf` deliberately reverses that component in PyPTC only and is a convention diagnostic, not a like-for-like comparison.", "",
+        "| Directory | Component | PyPTC convention | PyPTC component sign |", "| --- | --- | --- | --- |",
+    ]
+    for row in rows:
+        sign = "reversed (diagnostic)" if row["pyptc_flip"] else "same as MAD-X"
+        lines.append(f"| `{row['case']}` | {row['component']} | {row['convention']} | {sign} |")
+    for component in MISALIGNMENT_COMPONENTS:
+        entries = [(record.name, getattr(record, component.lower())) for record in records if getattr(record, component.lower()) != 0.0]
+        unit = "mm" if component in {"DX", "DY", "DS"} else "mrad"
+        scale = 1e3
+        lines.extend(["", f"## {component} signed source values [{unit}]", "", "| Element | Value |", "| --- | ---: |"])
+        lines.extend(f"| {name} | {scale * value:+.6f} |" for name, value in entries)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def run(args: argparse.Namespace) -> dict:
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     rows: list[dict] = []
-    for component in MISALIGNMENT_COMPONENTS:
-        rows.append(run_case(output_dir, component, "madx", False, args))
-        rows.append(run_case(output_dir, component, "raw", False, args))
-        rows.append(run_case(output_dir, component, "madx", True, args))
+    selected = tuple(args.components or MISALIGNMENT_COMPONENTS)
+    for component in selected:
+        for convention, flip in (("madx", False), ("raw", False), ("madx", True)):
+            if args.summary_only:
+                tag = "m" if convention == "madx" else "r"
+                case_name = f"{component.lower()}_{tag}{'f' if flip else ''}"
+                result = json.loads((output_dir / case_name / "summary.json").read_text(encoding="utf-8"))
+                result.update(case=case_name, component=component, convention=convention, pyptc_flip=flip)
+                rows.append(result)
+            else:
+                rows.append(run_case(output_dir, component, convention, flip, args))
 
     write_summary_csv(output_dir / "component_scan_summary.csv", rows)
     plot_summary(output_dir / "component_scan_summary.png", rows)
+    write_manifest(output_dir / "component_scan_manifest.md", rows, args.madx_error_table)
     best = {}
     for component in MISALIGNMENT_COMPONENTS:
         candidates = [row for row in rows if row["component"] == component]
@@ -150,6 +188,8 @@ def main() -> None:
     parser.add_argument("--library", type=Path, default=DEFAULT_LIBRARY)
     parser.add_argument("--madx-error-table", type=Path, default=DEFAULT_ERROR_TABLE)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--components", nargs="+", choices=MISALIGNMENT_COMPONENTS, help="Limit regeneration to named components.")
+    parser.add_argument("--summary-only", action="store_true", help="Rebuild aggregate labels and manifest from existing case summaries.")
     args = parser.parse_args()
     print(json.dumps(run(args), indent=2, sort_keys=True))
 

@@ -1,0 +1,11 @@
+{
+  "flat_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/flat_file/PTC-PyORBIT_flat_file.flt",
+  "lattice": "simplified",
+  "lattice_dir": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/lattices/00_Simplified_Lattice",
+  "log": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/flat_file/madx.log",
+  "madx": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/bin/madx-linux64_v5_02_00",
+  "madx_aperture_file": null,
+  "output_dir": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/flat_file",
+  "returncode": 0,
+  "twiss_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/flat_file/optimised_flat_file.tfs"
+}

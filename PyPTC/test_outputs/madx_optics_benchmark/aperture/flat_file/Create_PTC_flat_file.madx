@@ -1,0 +1,38 @@
+TITLE, "Flat file generation for PyPTC with ISIS RCS apertures";
+/***********************************************************************
+ * ISIS Proton Synchrotron: aperture lattice
+ * Create a PTC flat file and MAD-X APERTURE table for standalone PyPTC
+ * studies. This file is run from a generated working directory containing:
+ *   ISIS_Lattice/
+ *   PTC_Scripts/
+ **********************************************************************/
+CALL, FILE = "ISIS_Lattice/ISIS.injected_beam";
+CALL, FILE = "ISIS_Lattice/ISIS.elements";
+CALL, FILE = "ISIS_Lattice/ISIS.strength";
+CALL, FILE = "ISIS_Lattice/2023.strength";
+CALL, FILE = "ISIS_Lattice/ISIS.sequence";
+CALL, FILE = "ISIS_Lattice/ISIS.aperture";
+
+USE, SEQUENCE=synchrotron;
+
+select, flag=twiss, clear;
+select, flag=twiss, column=keyword, name, s, l, betx, alfx, mux, bety, alfy, muy, x, px, y, py, t, pt, dx, dpx, dy, dpy, wx, phix, dmux, wy, phiy, dmuy, ddx, ddpx, ddy, ddpy, r11, r12, r21, r22, energy, angle, k0l, k0sl, k1l, k1sl, k2l, k2sl, k3l, k3sl, k4l, k4sl, k5l, k5sl, k6l, k6sl, k7l, k7sl, k8l, k8sl, k9l, k9sl, k10l, k10sl, ksi, hkick, vkick, tilt, e1, e2, h1, h2, hgap, fint, fintx, volt, lag, freq, harmon, slot_id, assembly_id, mech_sep, kmax, kmin, calib, polarity, alfa, beta11, beta12, beta13, beta21, beta22, beta23, beta31, beta32, beta33, alfa11, alfa12, alfa13, alfa21, alfa22, disp1, disp2, disp3, disp4;
+twiss, sequence=synchrotron, file=synchrotron.tfs;
+
+select, flag=twiss, clear;
+select, flag=twiss, column=name, s, apertype, aper_1, aper_2, aper_3, aper_4;
+twiss, sequence=synchrotron, file=madx_aperture.tfs;
+
+propagation_method = 2;
+order_of_integrator = 6;
+integration_steps_per_element = 5;
+map_order = 5;
+
+ptc_create_universe;
+ptc_create_layout,time=true, model=propagation_method, exact=true, method=order_of_integrator, nst=integration_steps_per_element;
+ptc_script, file="./PTC_Scripts/resplit.ptc";
+ptc_script, file="./PTC_Scripts/print_flat_file.ptc";
+select, flag=ptc_twiss, clear;
+select, flag=ptc_twiss, column=name, s, betx, bety, alfx, alfy, disp1, disp2, disp3, disp4, mu1, mu2, x, px, y, py;
+ptc_twiss, icase=5, no=map_order, deltap_dependency, closed_orbit, file=optimised_flat_file.tfs, table=ptc_twiss;
+ptc_end;

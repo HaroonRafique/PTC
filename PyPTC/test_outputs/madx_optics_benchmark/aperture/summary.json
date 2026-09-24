@@ -1,0 +1,26 @@
+{
+  "applied_fibre_apertures": 1990,
+  "assignment_records": 1990,
+  "design_csv": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/design_aperture.csv",
+  "drift_probe": {
+    "fibre_index": 8,
+    "length_m": 0.1,
+    "lost": true,
+    "lost_pos": 1,
+    "lost_turn": 1,
+    "name": "SP0_D0_00",
+    "stored": true
+  },
+  "flat_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/flat_file/PTC-PyORBIT_flat_file.flt",
+  "madx_aperture_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/flat_file/madx_aperture.tfs",
+  "madx_csv": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/madx_aperture.csv",
+  "missing_csv": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/missing_pyptc_apertures.csv",
+  "missing_records": 0,
+  "plot": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/isis_rcs_aperture_overlay.png",
+  "pyptc_csv": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/pyptc_apertures.csv",
+  "queried_fibre_apertures": 1990,
+  "residual_csv": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/madx_vs_pyptc_aperture_residuals.csv",
+  "residual_max_half_x_m": 4.853434321105965e-11,
+  "residual_max_half_y_m": 5.016390081102884e-12,
+  "residual_plot": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/aperture/madx_vs_pyptc_aperture_residuals.png"
+}
