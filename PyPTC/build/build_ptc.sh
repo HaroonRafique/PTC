@@ -50,6 +50,7 @@ for symbol in \
   pyptc_get_api_level \
   pyptc_get_tunes \
   pyptc_get_chromaticities \
+  pyptc_get_node_phase_advances \
   pyptc_set_misalignment \
   pyptc_set_madx_misalignment \
   pyptc_set_one_aperture \
@@ -104,6 +105,7 @@ for name in (
     "pyptc_get_api_level",
     "pyptc_get_tunes",
     "pyptc_get_chromaticities",
+    "pyptc_get_node_phase_advances",
     "pyptc_set_misalignment",
     "pyptc_set_madx_misalignment",
     "pyptc_set_one_aperture",

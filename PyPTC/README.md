@@ -94,6 +94,11 @@ misalignment table to the simplified lattice:
 python3 PyPTC/workflows/madx/compare_madx_pyptc_closed_orbits.py
 ```
 
+This command also writes bare and corrected-Jan26 multi-panel linear-optics
+comparisons for beta/alpha, dispersion, phase advance, and all four closed-
+orbit coordinates. The companion aperture command below remains the
+design/MAD-X/PyPTC half-aperture comparison.
+
 Scan each MAD-X error-table component independently, including raw PTC and
 PyPTC-only sign-flip checks:
 

@@ -42,9 +42,18 @@ def parse_tfs(path: Path) -> dict[str, np.ndarray | list[str]]:
     lines = path.read_text(encoding="utf-8").splitlines()
     columns = None
     data_start = None
+    headers: dict[str, float | str] = {}
     for index, line in enumerate(lines):
         stripped = line.strip()
-        if stripped.startswith("*"):
+        if stripped.startswith("@"):
+            parts = stripped.split(maxsplit=3)
+            if len(parts) == 4:
+                token = parts[3].strip('"')
+                try:
+                    headers[parts[1].lower()] = float(token.replace("D", "E").replace("d", "e"))
+                except ValueError:
+                    headers[parts[1].lower()] = token
+        elif stripped.startswith("*"):
             columns = stripped.lstrip("*").split()
         elif stripped.startswith("$") and columns is not None:
             data_start = index + 1
@@ -76,6 +85,7 @@ def parse_tfs(path: Path) -> dict[str, np.ndarray | list[str]]:
     parsed: dict[str, np.ndarray | list[str]] = {}
     for key, value in values.items():
         parsed[key] = value if key in string_columns else np.asarray(value, dtype=float)
+    parsed.update(headers)
     return parsed
 
 
@@ -222,6 +232,24 @@ def run_pyptc_closed_orbits(args: argparse.Namespace, flat_file: Path, error_tab
     return rows_to_orbit_array(bare_rows), rows_to_orbit_array(misaligned_rows)
 
 
+def run_pyptc_linear_rows(args: argparse.Namespace, flat_file: Path, error_table: Path) -> tuple[list[dict[str, float | int]], list[dict[str, float | int]]]:
+    ptc = PTC(args.library)
+    ptc.init_lattice(flat_file)
+    bare_rows = ptc.all_node_twiss_orbit()
+    ptc.apply_madx_error_table(error_table, nonzero=False)
+    ptc.update_twiss()
+    return bare_rows, ptc.all_node_twiss_orbit()
+
+
+def run_pyptc_scalar_optics(args: argparse.Namespace, flat_file: Path, error_table: Path) -> tuple[dict[str, float], dict[str, float]]:
+    ptc = PTC(args.library)
+    ptc.init_lattice(flat_file)
+    bare = ptc.tunes() | ptc.chromaticities()
+    ptc.apply_madx_error_table(error_table, nonzero=False)
+    ptc.update_twiss()
+    return bare, ptc.tunes() | ptc.chromaticities()
+
+
 def rows_to_orbit_array(rows: list[dict[str, float | int]]) -> np.ndarray:
     s = np.cumsum([float(row["length"]) for row in rows])
     return np.column_stack(
@@ -246,6 +274,62 @@ def interpolate_to(s_target: np.ndarray, source: np.ndarray) -> np.ndarray:
     unique_s, unique_index = np.unique(s, return_index=True)
     unique_values = values[unique_index]
     return np.column_stack([np.interp(s_target, unique_s, unique_values[:, col]) for col in range(unique_values.shape[1])])
+
+
+def compare_series(madx_s: np.ndarray, madx_values: np.ndarray, pyptc_series: np.ndarray) -> np.ndarray:
+    """Return s, MAD-X, interpolated PyPTC, and PyPTC-minus-MAD-X values."""
+    pyptc_values = interpolate_to(np.asarray(madx_s, dtype=float), np.asarray(pyptc_series, dtype=float))[:, 0]
+    madx_values = np.asarray(madx_values, dtype=float)
+    return np.column_stack([madx_s, madx_values, pyptc_values, pyptc_values - madx_values])
+
+
+LINEAR_COLUMNS = ("betx", "bety", "alfx", "alfy", "dx", "dpx", "dy", "dpy", "mux", "muy", "x", "px", "y", "py")
+
+
+def rows_to_linear_table(rows: list[dict[str, float | int]]) -> dict[str, np.ndarray]:
+    s = np.cumsum([float(row["length"]) for row in rows])
+    names = {"betx": "betax", "bety": "betay", "alfx": "alphax", "alfy": "alphay", "dx": "etax", "dpx": "etapx", "dy": "etay", "dpy": "etapy", "mux": "mux", "muy": "muy", "x": "orbitx", "px": "orbitpx", "y": "orbity", "py": "orbitpy"}
+    return {name: np.column_stack([s, [float(row[names[name]]) for row in rows]]) for name in LINEAR_COLUMNS}
+
+
+def plot_linear_optics(path: Path, madx: dict[str, np.ndarray | list[str]], pyptc_rows: list[dict[str, float | int]]) -> np.ndarray:
+    """Plot all common node/TWISS linear quantities and return long-form residual data."""
+    plt = require_matplotlib(path.parent)
+    pyptc = rows_to_linear_table(pyptc_rows)
+    panels = (("betx", "bety"), ("alfx", "alfy"), ("dx", "dpx"), ("dy", "dpy"), ("mux", "muy"), ("x", "px"), ("y", "py"))
+    fig, axes = plt.subplots(len(panels), 2, figsize=(13, 20), sharex=True)
+    records = []
+    for row_axes, pair in zip(axes, panels):
+        for axis, name in zip(row_axes, pair):
+            values = np.asarray(madx[name], dtype=float)
+            compared = compare_series(np.asarray(madx["s"], dtype=float), values, pyptc[name])
+            scale = 1.0e3 if name in {"x", "y"} else 1.0
+            axis.plot(compared[:, 0], compared[:, 1] * scale, label=f"MAD-X {name}")
+            axis.plot(compared[:, 0], compared[:, 2] * scale, "--", label=f"PyPTC {name}")
+            axis.set_ylabel(f"{name}{' [mm]' if scale != 1.0 else ''}")
+            axis.grid(which="both", ls=":", lw=0.5)
+            axis.legend(loc="best", fontsize=8)
+            records.extend(np.column_stack([np.full(len(compared), LINEAR_COLUMNS.index(name)), compared]).tolist())
+    axes[-1, 0].set_xlabel("s [m]"); axes[-1, 1].set_xlabel("s [m]")
+    fig.tight_layout(); fig.savefig(path, dpi=170); plt.close(fig)
+    return np.asarray(records, dtype=float)
+
+
+def plot_scalar_optics(path: Path, madx_bare: dict[str, np.ndarray | list[str]], madx_error: dict[str, np.ndarray | list[str]], pyptc_bare: dict[str, float], pyptc_error: dict[str, float]) -> dict[str, dict[str, float]]:
+    plt = require_matplotlib(path.parent)
+    sources = (("bare", madx_bare, pyptc_bare), ("jan26", madx_error, pyptc_error))
+    mapping = (("qx", "q1"), ("qy", "q2"), ("chromx", "dq1"), ("chromy", "dq2"))
+    result = {case: {name: float(table[key]) for name, key in mapping} | {f"pyptc_{name}": float(values[name]) for name, _ in mapping} for case, table, values in sources}
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+    for axis, (case, _table, _values) in zip(axes, sources):
+        data = result[case]
+        names = [name for name, _ in mapping]
+        x = np.arange(len(names))
+        axis.bar(x - 0.18, [data[name] for name in names], 0.36, label="MAD-X")
+        axis.bar(x + 0.18, [data[f"pyptc_{name}"] for name in names], 0.36, label="PyPTC")
+        axis.set_title(case); axis.set_xticks(x, names); axis.grid(axis="y", ls=":", lw=0.5); axis.legend()
+    fig.tight_layout(); fig.savefig(path, dpi=170); plt.close(fig)
+    return result
 
 
 def plot_comparison(path: Path, madx_bare: np.ndarray, madx_misaligned: np.ndarray, pyptc_bare: np.ndarray, pyptc_misaligned: np.ndarray) -> np.ndarray:
@@ -398,8 +482,10 @@ def run(args: argparse.Namespace) -> dict:
         return summary
     else:
         madx_paths = run_madx_closed_orbits(args, output_dir, madx_error_table)
-        madx_bare = tfs_to_orbit_array(parse_tfs(madx_paths["bare"]))
-        madx_misaligned = tfs_to_orbit_array(parse_tfs(madx_paths["misaligned"]))
+        madx_bare_table = parse_tfs(madx_paths["bare"])
+        madx_misaligned_table = parse_tfs(madx_paths["misaligned"])
+        madx_bare = tfs_to_orbit_array(madx_bare_table)
+        madx_misaligned = tfs_to_orbit_array(madx_misaligned_table)
     pyptc_bare, pyptc_misaligned = run_pyptc_closed_orbits(args, flat_file, pyptc_error_table)
 
     if args.distorted_only:
@@ -445,6 +531,13 @@ def run(args: argparse.Namespace) -> dict:
         "s,madx_bare_x,madx_misaligned_x,pyptc_bare_x_interp,pyptc_misaligned_x_interp,madx_bare_y,madx_misaligned_y,pyptc_bare_y_interp,pyptc_misaligned_y_interp,pyptc_minus_madx_x,pyptc_minus_madx_y",
         comparison,
     )
+    pyptc_bare_rows, pyptc_misaligned_rows = run_pyptc_linear_rows(args, flat_file, pyptc_error_table)
+    pyptc_bare_scalars, pyptc_misaligned_scalars = run_pyptc_scalar_optics(args, flat_file, pyptc_error_table)
+    bare_linear = plot_linear_optics(output_dir / "madx_vs_pyptc_linear_optics_bare.png", madx_bare_table, pyptc_bare_rows)
+    misaligned_linear = plot_linear_optics(output_dir / "madx_vs_pyptc_linear_optics_jan26.png", madx_misaligned_table, pyptc_misaligned_rows)
+    write_csv(output_dir / "madx_vs_pyptc_linear_optics_bare.csv", "quantity_index,s,madx,pyptc,pyptc_minus_madx", bare_linear)
+    write_csv(output_dir / "madx_vs_pyptc_linear_optics_jan26.csv", "quantity_index,s,madx,pyptc,pyptc_minus_madx", misaligned_linear)
+    scalar_optics = plot_scalar_optics(output_dir / "madx_vs_pyptc_scalar_optics.png", madx_bare_table, madx_misaligned_table, pyptc_bare_scalars, pyptc_misaligned_scalars)
 
     summary = {
         "flat_file": str(flat_file),
@@ -466,6 +559,10 @@ def run(args: argparse.Namespace) -> dict:
         "residual_max_x_m": float(np.max(np.abs(comparison[:, 9]))),
         "residual_max_y_m": float(np.max(np.abs(comparison[:, 10]))),
         "comparison_png": str(output_dir / "madx_vs_pyptc_closed_orbit_comparison.png"),
+        "linear_optics_bare_png": str(output_dir / "madx_vs_pyptc_linear_optics_bare.png"),
+        "linear_optics_jan26_png": str(output_dir / "madx_vs_pyptc_linear_optics_jan26.png"),
+        "scalar_optics": scalar_optics,
+        "scalar_optics_png": str(output_dir / "madx_vs_pyptc_scalar_optics.png"),
     }
     if args.response_threshold > 0.0 and summary["pyptc_misaligned_max_x_m"] <= args.response_threshold and summary["pyptc_misaligned_max_y_m"] <= args.response_threshold:
         raise AssertionError("PyPTC misaligned orbit response is below threshold")

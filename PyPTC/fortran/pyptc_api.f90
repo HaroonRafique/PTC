@@ -37,7 +37,7 @@ contains
 
   subroutine pyptc_get_api_level(api_level) bind(C, name="pyptc_get_api_level")
     integer(c_int), intent(out) :: api_level
-    api_level = 3_c_int
+    api_level = 4_c_int
   end subroutine pyptc_get_api_level
 
   subroutine pyptc_get_tunes(qx, qy, qs, status) bind(C, name="pyptc_get_tunes")
@@ -90,6 +90,54 @@ contains
     chromy = chrom(2)
     if (.not. check_stable) status = 4_c_int
   end subroutine pyptc_get_chromaticities
+
+  subroutine pyptc_get_node_phase_advances(mux, muy, count, status) bind(C, name="pyptc_get_node_phase_advances")
+    real(c_double), intent(out) :: mux(*), muy(*)
+    integer(c_int), value, intent(in) :: count
+    integer(c_int), intent(out) :: status
+    type(layout), pointer :: r
+    type(internal_state) :: state
+    type(damap) :: id, a_f, a_l, a_nl, dr
+    type(normalform) :: norm
+    type(real_8) :: y(6)
+    real(dp) :: closed(6), phase_x, phase_y
+    integer :: k
+
+    status = 0_c_int
+    if (.not. pyptc_ready()) then
+      status = 1_c_int
+      return
+    end if
+    if (count /= int(my_ORBIT_LATTICE%ORBIT_N_NODE, c_int)) then
+      status = 2_c_int
+      return
+    end if
+
+    r => my_ORBIT_LATTICE%parent_layout
+    state = (my_ORBIT_LATTICE%state - time0) + delta0
+    call init(state, 1, 0, berz)
+    call alloc(id, a_f, a_l, a_nl, dr); call alloc(y); call alloc(norm)
+    closed = 0.0_dp
+    call find_orbit(r, closed, 1, state, 1.0e-5_dp)
+    id = 1
+    y = closed + id
+    call track(r, y, 1, state)
+    norm = y
+    call factor(norm%a_t, a_f, a_l, a_nl, dr=dr)
+    y = closed + norm%a_t
+    phase_x = 0.0_dp
+    phase_y = 0.0_dp
+    do k = 1, int(count)
+      call orbit_track_node(k, y, state)
+      norm%a_t = y
+      call factor(norm%a_t, a_f, a_l, a_nl, dr=dr)
+      phase_x = phase_x + asin(dr%v(1).sub.'01') / twopi
+      phase_y = phase_y + asin(dr%v(3).sub.'0001') / twopi
+      mux(k) = real(phase_x, c_double)
+      muy(k) = real(phase_y, c_double)
+    end do
+    call kill(id, a_f, a_l, a_nl, dr); call kill(y); call kill(norm)
+  end subroutine pyptc_get_node_phase_advances
 
   subroutine pyptc_set_misalignment(pos, mis, status) bind(C, name="pyptc_set_misalignment")
     integer(c_int), value, intent(in) :: pos
