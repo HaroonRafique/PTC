@@ -9,7 +9,9 @@
 - Synchronous-particle scalars: `omega`, `p0c`, `beta0`, kinetic energy through the legacy scalar functions.
 - Node-level Twiss and closed orbit through `ptc_get_twiss_for_node_`.
 - Node-level horizontal/vertical phase-advance curves through the additive
-  `pyptc_get_node_phase_advances` ABI shim.
+  `pyptc_get_node_phase_advances` ABI shim.  They are unwrapped cumulative
+  phases in turns, obtained from the normal-form cosine/sine basis with
+  `atan2`; their fractional parts agree with `pyptc_get_tunes`.
 - Exact tune/chromaticity getters through `pyptc_get_tunes` and
   `pyptc_get_chromaticities`.
 - Name-based and index-based misalignment application:

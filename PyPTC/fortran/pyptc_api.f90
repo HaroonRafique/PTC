@@ -97,10 +97,11 @@ contains
     integer(c_int), intent(out) :: status
     type(layout), pointer :: r
     type(internal_state) :: state
-    type(damap) :: id, a_f, a_l, a_nl, dr
+    type(damap) :: id
     type(normalform) :: norm
     type(real_8) :: y(6)
-    real(dp) :: closed(6), phase_x, phase_y
+    real(dp) :: closed(6)
+    real(dp) :: phase_x, phase_y
     integer :: k
 
     status = 0_c_int
@@ -116,27 +117,39 @@ contains
     r => my_ORBIT_LATTICE%parent_layout
     state = (my_ORBIT_LATTICE%state - time0) + delta0
     call init(state, 1, 0, berz)
-    call alloc(id, a_f, a_l, a_nl, dr); call alloc(y); call alloc(norm)
+    call alloc(id); call alloc(y); call alloc(norm)
     closed = 0.0_dp
     call find_orbit(r, closed, 1, state, 1.0e-5_dp)
     id = 1
     y = closed + id
     call track(r, y, 1, state)
     norm = y
-    call factor(norm%a_t, a_f, a_l, a_nl, dr=dr)
     y = closed + norm%a_t
-    phase_x = 0.0_dp
-    phase_y = 0.0_dp
     do k = 1, int(count)
       call orbit_track_node(k, y, state)
-      norm%a_t = y
-      call factor(norm%a_t, a_f, a_l, a_nl, dr=dr)
-      phase_x = phase_x + asin(dr%v(1).sub.'01') / twopi
-      phase_y = phase_y + asin(dr%v(3).sub.'0001') / twopi
+      ! ``norm%a_t`` is the transverse normal-form basis.  Its first row is
+      ! sqrt(beta) * (cos(mu), sin(mu)); atan2 therefore retains the phase
+      ! quadrant which the former asin-based implementation discarded.
+      phase_x = atan2(y(1).sub.'01', y(1).sub.'1') / twopi
+      phase_y = atan2(y(3).sub.'0001', y(3).sub.'001') / twopi
+      if (k > 1) then
+        do while (phase_x < real(mux(k - 1), dp) - 0.5_dp)
+          phase_x = phase_x + 1.0_dp
+        end do
+        do while (phase_x > real(mux(k - 1), dp) + 0.5_dp)
+          phase_x = phase_x - 1.0_dp
+        end do
+        do while (phase_y < real(muy(k - 1), dp) - 0.5_dp)
+          phase_y = phase_y + 1.0_dp
+        end do
+        do while (phase_y > real(muy(k - 1), dp) + 0.5_dp)
+          phase_y = phase_y - 1.0_dp
+        end do
+      end if
       mux(k) = real(phase_x, c_double)
       muy(k) = real(phase_y, c_double)
     end do
-    call kill(id, a_f, a_l, a_nl, dr); call kill(y); call kill(norm)
+    call kill(id); call kill(y); call kill(norm)
   end subroutine pyptc_get_node_phase_advances
 
   subroutine pyptc_set_misalignment(pos, mis, status) bind(C, name="pyptc_set_misalignment")

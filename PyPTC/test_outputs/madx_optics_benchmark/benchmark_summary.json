@@ -163,23 +163,23 @@
       "phase_advances": {
         "bare_metrics": {
           "mux": {
-            "max_abs": 3.7161499467592507,
-            "rms": 2.1967020248765516
+            "max_abs": 0.001061908304770931,
+            "rms": 0.00024065058933036117
           },
           "muy": {
-            "max_abs": 5.311343092429115,
-            "rms": 2.552673864103194
+            "max_abs": 0.0004527580725381952,
+            "rms": 0.0001438886052505959
           }
         },
         "bare_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_phase_advances_bare.png",
         "full_error_table_metrics": {
           "mux": {
-            "max_abs": 3.7180096442488586,
-            "rms": 2.195839834845762
+            "max_abs": 0.0010632325522316188,
+            "rms": 0.00023972604497067896
           },
           "muy": {
-            "max_abs": 5.312743573469141,
-            "rms": 2.5523468942491903
+            "max_abs": 0.00045655790122811624,
+            "rms": 0.00014493447658133187
           }
         },
         "full_error_table_png": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/madx_optics_benchmark/optics/madx_vs_pyptc_phase_advances_full_error_table.png"

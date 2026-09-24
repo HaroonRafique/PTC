@@ -301,7 +301,13 @@ def madx_lorentz_beta(table: dict[str, np.ndarray | list[str]]) -> float:
 def rows_to_linear_table(rows: list[dict[str, float | int]]) -> dict[str, np.ndarray]:
     s = np.cumsum([float(row["length"]) for row in rows])
     names = {"betx": "betax", "bety": "betay", "alfx": "alphax", "alfy": "alphay", "dx": "etax", "dpx": "etapx", "dy": "etay", "dpy": "etapy", "mux": "mux", "muy": "muy", "x": "orbitx", "px": "orbitpx", "y": "orbity", "py": "orbitpy"}
-    return {name: np.column_stack([s, [float(row[names[name]]) for row in rows]]) for name in LINEAR_COLUMNS}
+    result = {name: np.column_stack([s, [float(row[names[name]]) for row in rows]]) for name in LINEAR_COLUMNS}
+    # PTC reports optical values at node exits, while MAD-X also emits the
+    # lattice entrance at s=0.  Make the known phase reference explicit before
+    # interpolation, rather than attaching the first node-exit phase to s=0.
+    for name in ("mux", "muy"):
+        result[name] = np.vstack((np.asarray([[0.0, 0.0]]), result[name]))
+    return result
 
 
 def plot_linear_topic(path: Path, title: str, quantities: tuple[str, ...], madx: dict[str, np.ndarray | list[str]], pyptc_rows: list[dict[str, float | int]]) -> np.ndarray:

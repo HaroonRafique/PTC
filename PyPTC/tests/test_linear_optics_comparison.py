@@ -25,12 +25,19 @@ class LinearOpticsComparisonTests(unittest.TestCase):
         ptc.init_lattice(ensure_default_lattice())
 
         phases = ptc.node_phase_advances()
+        tunes = ptc.tunes()
         self.assertEqual(phases.shape, (ptc.machine_summary()["n_nodes"], 2))
         self.assertTrue(np.isfinite(phases).all())
         self.assertGreater(np.ptp(phases[:, 0]), 0.1)
         self.assertGreater(np.ptp(phases[:, 1]), 0.1)
         self.assertGreater(phases[-1, 0], 0.0)
         self.assertGreater(phases[-1, 1], 0.0)
+        # The integer part is the accumulated number of oscillations; PTC's
+        # tune getter reports the fractional part.  This catches a principal-
+        # branch phase calculation such as asin(M12), which oscillates.
+        self.assertTrue(np.all(np.diff(phases[:, 0]) >= -1.0e-12))
+        self.assertTrue(np.all(np.diff(phases[:, 1]) >= -1.0e-12))
+        np.testing.assert_allclose(np.mod(phases[-1], 1.0), [tunes["qx"], tunes["qy"]], atol=1.0e-9)
 
     def test_compare_series_interpolates_pyptc_onto_madx_positions(self) -> None:
         madx_s = np.asarray([0.0, 0.5, 1.0])
