@@ -37,6 +37,39 @@ used.
   plots for 1000-particle tracking workflows, with tune/action data retained in
   the bunch diagnostics CSV.
 
+## Skill-Test Development And Benchmarking
+
+Use the following as the default process when developing or benchmarking
+PyPTC against an ISIS RCS skill in `isis-modelling-agents`:
+
+- Start each skill application from the exact current skill revision. Rebuild
+  the working harness from that skill for each iteration; do not quietly carry
+  forward an earlier agent implementation as if it were a fresh skill result.
+- Keep the user-facing attempt runner repeatable and runnable with its
+  documented defaults. The user runs full skill-test or benchmark attempts.
+  Agents may prepare the runner and run bounded diagnostic preflight/smoke
+  checks, clearly labelled as diagnostics; those are not user-run skill-test
+  results.
+- After a user-run attempt, assess it first against the invoked skill, then
+  compare the generated workflow with existing PyPTC examples and tests for
+  learning. Do not use those examples/tests as hidden implementation inputs to
+  the independent first attempt. Keep admission distinct from optics and
+  benchmarking.
+- Append evidence-backed feedback under the step's `feedback/` directory.
+  Record the exact skill and code revisions, attempt IDs, hashes and outcomes,
+  reusable gaps, PyPTC-specific findings, scope limits, and review status.
+  Feedback files are immutable; create a new numbered file for later cycles.
+- Keep review dispositions in the step's human-maintained ledger. The normal
+  runner must not modify it or imply acceptance. Retain the newest three raw
+  attempt bundles; before pruning older bundles, preserve their identities,
+  relevant hashes, outcomes, and feedback links in the ledger/feedback record.
+  Use the step's `prune_attempts.sh` dry run to inspect pruning and pass
+  `--apply` only after the ledger and feedback records are complete.
+- Route proposed reusable skill changes to a separate agent in
+  `isis-modelling-agents`. Keep PyPTC-specific facts in this repository, present
+  shared-skill edits for review there, and record the exact revised skill
+  revision before the next fresh application.
+
 ## Artefact Hygiene
 
 The worktree may contain generated plots, flat files, build products, caches, or
@@ -45,9 +78,19 @@ human explicitly asks.
 
 ## Git Commit Style
 
-Use the established commit style for agent-created commits:
+Every commit in this repository, including user-created and agent-created
+commits, must use the established scoped subject style found in the Git
+history:
 
-- Format: `<type>[<scope>] message`
-- Typical types: `<add>`, `<update>`, `<fix>`, `<cleanup>`
-- Keep scope small and meaningful, for example `[pyptc]`
-- Use a short lower-case summary, e.g. `<update>[pyptc] standardise examples`
+- Format: `<type>[<scope>] lower-case summary`
+- Use a short, meaningful type such as `<add>`, `<update>`, `<fix>`, or
+  `<cleanup>`.
+- Use `[pyptc]` for PyPTC work and a narrower established scope when it better
+  identifies another component, such as `[ptc-interface]`.
+- Keep the summary concise, lower-case, and imperative. Match examples in the
+  history, including `<add>[pyptc] compare linear optics with madx`,
+  `<update>[pyptc] standardise examples and outputs`, and
+  `<fix>[pyptc] restore jan26 madx distorted orbit comparison`.
+- Do not use bare subjects or alternate prefixes such as `docs:` or
+  `fix[pyptc]:`; all commits must retain the angle-bracket type followed by
+  the square-bracket scope.
