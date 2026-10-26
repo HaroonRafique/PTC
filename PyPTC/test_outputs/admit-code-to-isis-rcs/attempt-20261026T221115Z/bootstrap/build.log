@@ -1,0 +1,74 @@
+[pyptc] Reconfiguring PyPTC build at /home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/build_pyptc
+Cleaning... 0 files.
+The Meson build system
+Version: 1.8.5
+Source dir: /home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC
+Build dir: /home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/build_pyptc
+Build type: native build
+Project name: pyptc
+Project version: 0.1.0
+Fortran compiler for the host machine: gfortran (gcc 15.3.1 "GNU Fortran (GCC) 15.3.1 20260722 (Red Hat 15.3.1-1)")
+Fortran linker for the host machine: gfortran ld.bfd 2.45.1-5
+Host machine cpu family: x86_64
+Host machine cpu: x86_64
+Build targets in project: 1
+
+Found ninja-1.13.1 at /usr/bin/ninja
+[pyptc] Compiling libpyptc
+ninja: Entering directory `/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/build_pyptc'
+[1/2] Compiling Fortran object libpyptc.so.p/fortran_pyptc_api.f90.o
+[2/2] Linking target libpyptc.so
+INFO: autodetecting backend as ninja
+INFO: calculating backend command to run: /usr/bin/ninja -C /home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/build_pyptc
+[pyptc] Checking exported symbols
+Expected symbol not found in /home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/build_pyptc/libpyptc.so: ptc_init_
+Meson compiler info: {"host": {"fortran": {"id": "gcc", "exelist": ["gfortran"], "linker_exelist": ["gfortran"], "file_suffixes": ["f90", "f95", "f03", "f08", "f", "for", "ftn", "fpp"], "default_suffix": "f90", "version": "15.3.1", "full_version": "GNU Fortran (GCC) 15.3.1 20260722 (Red Hat 15.3.1-1)", "linker_id": "ld.bfd"}}, "build": {"fortran": {"id": "gcc", "exelist": ["gfortran"], "linker_exelist": ["gfortran"], "file_suffixes": ["f90", "f95", "f03", "f08", "f", "for", "ftn", "fpp"], "default_suffix": "f90", "version": "15.3.1", "full_version": "GNU Fortran (GCC) 15.3.1 20260722 (Red Hat 15.3.1-1)", "linker_id": "ld.bfd"}}}
+Available exported ptc_* symbols:
+  ptc_get_beta0_
+  ptc_get_fibre_aperture_
+  ptc_get_fibre_count_
+  ptc_get_fibre_name_
+  ptc_get_ini_params_
+  ptc_get_kinetic_
+  ptc_get_omega_
+  ptc_get_p0c_
+  ptc_get_syncpart_
+  ptc_get_task_type_
+  ptc_get_twiss_for_node_
+  ptc_get_twiss_init_
+  ptc_init_
+  ptc_read_accel_table_
+  ptc_script_
+  ptc_set_fibre_aperture_
+  ptc_synchronous_after_
+  ptc_synchronous_set_
+  ptc_track_particle_
+  ptc_update_twiss_
+Available exported pyptc_* symbols:
+  pyptc_cavity_totalpath
+  pyptc_close_cavity_ring
+  pyptc_configure_ac_magnet
+  pyptc_configure_ramp_magnet
+  pyptc_energize_lattice
+  pyptc_get_absolute_aperture
+  pyptc_get_api_level
+  pyptc_get_chromaticities
+  pyptc_get_node_phase_advances
+  pyptc_get_one_aperture
+  pyptc_get_tunes
+  pyptc_initialize_cavity
+  pyptc_power_cavity
+  pyptc_set_absolute_aperture
+  pyptc_set_acceleration
+  pyptc_set_all_ramp
+  pyptc_set_cavity
+  pyptc_set_madx_misalignment
+  pyptc_set_misalignment
+  pyptc_set_modulation
+  pyptc_set_one_aperture
+  pyptc_set_orbit_time
+  pyptc_set_ramping
+  pyptc_store_orbit_state
+  pyptc_track_particle_ring_loss
+  pyptc_turn_off_one_aperture
+  pyptc_use_orbit_state

@@ -1,0 +1,4 @@
+{"input_count": 5, "stage": "snapshot-copy", "state": "complete", "utc": "2026-10-26T22:11:15.859463+00:00"}
+{"command": ["/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/admit-code-to-isis-rcs/.venv/bin/python", "-m", "unittest", "discover", "-s", "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/admit-code-to-isis-rcs/iteration-0002/tests", "-v"], "stage": "harness-tests", "state": "started", "utc": "2026-10-26T22:11:15.859548+00:00"}
+{"log_sha256": "8170d02f410c7494e483cd4e380c7943d3b0ce4777fa0c3d4b53dcc11bdf771a", "returncode": 0, "stage": "harness-tests", "state": "complete", "tests_run": 10, "utc": "2026-10-26T22:11:15.965505+00:00"}
+{"command": ["bash", "build/build_ptc.sh"], "stage": "pyptc-build", "state": "started", "utc": "2026-10-26T22:11:15.966098+00:00"}

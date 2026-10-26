@@ -1,0 +1,47 @@
+{
+  "attempt_class": "user-run skill-test attempt",
+  "attempt_id": "attempt-20261026T221115Z",
+  "canonical_result": "result.json",
+  "effective_command": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/admit-code-to-isis-rcs/.venv/bin/python ./run_admission.py",
+  "events": "events.jsonl",
+  "ledger": "steps/admit-code-to-isis-rcs/review_ledger.csv",
+  "manifest": "manifest.json",
+  "nonclaims": [
+    "No admission acceptance, optics, or benchmark claim is made."
+  ],
+  "outcome": "failed",
+  "reason_incomplete": "PyPTC build failed; see /home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/admit-code-to-isis-rcs/attempt-20261026T221115Z/bootstrap/build.log",
+  "reference": {
+    "dirty_entry_count": 206,
+    "include_order": [
+      "ISIS.injected_beam",
+      "ISIS.elements",
+      "ISIS.strength",
+      "2023.strength",
+      "ISIS.sequence"
+    ],
+    "mode": "working-copy-snapshot",
+    "observed_checkout_revision": "823e6c08dfa79a182548b07706b3d46f0157137a",
+    "reference_calculation": "one MAD-X TWISS calculation",
+    "sequence": "synchrotron",
+    "snapshot_manifest": "reference_evidence/source_manifest.json",
+    "source_revision": "1bada6a2ab94edd426c52b7e97a5d335926e0646",
+    "status_evidence": "reference_evidence/source_checkout_status.porcelain-v2.txt",
+    "status_sha256": "0de8a247d46a968b69d6af0287ad281e892d7e77c524062711ab60cae6565f6a",
+    "variant": "00_Simplified_Lattice with 2023.strength overlay"
+  },
+  "reference_engine_invoked": false,
+  "report": "report.md",
+  "review_disposition": "awaiting review",
+  "seed": null,
+  "snapshot_scope": "Any evidence in this bundle is limited to the authorized pinned input snapshot; it is not a clean-checkout result or a reviewed acceptance.",
+  "target": {
+    "bootstrap_log": null,
+    "bootstrap_log_sha256": null,
+    "build_log": "bootstrap/build.log",
+    "build_log_sha256": "05c539c54894998bebdecf65212d624043940f798f0b4ca8f129cb68f888e181",
+    "library": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/build_pyptc/libpyptc.so",
+    "library_sha256": "b388eeceaa24df26e67e8d397220818f4a8a48e7193f790e0cf3acffa65efe76"
+  },
+  "target_engine_invoked": false
+}

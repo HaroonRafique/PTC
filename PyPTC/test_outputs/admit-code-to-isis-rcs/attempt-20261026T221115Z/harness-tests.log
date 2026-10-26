@@ -1,5 +1,6 @@
 test_approved_recipe_and_unapproved_changes (test_admission.AdmissionSkillTests.test_approved_recipe_and_unapproved_changes) ... ok
-test_blocked_run_does_not_change_review_ledger (test_admission.AdmissionSkillTests.test_blocked_run_does_not_change_review_ledger) ... blocked: Authorized local reference snapshot is missing at /home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/admit-code-to-isis-rcs/.iteration-0002-test-fixtures/tmp9jebxjmo/missing; materialize the documented five-file snapshot first.
+test_attempt_class_defaults_to_user_and_supports_agent_diagnostic (test_admission.AdmissionSkillTests.test_attempt_class_defaults_to_user_and_supports_agent_diagnostic) ... ok
+test_blocked_run_does_not_change_review_ledger (test_admission.AdmissionSkillTests.test_blocked_run_does_not_change_review_ledger) ... blocked: Authorized local reference snapshot is missing at /home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/admit-code-to-isis-rcs/.iteration-0002-test-fixtures/tmpai0x26ye/missing; materialize the documented five-file snapshot first.
 ok
 test_dirty_or_wrong_revision_blocks_clean_checkout (test_admission.AdmissionSkillTests.test_dirty_or_wrong_revision_blocks_clean_checkout) ... ok
 test_documented_defaults_and_cli_overrides (test_admission.AdmissionSkillTests.test_documented_defaults_and_cli_overrides) ... ok
@@ -10,8 +11,8 @@ test_runtime_warning_classification_covers_both_engines (test_admission.Admissio
 test_tfs_fingerprint_ignores_only_volatile_headers (test_admission.AdmissionSkillTests.test_tfs_fingerprint_ignores_only_volatile_headers) ... ok
 
 ----------------------------------------------------------------------
-Ran 9 tests in 0.019s
+Ran 10 tests in 0.019s
 
 OK
-Report: /home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/admit-code-to-isis-rcs/.iteration-0002-test-fixtures/tmp9jebxjmo/runs/attempt-ledger-guard/report.md
-Canonical result: /home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/admit-code-to-isis-rcs/.iteration-0002-test-fixtures/tmp9jebxjmo/runs/attempt-ledger-guard/result.json
+Report: /home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/admit-code-to-isis-rcs/.iteration-0002-test-fixtures/tmpai0x26ye/runs/attempt-ledger-guard/report.md
+Canonical result: /home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/admit-code-to-isis-rcs/.iteration-0002-test-fixtures/tmpai0x26ye/runs/attempt-ledger-guard/result.json

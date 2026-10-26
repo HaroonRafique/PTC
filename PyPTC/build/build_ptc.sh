@@ -75,7 +75,7 @@ for symbol in \
   pyptc_configure_ac_magnet \
   pyptc_configure_ramp_magnet
 do
-  if ! printf '%s\n' "${nm_output}" | grep -q "[[:space:]]${symbol}$"; then
+  if ! awk -v symbol="${symbol}" '$NF == symbol { found = 1 } END { exit !found }' <<< "${nm_output}"; then
     printf 'Expected symbol not found in %s: %s\n' "${library}" "${symbol}" >&2
     printf 'Meson compiler info: %s\n' "$(meson introspect "${build_dir}" --compilers 2>/dev/null || true)" >&2
     printf 'Available exported ptc_* symbols:\n' >&2
