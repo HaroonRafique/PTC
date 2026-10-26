@@ -94,3 +94,7 @@ history:
 - Do not use bare subjects or alternate prefixes such as `docs:` or
   `fix[pyptc]:`; all commits must retain the angle-bracket type followed by
   the square-bracket scope.
+- When a change warrants an entry in a maintained work diary, write that entry
+  before committing and include it in the same commit as the related work. In
+  repositories without a work diary, include the appropriate campaign record,
+  such as feedback and ledger updates, with the commit.
