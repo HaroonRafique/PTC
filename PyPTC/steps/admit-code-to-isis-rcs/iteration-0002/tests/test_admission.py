@@ -12,7 +12,7 @@ from pathlib import Path
 ITERATION_DIR = Path(__file__).resolve().parents[1]
 REPO_ROOT = ITERATION_DIR.parents[2]
 FIXTURE_ROOT = REPO_ROOT / "test_outputs" / "admit-code-to-isis-rcs" / ".iteration-0002-test-fixtures"
-SPEC = importlib.util.spec_from_file_location("fresh_admission", ITERATION_DIR / "run_admission.py")
+SPEC = importlib.util.spec_from_file_location("fresh_admission", ITERATION_DIR / "admission_harness.py")
 assert SPEC and SPEC.loader
 admission = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(admission)

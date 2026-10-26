@@ -23,21 +23,17 @@ steps/admit-code-to-isis-rcs/.venv/bin/python -m unittest discover \
   -s steps/admit-code-to-isis-rcs/iteration-0002/tests -v
 ```
 
-Run the attempt with its documented defaults using:
+Run the current attempt from the step root with no arguments:
 
 ```bash
 steps/admit-code-to-isis-rcs/.venv/bin/python \
-  steps/admit-code-to-isis-rcs/iteration-0002/run_admission.py
+  steps/admit-code-to-isis-rcs/run_admission.py
 ```
 
-The optional flags are:
-
-- `--snapshot-dir`: select the authorized files-only input snapshot.
-- `--output-root`: choose where new attempt bundles are created.
-- `--library`: select the built `libpyptc.so` shared library.
-- `--madx`: select the MAD-X executable.
-- `--attempt-id`: set a unique attempt directory name; existing nonempty bundles
-  are not overwritten.
+The entry point automatically selects the highest numbered
+`iteration-NNNN/admission_harness.py`. Do not run the iteration module directly;
+the root entry point records the selected iteration and retains both the
+entry-point and harness source in each new attempt bundle.
 
 Each attempt copies the five inputs
 and source status evidence into its own output before the bootstrap or engines

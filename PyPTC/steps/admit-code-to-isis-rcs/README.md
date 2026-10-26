@@ -13,20 +13,18 @@ Run the setup once:
 bash steps/admit-code-to-isis-rcs/setup.sh
 ```
 
-Then build the documented PyPTC library and run admission:
+Run admission with no arguments:
 
 ```bash
-bash build/build_ptc.sh
 steps/admit-code-to-isis-rcs/.venv/bin/python \
   steps/admit-code-to-isis-rcs/run_admission.py
 ```
 
-The default ISIS reference checkout is `/home/hr/Repositories/isis_2024`.
-Set `ISIS_REFERENCE_REPO` or pass `--reference-repo` to relocate it. The
-runner reads only the pinned Git revision and does not use or change the
-checkout's working files. `--library` and `--output-root` override the PyPTC
-shared library and evidence output root. A missing or invalid reference is
-reported as `blocked`; the runner never substitutes another lattice.
+The entry point selects the highest numbered `iteration-NNNN` directory that
+contains an `admission_harness.py`, then runs it with the documented defaults.
+It builds PyPTC as part of the attempt. The current harness reads only the
+authorized files-only snapshot in `reference_snapshot/`; it does not require
+or change the external `isis_2024` checkout.
 
 The run outputs are written under
 `test_outputs/admit-code-to-isis-rcs/<attempt-id>/`. Each attempt contains a
@@ -55,13 +53,9 @@ ring turn and requires finite final coordinates with no reported loss.
 
 ## Public helper behavior
 
-`run_admission.py` resolves the pinned reference revision, copies the approved
-input closure into an attempt bundle, validates source strengths, executes the
-approved MAD-X recipe, loads the generated flat file through PyPTC, checks the
-machine structure and reference particle, tracks the smoke particle, and
-writes the run records. It accepts `--reference-repo`, `--library`, and
-`--output-root` path overrides. It returns a non-zero exit status for `blocked`
-or `failed` attempts and zero only for technically complete admission.
+`run_admission.py` requires no arguments. It detects the newest numbered skill
+iteration and returns a non-zero exit status for blocked or failed attempts;
+zero means only that the technical admission checks completed.
 
 `review_ledger.csv` is separate from execution. Runs never edit it. A technical
 `admitted` result remains `awaiting review` until a human records a disposition
@@ -75,7 +69,7 @@ iteration pattern used in `/home/hr/Codes/agentic_xsuite_test`:
 1. Start each application from the exact shared-skill revision and reconstruct
    the working harness from that skill. Do not reuse an earlier agent-built
    harness as if it were a fresh skill result.
-2. The user runs full skill-test attempts with the documented command above.
+2. The user runs full skill-test attempts with the no-argument command above.
    Agent runs are limited to bounded preflight or diagnostic smoke checks and
    must be labelled as diagnostics.
 3. Assess a user-run attempt against the invoked skill first. Compare it with

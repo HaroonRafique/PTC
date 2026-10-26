@@ -344,6 +344,7 @@ def render_report(result: dict[str, Any]) -> str:
     lines = [
         f"# PyPTC ISIS RCS admission {result['attempt_id']}", "",
         f"- Technical outcome: **{result['outcome']}**; external review disposition: **awaiting review**.",
+        f"- Skill application iteration: `{result['skill_iteration']}`.",
         f"- Reference mode: `{ref['mode']}`; snapshot source revision: `{ref['source_revision']}`.",
         f"- Shared skill: `{result['skill']['commit']}`; SHA-256 `{result['skill']['sha256']}`.",
         f"- Snapshot source checkout revision/state: `{ref['observed_checkout_revision']}`, dirty with {ref['dirty_entry_count']} entries; full status: `{ref['status_evidence']}` (SHA-256 `{ref['status_sha256']}`).",
@@ -404,8 +405,10 @@ def execute(args: argparse.Namespace) -> tuple[dict[str, Any], Path]:
     (out / "reference_evidence").mkdir()
     implementation = out / "implementation"
     implementation.mkdir()
-    runner_copy = implementation / "run_admission.py"
+    runner_copy = implementation / "admission_harness.py"
     shutil.copy2(Path(__file__).resolve(), runner_copy)
+    entrypoint_copy = implementation / "run_admission.py"
+    shutil.copy2(STEP_DIR / "run_admission.py", entrypoint_copy)
     test_source = ITERATION_DIR / "tests/test_admission.py"
     test_copy = implementation / "test_admission.py"
     if test_source.is_file():
@@ -565,7 +568,9 @@ def execute(args: argparse.Namespace) -> tuple[dict[str, Any], Path]:
                                "log_path": str(test_log.relative_to(out)), "log_sha256": sha_file(test_log),
                                "runner_sha256": runner_hash, "test_script_sha256": sha_file(test_copy)},
         "skill": {"name": "admit-code-to-isis-rcs", "commit": PINNED_SKILL_COMMIT, "sha256": PINNED_SKILL_SHA256},
-        "runner": {"path": "implementation/run_admission.py", "sha256": runner_hash},
+        "skill_iteration": ITERATION_DIR.name,
+        "runner": {"path": "implementation/admission_harness.py", "sha256": runner_hash},
+        "entrypoint": {"path": "implementation/run_admission.py", "sha256": sha_file(entrypoint_copy)},
         "target": {"repository_commit": subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True, stdout=subprocess.PIPE, check=True).stdout.strip(),
                    "official_source": subprocess.run(["git", "config", "--get", "remote.origin.url"], cwd=REPO_ROOT, text=True, stdout=subprocess.PIPE, check=True).stdout.strip(),
                    "version_identity": "exact Git commit; no separate release tag asserted",
@@ -661,7 +666,3 @@ def cli(argv: list[str] | None = None) -> int:
     print(f"Canonical result: {output / 'result.json'}")
     print(f"Manifest: {output / 'manifest.json'}")
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(cli())
