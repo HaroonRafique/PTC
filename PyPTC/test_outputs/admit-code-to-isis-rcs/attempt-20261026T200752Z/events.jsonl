@@ -1,0 +1,12 @@
+{"input_count": 5, "stage": "snapshot-copy", "state": "complete", "utc": "2026-10-26T20:07:52.587624+00:00"}
+{"command": ["/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/admit-code-to-isis-rcs/.venv/bin/python", "-m", "unittest", "discover", "-s", "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/admit-code-to-isis-rcs/iteration-0002/tests", "-v"], "stage": "harness-tests", "state": "started", "utc": "2026-10-26T20:07:52.587703+00:00"}
+{"log_sha256": "9ebaaf28bcad12b6b56c272e652a679600e3139196d1ebfc297fe2a35887ca94", "returncode": 0, "stage": "harness-tests", "state": "complete", "tests_run": 9, "utc": "2026-10-26T20:07:52.669675+00:00"}
+{"command": ["bash", "build/build_ptc.sh"], "stage": "pyptc-build", "state": "started", "utc": "2026-10-26T20:07:52.670138+00:00"}
+{"returncode": 0, "stage": "pyptc-build", "state": "complete", "utc": "2026-10-26T20:07:53.853820+00:00"}
+{"command": ["/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/admit-code-to-isis-rcs/.venv/bin/python", "-c", "import json,sys; sys.path.insert(0,sys.argv[1]); from pyptc import PTC; p=PTC(sys.argv[2]); print(json.dumps({'library':p.library.resolve().as_posix(),'api_level':p.api_level()}))", "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC", "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/build_pyptc/libpyptc.so"], "stage": "pyptc-bootstrap", "state": "started", "utc": "2026-10-26T20:07:53.853919+00:00"}
+{"returncode": 0, "stage": "pyptc-bootstrap", "state": "complete", "utc": "2026-10-26T20:07:53.939380+00:00"}
+{"command": ["/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/bin/madx-linux64_v5_02_00"], "recipe_sha256": "3afb7417c382dc3d964e8833c1fc6df4bd6a70c1c18e4edd2824055655b604cf", "stage": "madx-reference", "state": "started", "utc": "2026-10-26T20:07:53.940496+00:00"}
+{"log_sha256": "54bda3d0e96ce818cabd7e92c87dc316db95d2073fc1bee18389c87335bc2dab", "returncode": 0, "stage": "madx-reference", "state": "complete", "utc": "2026-10-26T20:07:54.107805+00:00"}
+{"api_definition_sha256": "484939ccbbbf6d6cc218d5b3a97167bb6ddfd383878adf442ac49a90bcced571", "stage": "pyptc-admission", "state": "started", "utc": "2026-10-26T20:07:54.125255+00:00"}
+{"runtime_log_sha256": "9044cb0b247391a198219302f68d2bec8af617b515d279375cd43a7bf2ecb70a", "stage": "pyptc-admission", "state": "complete", "utc": "2026-10-26T20:07:54.437851+00:00"}
+{"smoke_passed": true, "stage": "pyptc-admission", "state": "complete", "utc": "2026-10-26T20:07:54.437901+00:00"}

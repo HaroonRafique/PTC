@@ -1,0 +1,7 @@
+{"call": "PTC.init_lattice", "arguments": ["/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/admit-code-to-isis-rcs/attempt-20261026T200752Z/madx_work/PTC-PyORBIT_flat_file.flt"], "return": null}
+{"call": "PTC.machine_summary", "arguments": [], "return": {"n_nodes": 375, "harmonic": 71, "circumference_m": 163.36281999999989, "gamma_t": 5.077658797213571, "mass_gev": 0.9999999986892394, "charge": 1, "kinetic_energy_gev": 0.07044002991247011}}
+{"call": "pyptc.read_flatfile_fibres", "arguments": [], "return": {"count": 586, "first": "SYNCHROTRON$START"}}
+{"call": "PTC.scalar(ptc_get_p0c_)", "arguments": ["ptc_get_p0c_"], "return": 0.370331763608763}
+{"call": "PTC.scalar(ptc_get_beta0_)", "arguments": ["ptc_get_beta0_"], "return": 0.367133282695325}
+{"call": "PTC.scalar(ptc_get_kinetic_)", "arguments": ["ptc_get_kinetic_"], "return": 0.07044002991247011}
+{"call": "PTC.track_particle_ptc_with_loss", "arguments": ["[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]", "1"], "return": ["[-2.48689958e-14 -2.10587764e-14  0.00000000e+00  0.00000000e+00\n  0.00000000e+00  3.22068761e-14]", {"lost": false, "lost_turn": 0, "lost_pos": 0}]}
