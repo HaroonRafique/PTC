@@ -7,6 +7,7 @@ import json
 import re
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 ITERATION_DIR = Path(__file__).resolve().parents[1]
@@ -37,6 +38,15 @@ class AdmissionSkillTests(unittest.TestCase):
         self.assertEqual(selected.library, Path("libcustom.so"))
         self.assertEqual(selected.madx, Path("madx-custom"))
         self.assertEqual(selected.attempt_id, "attempt-explicit")
+
+    def test_attempt_class_defaults_to_user_and_supports_agent_diagnostic(self) -> None:
+        with patch.dict(admission.os.environ, {}, clear=True):
+            self.assertEqual(admission.attempt_class_label(), "user-run skill-test attempt")
+        with patch.dict(admission.os.environ, {admission.ATTEMPT_CLASS_ENV: "agent-diagnostic"}, clear=True):
+            self.assertEqual(
+                admission.attempt_class_label(),
+                "agent-run diagnostic; not a user-run skill-test result",
+            )
 
     def test_dirty_or_wrong_revision_blocks_clean_checkout(self) -> None:
         admission.clean_checkout_gate("# branch.oid abc\n", "abc", "abc")
@@ -87,6 +97,7 @@ class AdmissionSkillTests(unittest.TestCase):
     def test_report_preserves_pending_review_and_warning_disposition(self) -> None:
         result = {
             "attempt_id": "attempt-test", "outcome": "admitted-snapshot", "ledger": "review_ledger.csv",
+            "attempt_class": "user-run skill-test attempt", "skill_iteration": "iteration-0002",
             "effective_command": "python run_admission.py", "recipe": admission.AUTHORIZED_RECIPE,
             "snapshot_scope": "This is snapshot-scoped evidence only and is not a clean-checkout result.",
             "skill": {"commit": admission.PINNED_SKILL_COMMIT, "sha256": admission.PINNED_SKILL_SHA256},
@@ -105,6 +116,7 @@ class AdmissionSkillTests(unittest.TestCase):
         }
         report = admission.render_report(result)
         self.assertIn("awaiting review", report)
+        self.assertIn("Skill application iteration: `iteration-0002`", report)
         self.assertIn("DLMAX > LMAX", report)
         self.assertIn("Unresolved PyPTC runtime warning", report)
         self.assertIn("snapshot-scoped", report)

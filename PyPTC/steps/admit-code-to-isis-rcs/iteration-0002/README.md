@@ -34,6 +34,9 @@ The entry point automatically selects the highest numbered
 `iteration-NNNN/admission_harness.py`. Do not run the iteration module directly;
 the root entry point records the selected iteration and retains both the
 entry-point and harness source in each new attempt bundle.
+Runs default to `user-run skill-test attempt`. Agent diagnostics set
+`PYPTC_ADMISSION_RUN_CLASS=agent-diagnostic` in the environment before invoking
+the same no-argument entry point.
 
 Each attempt copies the five inputs
 and source status evidence into its own output before the bootstrap or engines

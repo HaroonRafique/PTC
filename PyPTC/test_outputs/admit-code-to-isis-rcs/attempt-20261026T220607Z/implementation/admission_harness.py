@@ -32,7 +32,7 @@ PC_TOL_GEV_C = 2e-7
 KE_TOL_GEV = 2e-6
 LENGTH_TOL_M = 1e-6
 AUTHORIZED_RECIPE = {
-    "authorization_source": "user-approved recipe recorded in admission feedback and step documentation",
+    "authorization_source": "user instructions on 2026-10-26; recipe recorded in step README and feedback 0001",
     "reference_mode": "working-copy-snapshot",
     "variant": "00_Simplified_Lattice with 2023.strength overlay",
     "sequence": "synchrotron",
@@ -300,6 +300,7 @@ def write_incomplete_bundle(args: argparse.Namespace, error: Exception) -> None:
         "effective_command": " ".join([sys.executable, *sys.argv]),
         "seed": None, "ledger": "steps/admit-code-to-isis-rcs/review_ledger.csv",
         "report": "report.md", "canonical_result": "result.json", "manifest": "manifest.json",
+        "snapshot_scope": "Any evidence in this bundle is limited to the authorized pinned input snapshot; it is not a clean-checkout result or a reviewed acceptance.",
         "reason_incomplete": reason,
         "reference_engine_invoked": reference_called, "target_engine_invoked": target_called,
         "reference": {"mode": "working-copy-snapshot", "snapshot_manifest": "reference_evidence/source_manifest.json",
@@ -324,6 +325,7 @@ def write_incomplete_bundle(args: argparse.Namespace, error: Exception) -> None:
         f"# PyPTC ISIS RCS admission {args.attempt_id}\n\n"
         f"- Outcome: **{outcome}**; review disposition: **awaiting review**.\n"
         f"- Reference mode: `working-copy-snapshot`; source revision: `{result['reference']['source_revision']}`.\n"
+        f"- Scope: {result['snapshot_scope']}\n"
         f"- Pre-run dirty-state evidence: `{result['reference']['status_evidence']}` (SHA-256 `{result['reference']['status_sha256']}`; {result['reference']['dirty_entry_count']} entries).\n"
         f"- Approved recipe (not executed): `{result['reference']['variant']}`, sequence `{result['reference']['sequence']}`, include order `{result['reference']['include_order']}`; permitted calculation: {result['reference']['reference_calculation']}.\n"
         f"- Bootstrap log: `{result['target']['bootstrap_log']}` (SHA-256 `{result['target']['bootstrap_log_sha256']}`).\n"
@@ -342,13 +344,16 @@ def render_report(result: dict[str, Any]) -> str:
     lines = [
         f"# PyPTC ISIS RCS admission {result['attempt_id']}", "",
         f"- Technical outcome: **{result['outcome']}**; external review disposition: **awaiting review**.",
+        f"- Skill application iteration: `{result['skill_iteration']}`.",
         f"- Reference mode: `{ref['mode']}`; snapshot source revision: `{ref['source_revision']}`.",
         f"- Shared skill: `{result['skill']['commit']}`; SHA-256 `{result['skill']['sha256']}`.",
         f"- Snapshot source checkout revision/state: `{ref['observed_checkout_revision']}`, dirty with {ref['dirty_entry_count']} entries; full status: `{ref['status_evidence']}` (SHA-256 `{ref['status_sha256']}`).",
         f"- Input selection: {ref.get('snapshot_content_source', 'not recorded')}; dirty working-tree file contents were not used.",
         "- Snapshot boundary: only the five listed direct lattice inputs are passed to MAD-X; the source checkout's unrelated files were not copied.",
         f"- Target-code commit: `{target.get('repository_commit')}`; runtime: Python `{target.get('runtime')}`, NumPy `{target.get('numpy')}`.",
+        f"- Target source: `{target.get('official_source')}`; install/build method: `{target.get('installation_method')}`.",
         f"- Loaded shared library SHA-256: `{target.get('library_sha256')}`; API definition: `{target.get('api_definition')}`.",
+        f"- Bootstrap: {target.get('bootstrap_kind')}; loaded API level `{target.get('bootstrap', {}).get('api_level')}` without an ISIS lattice.",
         f"- Variant/sequence: `{recipe['variant']}` / `{recipe['sequence']}`.",
         f"- Approved recipe authorization: {recipe['authorization_source']}.",
         f"- Include order: `{' → '.join(recipe['include_order'])}`.",
@@ -360,7 +365,7 @@ def render_report(result: dict[str, Any]) -> str:
         f"- MAD-X runtime: `{ref.get('madx_version')}`; executable SHA-256 `{ref.get('madx_binary_sha256')}`.",
         f"- Attempt-local input snapshot: `{ref.get('snapshot_input_path')}`; logical input names and hashes are in the result and manifest.",
         f"- Harness checks: {result.get('harness_validation', {}).get('tests_run', 0)} passed; log `{result.get('harness_validation', {}).get('log_path')}` (SHA-256 `{result.get('harness_validation', {}).get('log_sha256')}`).",
-        "## Executed PyPTC calls", "",
+        "", "## Executed PyPTC calls", "",
         "The actual calls and returned values are recorded in `pyptc_api_trace.jsonl`.",
     ]
     lines += [f"- `{call}`" for call in calls]
@@ -379,7 +384,8 @@ def render_report(result: dict[str, Any]) -> str:
         lines.append(f"- MAD-X category ({count}): {category}")
     for warning in pyptc_warnings.get("relevant", []):
         lines.append(f"- Unresolved PyPTC runtime warning for review: {warning}")
-    lines += ["", "## Nonclaims", "", "This is snapshot-scoped admission evidence only. It does not validate closed orbit, tunes, Twiss agreement, dispersion, long-term tracking, collective effects, or benchmark agreement. The technical result is pending external review; it is not reviewed acceptance.", ""]
+    lines += ["", "## Nonclaims", "", result.get("snapshot_scope", "This is snapshot-scoped admission evidence only; it is not a clean-checkout result."),
+              "It does not validate closed orbit, tunes, Twiss agreement, dispersion, long-term tracking, collective effects, or benchmark agreement. The technical result is pending external review; it is not reviewed acceptance.", ""]
     if result.get("reason_incomplete"):
         lines += ["## Incomplete evidence", "", result["reason_incomplete"], ""]
     return "\n".join(lines)
@@ -399,8 +405,10 @@ def execute(args: argparse.Namespace) -> tuple[dict[str, Any], Path]:
     (out / "reference_evidence").mkdir()
     implementation = out / "implementation"
     implementation.mkdir()
-    runner_copy = implementation / "run_admission.py"
+    runner_copy = implementation / "admission_harness.py"
     shutil.copy2(Path(__file__).resolve(), runner_copy)
+    entrypoint_copy = implementation / "run_admission.py"
+    shutil.copy2(STEP_DIR / "run_admission.py", entrypoint_copy)
     test_source = ITERATION_DIR / "tests/test_admission.py"
     test_copy = implementation / "test_admission.py"
     if test_source.is_file():
@@ -530,7 +538,9 @@ def execute(args: argparse.Namespace) -> tuple[dict[str, Any], Path]:
     finite = all(math.isfinite(float(value)) for value in final_coords)
     smoke = {"initial_coordinates": smoke_coords, "final_coordinates": final_coords,
              "coordinate_order": "PyPTC six-coordinate API order; all components initialized to zero",
-             "turns": 1, "loss": loss, "finite": finite, "pass": finite and not loss["lost"]}
+             "turns": 1, "loss": loss,
+             "loss_policy": "any reported loss fails the one-turn smoke; all final coordinates must be finite",
+             "finite": finite, "pass": finite and not loss["lost"]}
     if not smoke["pass"]:
         raise AdmissionFailed("One-turn zero-offset smoke produced non-finite coordinates or particle loss.")
     record_stage(events, "pyptc-admission", "complete", smoke_passed=True)
@@ -553,12 +563,19 @@ def execute(args: argparse.Namespace) -> tuple[dict[str, Any], Path]:
         "seed": None, "ledger": "steps/admit-code-to-isis-rcs/review_ledger.csv",
         "report": "report.md", "canonical_result": "result.json", "manifest": "manifest.json",
         "output_path": str(out.resolve()),
+        "snapshot_scope": (f"This technical outcome applies only to the five hash-identified reference inputs copied from {source_manifest['reference_source']['materialized_revision']}. It is not a clean-checkout result and does not describe the dirty source working tree at {source_manifest['reference_source']['checkout_revision_at_copy']}."),
         "harness_validation": {"command": test_command, "outcome": "passed", "tests_run": test_count,
                                "log_path": str(test_log.relative_to(out)), "log_sha256": sha_file(test_log),
                                "runner_sha256": runner_hash, "test_script_sha256": sha_file(test_copy)},
         "skill": {"name": "admit-code-to-isis-rcs", "commit": PINNED_SKILL_COMMIT, "sha256": PINNED_SKILL_SHA256},
-        "runner": {"path": "implementation/run_admission.py", "sha256": runner_hash},
+        "skill_iteration": ITERATION_DIR.name,
+        "runner": {"path": "implementation/admission_harness.py", "sha256": runner_hash},
+        "entrypoint": {"path": "implementation/run_admission.py", "sha256": sha_file(entrypoint_copy)},
         "target": {"repository_commit": subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True, stdout=subprocess.PIPE, check=True).stdout.strip(),
+                   "official_source": subprocess.run(["git", "config", "--get", "remote.origin.url"], cwd=REPO_ROOT, text=True, stdout=subprocess.PIPE, check=True).stdout.strip(),
+                   "version_identity": "exact Git commit; no separate release tag asserted",
+                   "installation_method": "bash build/build_ptc.sh builds build_pyptc/libpyptc.so",
+                   "supported_interface": "public pyptc Python package using its ctypes wrapper",
                    "runtime": sys.version, "numpy": importlib.metadata.version("numpy"), "bootstrap": bootstrap_value,
                    "build_command": build_command, "bootstrap_command": bootstrap_command, "build_log": str(build_log.relative_to(out)),
                    "build_log_sha256": sha_file(build_log), "bootstrap_log_sha256": sha_file(out / "bootstrap/bootstrap.log"),
@@ -567,10 +584,11 @@ def execute(args: argparse.Namespace) -> tuple[dict[str, Any], Path]:
                    "runtime_log_sha256": sha_file(target_runtime_log),
                    "api_trace": str(trace.relative_to(out)), "api_trace_sha256": sha_file(trace),
                    "api_definition": "pyptc/core.py: PTC.__init__, PTC.api_level, PTC.init_lattice, machine_summary, scalar, track_particle_ptc_with_loss",
+                   "bootstrap_kind": "locally constructed no-lattice library-load and API-level readback",
                    "api_definition_sha256": sha_file(REPO_ROOT / "pyptc/core.py"),
                    "library": str(library), "library_sha256": sha_file(library),
                    "structure": {**structure, "flat_file_fibre_count": len(fibres)}, "reference_particle": reference_particle},
-        "reference": {"mode": "working-copy-snapshot", "snapshot_content_source": "pinned commit tree; dirty working-tree file contents were not used",
+        "reference": {"mode": "working-copy-snapshot", "snapshot_content_source": "pinned Git commit tree",
                       "source_repository": source_manifest["reference_source"]["repository"],
                       "snapshot_source_path": str(args.snapshot_dir.resolve()),
                       "snapshot_input_path": "snapshot_inputs/", "source_revision": source_manifest["reference_source"]["materialized_revision"],
@@ -648,7 +666,3 @@ def cli(argv: list[str] | None = None) -> int:
     print(f"Canonical result: {output / 'result.json'}")
     print(f"Manifest: {output / 'manifest.json'}")
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(cli())

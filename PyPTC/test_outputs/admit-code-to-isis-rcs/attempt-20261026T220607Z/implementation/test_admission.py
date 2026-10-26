@@ -12,7 +12,7 @@ from pathlib import Path
 ITERATION_DIR = Path(__file__).resolve().parents[1]
 REPO_ROOT = ITERATION_DIR.parents[2]
 FIXTURE_ROOT = REPO_ROOT / "test_outputs" / "admit-code-to-isis-rcs" / ".iteration-0002-test-fixtures"
-SPEC = importlib.util.spec_from_file_location("fresh_admission", ITERATION_DIR / "run_admission.py")
+SPEC = importlib.util.spec_from_file_location("fresh_admission", ITERATION_DIR / "admission_harness.py")
 assert SPEC and SPEC.loader
 admission = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(admission)
@@ -88,12 +88,14 @@ class AdmissionSkillTests(unittest.TestCase):
         result = {
             "attempt_id": "attempt-test", "outcome": "admitted-snapshot", "ledger": "review_ledger.csv",
             "effective_command": "python run_admission.py", "recipe": admission.AUTHORIZED_RECIPE,
+            "snapshot_scope": "This is snapshot-scoped evidence only and is not a clean-checkout result.",
             "skill": {"commit": admission.PINNED_SKILL_COMMIT, "sha256": admission.PINNED_SKILL_SHA256},
             "harness_validation": {"tests_run": 9, "log_path": "harness-tests.log", "log_sha256": "tests-hash"},
             "reference": {"mode": "working-copy-snapshot", "source_revision": "abc", "observed_checkout_revision": "def",
                           "dirty_entry_count": 1, "status_evidence": "status.txt", "status_sha256": "hash"},
             "target": {"repository_commit": "target", "runtime": "python", "numpy": "numpy", "library_sha256": "libhash",
-                       "api_definition": "pyptc/core.py", "bootstrap_log": "bootstrap.log", "structure": {}, "reference_particle": {}},
+                       "official_source": "origin", "installation_method": "build", "bootstrap_kind": "local",
+                       "bootstrap": {"api_level": 4}, "api_definition": "pyptc/core.py", "bootstrap_log": "bootstrap.log", "structure": {}, "reference_particle": {}},
             "executed_calls": [], "smoke": {"pass": True},
             "warning_summary": {"madx": {"line_count": 1, "categories": {"implicit re-definition ignored": 1}},
                                 "pyptc": {"line_count": 1, "relevant": ["DLMAX > LMAX"]},
@@ -106,6 +108,7 @@ class AdmissionSkillTests(unittest.TestCase):
         self.assertIn("DLMAX > LMAX", report)
         self.assertIn("Unresolved PyPTC runtime warning", report)
         self.assertIn("snapshot-scoped", report)
+        self.assertIn("not a clean-checkout result", report)
 
     def test_runtime_warning_classification_covers_both_engines(self) -> None:
         summary = admission.classify_runtime_warnings(

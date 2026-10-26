@@ -31,6 +31,7 @@ ZERO_TOL = 1e-12
 PC_TOL_GEV_C = 2e-7
 KE_TOL_GEV = 2e-6
 LENGTH_TOL_M = 1e-6
+ATTEMPT_CLASS_ENV = "PYPTC_ADMISSION_RUN_CLASS"
 AUTHORIZED_RECIPE = {
     "authorization_source": "user instructions on 2026-10-26; recipe recorded in step README and feedback 0001",
     "reference_mode": "working-copy-snapshot",
@@ -50,6 +51,13 @@ class AdmissionBlocked(RuntimeError):
 
 class AdmissionFailed(RuntimeError):
     """A requested bootstrap, reference, or target operation failed."""
+
+
+def attempt_class_label() -> str:
+    """Default to user-run evidence; agents must opt into diagnostic labeling."""
+    if os.environ.get(ATTEMPT_CLASS_ENV, "").strip() == "agent-diagnostic":
+        return "agent-run diagnostic; not a user-run skill-test result"
+    return "user-run skill-test attempt"
 
 
 def sha_bytes(data: bytes) -> str:
@@ -296,7 +304,7 @@ def write_incomplete_bundle(args: argparse.Namespace, error: Exception) -> None:
     library = args.library.resolve()
     result = {
         "attempt_id": args.attempt_id, "outcome": outcome, "review_disposition": "awaiting review",
-        "attempt_class": "agent-run diagnostic; not a user-run skill-test result",
+        "attempt_class": attempt_class_label(),
         "effective_command": " ".join([sys.executable, *sys.argv]),
         "seed": None, "ledger": "steps/admit-code-to-isis-rcs/review_ledger.csv",
         "report": "report.md", "canonical_result": "result.json", "manifest": "manifest.json",
@@ -344,6 +352,7 @@ def render_report(result: dict[str, Any]) -> str:
     lines = [
         f"# PyPTC ISIS RCS admission {result['attempt_id']}", "",
         f"- Technical outcome: **{result['outcome']}**; external review disposition: **awaiting review**.",
+        f"- Attempt class: {result['attempt_class']}.",
         f"- Skill application iteration: `{result['skill_iteration']}`.",
         f"- Reference mode: `{ref['mode']}`; snapshot source revision: `{ref['source_revision']}`.",
         f"- Shared skill: `{result['skill']['commit']}`; SHA-256 `{result['skill']['sha256']}`.",
@@ -557,7 +566,7 @@ def execute(args: argparse.Namespace) -> tuple[dict[str, Any], Path]:
         "disposition": "MAD-X reports repeated element definitions as ignored; these are counted and retained. PyPTC runtime warnings remain unresolved for review. Structural and reference-particle checks passed, but warning interpretation remains pending external review.",
     })
     result = {
-        "attempt_id": attempt_id, "attempt_class": "agent-run diagnostic; not a user-run skill-test result",
+        "attempt_id": attempt_id, "attempt_class": attempt_class_label(),
         "outcome": "admitted-snapshot", "review_disposition": "awaiting review",
         "effective_command": " ".join([sys.executable, *sys.argv]),
         "seed": None, "ledger": "steps/admit-code-to-isis-rcs/review_ledger.csv",
