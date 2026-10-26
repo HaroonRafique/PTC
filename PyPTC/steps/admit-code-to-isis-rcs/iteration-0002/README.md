@@ -7,6 +7,15 @@ independently. It reads only the files-only local snapshot described by
 `../reference_snapshot/README.md`; it does not require or create a nested Git
 repository.
 
+Set up the local, ignored virtual environment once per checkout:
+
+```bash
+bash steps/admit-code-to-isis-rcs/setup.sh
+```
+
+This creates `steps/admit-code-to-isis-rcs/.venv/` and installs the Python
+dependencies. The environment is local and is not committed.
+
 Run focused harness tests with:
 
 ```bash
