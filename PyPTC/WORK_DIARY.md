@@ -358,6 +358,62 @@ The report is
 It links the run artefacts and relevant Task 6 longitudinal-evidence and Task
 9 event-maintenance requirements in the
 [evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+## 2026-10-27 — Prepare updated PyPTC linear-optics skill attempt
+
+Generated benchmark iteration 0002 from the updated optics skill at
+`isis-modelling-agents` revision `f5293a3754dc8c4e9a6a4ba987603924b91949f3`
+(snapshot SHA-256
+`2c720d050d5c26cff6abcb619c503cfae309d8b29ba8434042bfe3e435fa3f26`). It
+uses user-accepted admission snapshot attempt `attempt-20261027T194128Z`, with
+snapshot-only scope, and reuses the five input files, 2023 strength overlay,
+zero harmonics and trims, accepted flat file, PyPTC library, and MAD-X binary
+by hash. Setup and seven harness fixtures passed in the agent diagnostic.
+
+Smoke attempt `attempt-20261027T223232Z` mapped 586 named MAD-X exits to PyPTC
+fibre boundaries by name, occurrence, and position; retained 804 PyPTC node
+rows and mapped the 586 named fibre exits; generated aligned profile/scalar
+evidence and one nominal composite. The target completed 64 turns with 65 finite samples
+and no loss. MAD-X also emitted 65 samples but became non-finite, so the
+cross-code tracking comparison remains blocked as invalid reference tracking
+evidence, not a numerical disagreement. Scalar and profile differences remain
+pending tolerance, and chromaticity remains blocked on the target derivative
+coordinate. The composite is available for user review; normal-size
+readability has not been accepted. Feedback 0004 records this and superseded
+smoke attempts. The review ledger records attempt identities and hashes, and
+the three newest raw bundles are retained. This local record supports evidence
+traceability under Tasks 6 and 9 of the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+No shared skill edit, `REP`, `EVAL`, benchmark acceptance, or physics claim was
+made.
+
+## 2026-10-27 — Assess user-run optics benchmark iteration 0002
+
+The user ran `attempt-20261027T232957Z` using the pinned updated skill
+`f5293a3754dc8c4e9a6a4ba987603924b91949f3`. Admission provenance and hashes
+matched the accepted snapshot. MAD-X produced 586 TWISS rows; the target had
+804 node rows across 586 fibres, and all 586 element exits were verified by
+name, occurrence, fibre, and position. Fourteen profile residual summaries
+and scalar differences were retained as pending tolerance; chromaticity is
+blocked on the PyPTC derivative coordinate. The target supplied a finite,
+loss-free 65-sample record for 64 turns. MAD-X supplied 65 rows but had
+`x=3.195 m` at turn 1 and NaNs from turn 2; comparison remains blocked rather
+than reported as numerical disagreement.
+
+The MAD-X tracking recipe's `MAKETHIN` command selected no elements and the
+log says the default was one thin lens per thick element. The admitted PyPTC
+flat lattice has 804 integration nodes. This is a substantial integration
+method mismatch and likely invalidates the MAD-X tracking record; the specific
+cause of NaNs is not yet isolated. Feedback 0005 records exact artifact hashes,
+the skill-first assessment, the evidence-based tracking finding, and learning
+from the existing `compare_madx_pyptc_closed_orbits.py` workflow and
+`test_madx_optics_benchmark.py`. It also records missing capability inventory,
+helper documentation, explicit fixtures, plot-manifest identity links, and
+normal-view readability. The review ledger retains the no-acceptance
+disposition. The newest three attempt bundles are retained under the campaign
+policy. This evidence trail supports Tasks 6 and 9 of the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+No skill edit, `REP`, `EVAL`, or physics acceptance was made.
 This is diagnostic campaign evidence, not benchmark completion or physics
 acceptance; no shared publication-repository file or split setting was
 changed.

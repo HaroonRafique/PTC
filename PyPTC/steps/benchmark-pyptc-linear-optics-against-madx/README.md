@@ -1,9 +1,9 @@
 # PyPTC linear-optics benchmark against MAD-X
 
 This is an independent skill-test campaign, separate from
-`steps/admit-code-to-isis-rcs/`. Its only admission basis is the accepted
+`steps/admit-code-to-isis-rcs/`. Its admission basis is the user-accepted
 snapshot attempt copied to
-`admission_basis-accepted-attempt-20261027T082315Z/`. No failed admission
+`admission_basis-accepted-attempt-20261027T194128Z/`. No failed admission
 attempt is used as a benchmark input, and the historical admission campaign
 is left intact.
 
@@ -19,8 +19,8 @@ settings (`a1 = b1 = 0`), trim settings, or flat-file splitting.
 From this directory:
 
 ```bash
-./iteration-0001/setup.sh
-./iteration-0001/run_benchmark.py
+./iteration-0002/setup.sh
+./iteration-0002/run_benchmark.py
 ```
 
 The runner needs no arguments and automatically uses the step's `.venv` after
@@ -29,12 +29,24 @@ setup. Outputs are placed under
 `PYPTC_BENCHMARK_RUN_CLASS=agent-diagnostic` only for an agent smoke run; the
 default is `user-run`.
 
-Iteration 0001 is deliberately a first diagnostic. It reruns the pinned
-MAD-X 5.02.00 binary from the accepted admission record and runs PyPTC from the
-accepted flat file. It writes raw optics records, scalar differences, a
-longitudinal-position mapping diagnostic, and a report. It does not claim
-profile agreement when the boundary map is unresolved. No reviewed observable
-tolerances have been supplied, so numerical differences remain
+Iteration 0001 records the first skill attempt and its blocked profile map.
+Iteration 0002 is regenerated from the updated skill at
+`f5293a3754dc8c4e9a6a4ba987603924b91949f3` and uses the newly accepted
+snapshot attempt `attempt-20261027T194128Z` as its evidence basis. It adds a
+Python adapter around PTC's named orbit-marker interface, verifies element
+exit identity/occurrence and position, and writes aligned profile residuals
+and the nominal case composite when that map passes. It reuses the accepted
+MAD-X 5.02.00 binary, PyPTC library, source snapshot and flat file by hash; it
+does not change machine strengths or resplitting. Chromaticity remains blocked
+until the PyPTC derivative coordinate is established, and bounded tracking
+remains blocked until a matched complete per-turn workflow is verified. The
+agent diagnostic smoke run `attempt-20261027T223232Z` verified all 586 named
+element exits and completed target tracking for 64 turns without loss. MAD-X
+retained 65 rows but produced non-finite coordinates, so the cross-code
+tracking comparison is blocked as reference evidence, not classified as a
+numerical mismatch. The composite plot is retained for user review; no
+tolerance or physics acceptance has been set. Numerical differences without
+reviewed observable-specific tolerances remain
 `pending-tolerance`.
 
 ## Review sequence
@@ -51,6 +63,11 @@ explains the 586 MAD-X element rows versus 375 PyPTC orbit-node rows, verifies
 the shared lattice provenance, and records the evidence limits and possible
 sampling approaches. It is not a benchmark acceptance decision.
 
+The follow-up
+[`diagnostics/ptc-orbit-marker-capability-20261027.md`](diagnostics/ptc-orbit-marker-capability-20261027.md)
+probes the existing PTC `SETORBITMARKER` support and records a complete
+fibre-boundary identity match through the Python-accessible PTC commands.
+
 ## Evidence-gated publication alignment
 
 This campaign follows the prospective campaign-evidence practice in Task 6
@@ -63,9 +80,9 @@ this step's manifests, `feedback/`, `review_ledger.csv`, and the local PyPTC
 work diary.
 
 This is an observational campaign episode, not a controlled baseline-versus-
-skill evaluation: no matched baseline was run. The current agent preflight is
-not a user-run skill test or physics review. A `REP-####` chronology record is
-required by the benchmark skill when a code/reference/recipe/run reaches
-technical completion; this first attempt is explicitly incomplete and creates
-no `REP`, `EVAL`, physics claim, or acceptance. Keep full run bundles here and
-do not copy bulky outputs into the publication repository.
+skill evaluation: no matched baseline was run. Agent runs are bounded
+diagnostics, not user-run skill tests or physics reviews. A `REP-####`
+chronology record is required by the benchmark skill when a
+code/reference/recipe/run reaches technical completion; an incomplete attempt
+creates no `REP`, `EVAL`, physics claim, or acceptance. Keep full run bundles
+here and do not copy bulky outputs into the publication repository.
