@@ -1,8 +1,26 @@
 {
-  "attempt_class": "agent-run diagnostic; not a user-run skill-test result",
-  "attempt_id": "attempt-20261026T200752Z",
+  "attempt_class": "user-run skill-test attempt",
+  "attempt_id": "attempt-20261027T082315Z",
   "canonical_result": "result.json",
-  "effective_command": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/admit-code-to-isis-rcs/.venv/bin/python steps/admit-code-to-isis-rcs/iteration-0002/run_admission.py",
+  "commands": {
+    "effective_admission": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/admit-code-to-isis-rcs/.venv/bin/python ./run_admission.py",
+    "madx": [
+      "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/bin/madx-linux64_v5_02_00"
+    ],
+    "pyptc_bootstrap": [
+      "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/admit-code-to-isis-rcs/.venv/bin/python",
+      "-c",
+      "import json,sys; sys.path.insert(0,sys.argv[1]); from pyptc import PTC; p=PTC(sys.argv[2]); print(json.dumps({'library':p.library.resolve().as_posix(),'api_level':p.api_level()}))",
+      "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC",
+      "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/build_pyptc/libpyptc.so"
+    ]
+  },
+  "effective_command": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/admit-code-to-isis-rcs/.venv/bin/python ./run_admission.py",
+  "entrypoint": {
+    "path": "implementation/run_admission.py",
+    "sha256": "5066a188a951fd75ea45e10fb7b2f2e429189a32e827bedd43b01d67bde62ad8"
+  },
+  "events": "events.jsonl",
   "executed_calls": [
     "PTC.init_lattice(madx_work/PTC-PyORBIT_flat_file.flt)",
     "PTC.machine_summary()",
@@ -23,11 +41,11 @@
       "-v"
     ],
     "log_path": "harness-tests.log",
-    "log_sha256": "9ebaaf28bcad12b6b56c272e652a679600e3139196d1ebfc297fe2a35887ca94",
+    "log_sha256": "153edc57ba807b8977e83b8752f94e3e0c8a813631caf1f79e4e5cdd632dca87",
     "outcome": "passed",
-    "runner_sha256": "3dbd35436376be065dd0fe64d31b1d5de68e6e7881d073480e1438500cfd02fc",
-    "test_script_sha256": "6c400bd8876684bdb1c7051f37462d03edbff102f1bce4f51c1d1c899a8954b6",
-    "tests_run": 9
+    "runner_sha256": "2fdbb4a0701047a13678b5f9a8c484b5cafec3d967f8cc18ade19beb28729785",
+    "test_script_sha256": "c13416f4f8309ab868c6330ca37aa2810494c60d1b36f77c19b577143e9236ef",
+    "tests_run": 10
   },
   "ledger": "steps/admit-code-to-isis-rcs/review_ledger.csv",
   "manifest": "manifest.json",
@@ -35,7 +53,7 @@
     "No orbit, tunes, Twiss agreement, dispersion, long-term stability, collective-effects, or benchmark validation."
   ],
   "outcome": "admitted-snapshot",
-  "output_path": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/admit-code-to-isis-rcs/attempt-20261026T200752Z",
+  "output_path": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/admit-code-to-isis-rcs/attempt-20261027T082315Z",
   "recipe": {
     "authorization_source": "user instructions on 2026-10-26; recipe recorded in step README and feedback 0001",
     "include_order": [
@@ -122,7 +140,7 @@
     ],
     "reference_engine_invoked": true,
     "reference_output": "madx_work/reference_twiss.tfs",
-    "reference_output_sha256": "97336352b74e7e654ee944e9daced5bcd85198252b9a5d2cdef123258bfff58d",
+    "reference_output_sha256": "ae7c3867fcf194262a13ddf8f8746d312c1a4309ee86e9a2a1b25caf72faa803",
     "sequence": "synchrotron",
     "snapshot_content_source": "pinned Git commit tree",
     "snapshot_input_path": "snapshot_inputs/",
@@ -137,11 +155,18 @@
     "target_engine_invoked": true,
     "variant": "00_Simplified_Lattice with 2023.strength overlay"
   },
+  "reference_input_paths": {
+    "Lattice_Files/00_Simplified_Lattice/2023.strength": "snapshot_inputs/2023.strength",
+    "Lattice_Files/00_Simplified_Lattice/ISIS.elements": "snapshot_inputs/ISIS.elements",
+    "Lattice_Files/00_Simplified_Lattice/ISIS.injected_beam": "snapshot_inputs/ISIS.injected_beam",
+    "Lattice_Files/00_Simplified_Lattice/ISIS.sequence": "snapshot_inputs/ISIS.sequence",
+    "Lattice_Files/00_Simplified_Lattice/ISIS.strength": "snapshot_inputs/ISIS.strength"
+  },
   "report": "report.md",
   "review_disposition": "awaiting review",
   "runner": {
-    "path": "implementation/run_admission.py",
-    "sha256": "3dbd35436376be065dd0fe64d31b1d5de68e6e7881d073480e1438500cfd02fc"
+    "path": "implementation/admission_harness.py",
+    "sha256": "2fdbb4a0701047a13678b5f9a8c484b5cafec3d967f8cc18ade19beb28729785"
   },
   "seed": null,
   "skill": {
@@ -149,6 +174,7 @@
     "name": "admit-code-to-isis-rcs",
     "sha256": "ca7457645d0fe9049e7b55c50fc3b035b4db771bdb5984c6ab662cbe3cfbf35f"
   },
+  "skill_iteration": "iteration-0002",
   "smoke": {
     "coordinate_order": "PyPTC six-coordinate API order; all components initialized to zero",
     "final_coordinates": [
@@ -197,7 +223,7 @@
     "api_definition": "pyptc/core.py: PTC.__init__, PTC.api_level, PTC.init_lattice, machine_summary, scalar, track_particle_ptc_with_loss",
     "api_definition_sha256": "484939ccbbbf6d6cc218d5b3a97167bb6ddfd383878adf442ac49a90bcced571",
     "api_trace": "pyptc_api_trace.jsonl",
-    "api_trace_sha256": "5ea5327cc01f648b822bfe77e5db608aafb5fdc4f8ec7f2338fb0b6bdde9d081",
+    "api_trace_sha256": "bd179ae86e9196b557c143a25fad79fb66676786d706c0b52c9fa501db99e8df",
     "bootstrap": {
       "api_level": 4,
       "library": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/build_pyptc/libpyptc.so"
@@ -237,7 +263,7 @@
       "pyptc_kinetic_gev": 0.07044002991247011,
       "pyptc_p0c_gev_c": 0.370331763608763
     },
-    "repository_commit": "4b9a30ab61c820e99d4f5c18804cafdfdbaeb25f",
+    "repository_commit": "324c1a6e0389137c4f93658621089f9e01159827",
     "runtime": "3.14.7 (main, Aug 10 2026, 00:00:00) [GCC 15.3.1 20260722 (Red Hat 15.3.1-1)]",
     "runtime_log": "pyptc_runtime.log",
     "runtime_log_sha256": "9044cb0b247391a198219302f68d2bec8af617b515d279375cd43a7bf2ecb70a",
@@ -253,6 +279,11 @@
     },
     "supported_interface": "public pyptc Python package using its ctypes wrapper",
     "version_identity": "exact Git commit; no separate release tag asserted"
+  },
+  "target_source_hashes": {
+    "build/build_ptc.sh": "99cd8dbf84fc57c118db690aa6213d953a4f7eb24450cdcbeed0e3df45f8de01",
+    "pyptc/core.py": "484939ccbbbf6d6cc218d5b3a97167bb6ddfd383878adf442ac49a90bcced571",
+    "pyptc/lattice.py": "1efaa2c2b314e447e9a01f398c564d76b1f0c0b431dce553e263a4538350800c"
   },
   "warning_summary": {
     "disposition": "MAD-X reports repeated element definitions as ignored; these are counted and retained. PyPTC runtime warnings remain unresolved for review. Structural and reference-particle checks passed, but warning interpretation remains pending external review.",
@@ -273,7 +304,7 @@
       "line_count": 302
     },
     "madx_log_path": "madx_work/madx.log",
-    "madx_log_sha256": "54bda3d0e96ce818cabd7e92c87dc316db95d2073fc1bee18389c87335bc2dab",
+    "madx_log_sha256": "abf52d5b5da1527f7bf76f72938627ab8ef4d0c8d6fc01e175b448a42905c47b",
     "pyptc": {
       "line_count": 3,
       "relevant": [

@@ -41,8 +41,8 @@
 @ SYNCH_5          %le                   0
 @ TITLE            %24s "PyPTC admission snapshot"
 @ ORIGIN           %22s "MAD-X 5.02.00 Linux 64"
-@ DATE             %08s "26/10/26"
-@ TIME             %08s "20.07.53"
+@ DATE             %08s "27/10/26"
+@ TIME             %08s "08.23.17"
 * NAME                                S                  X                 PX                  Y                 PY               BETX               BETY               ALFX               ALFY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "SYNCHROTRON$START"                   0                  0                  0                  0                  0        10.51872618        5.963206005       0.7533722726       -1.080272387

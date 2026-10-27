@@ -24,7 +24,7 @@
     ]
   },
   "madx_log_path": "madx_work/madx.log",
-  "madx_log_sha256": "54bda3d0e96ce818cabd7e92c87dc316db95d2073fc1bee18389c87335bc2dab",
+  "madx_log_sha256": "abf52d5b5da1527f7bf76f72938627ab8ef4d0c8d6fc01e175b448a42905c47b",
   "pyptc_log_path": "pyptc_runtime.log",
   "pyptc_log_sha256": "9044cb0b247391a198219302f68d2bec8af617b515d279375cd43a7bf2ecb70a",
   "disposition": "MAD-X reports repeated element definitions as ignored; these are counted and retained. PyPTC runtime warnings remain unresolved for review. Structural and reference-particle checks passed, but warning interpretation remains pending external review."
