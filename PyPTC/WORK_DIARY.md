@@ -359,6 +359,36 @@ It links the run artefacts and relevant Task 6 longitudinal-evidence and Task
 9 event-maintenance requirements in the
 [evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
 
+## 2026-10-28 — Prepare benchmark iteration 0003 thick tracking default
+
+Prepared iteration 0003 in response to user-run feedback 0005 and the recorded
+tracking-mode investigation. The runner retains the exact pinned optics skill
+snapshot and the verified 586-element-exit adapter, and explicitly labels this
+as a feedback-driven correction rather than an independent fresh skill
+implementation. MAD-X `PTC_TRACK` with the thick PTC layout is now the default
+reference tracking route. The optional `PYPTC_BENCHMARK_TRACKING_MODE=both`
+adds a separately classified classic thin-track diagnostic using the tested
+ten-slice recipe; the known negative-drift failure is recorded without
+blocking the thick result. The report states that MAD-X `PTC_TRACK` and PyPTC
+share the PTC engine, and that a matching PyPTC thin control has not been
+established. The admitted lattice, harmonics, trims, and split settings are
+unchanged.
+
+The user-facing commands, environment option, and limitations are documented
+in the step README and `iteration-0003/README.md`. Bounded agent diagnostics
+`attempt-20261027T234834Z` (default thick) and
+`attempt-20261027T234910Z` (`both`) completed with finite 65-sample thick
+records; the seven local fixtures passed. The optional thin test reproduced
+the known negative-drift failure. The initial failed smoke and intermediate
+thin recipe-ordering error are retained in feedback 0006 with hashes and
+supersession notes. These are diagnostics, not a user-run attempt or benchmark
+acceptance. This preparation supports Tasks 6 and 9 of the evidence-gated
+agents publication plan. After the ledger and feedback were complete, the
+retention helper's dry run was reviewed and its `--apply` pruned the four
+older bundles `234802Z`, `232957Z`, `223232Z`, and `223155Z`. Their identities,
+hashes, and findings remain recorded in feedback 0004/0005/0006 and the ledger.
+The retained newest three are `234834Z`, `234844Z`, and `234910Z`.
+
 ## 2026-10-27 — Prepare updated PyPTC linear-optics skill attempt
 
 Generated benchmark iteration 0002 from the updated optics skill at

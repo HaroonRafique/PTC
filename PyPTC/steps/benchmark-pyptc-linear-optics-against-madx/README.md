@@ -19,8 +19,8 @@ settings (`a1 = b1 = 0`), trim settings, or flat-file splitting.
 From this directory:
 
 ```bash
-./iteration-0002/setup.sh
-./iteration-0002/run_benchmark.py
+./iteration-0003/setup.sh
+./iteration-0003/run_benchmark.py
 ```
 
 The runner needs no arguments and automatically uses the step's `.venv` after
@@ -29,8 +29,14 @@ setup. Outputs are placed under
 `PYPTC_BENCHMARK_RUN_CLASS=agent-diagnostic` only for an agent smoke run; the
 default is `user-run`.
 
+Tracking defaults to thick MAD-X `PTC_TRACK` and accepts the optional
+`PYPTC_BENCHMARK_TRACKING_MODE=both` setting to also retain a separately
+classified thin-mode diagnostic. See the iteration 0003 README for the
+limitations and command details. Iteration 0003 is a feedback-driven
+correction of the prior harness, not an independent fresh skill implementation.
+
 Iteration 0001 records the first skill attempt and its blocked profile map.
-Iteration 0002 is regenerated from the updated skill at
+Iteration 0002 was generated from the updated skill at
 `f5293a3754dc8c4e9a6a4ba987603924b91949f3` and uses the newly accepted
 snapshot attempt `attempt-20261027T194128Z` as its evidence basis. It adds a
 Python adapter around PTC's named orbit-marker interface, verifies element
@@ -48,6 +54,16 @@ numerical mismatch. The composite plot is retained for user review; no
 tolerance or physics acceptance has been set. Numerical differences without
 reviewed observable-specific tolerances remain
 `pending-tolerance`.
+
+Iteration 0003 keeps that exact skill snapshot and the verified boundary
+adapter, while correcting the tracking route in response to feedback 0005 and
+the [thick/thin tracking investigation](diagnostics/tracking-mode-investigation-20261028.md).
+It uses thick MAD-X `PTC_TRACK` by default. Thin mode is optional and remains a
+reference-only diagnostic until a valid slicing policy and matching PyPTC
+control are established. Iteration 0003 agent smoke outcomes, including the
+default thick run and optional thin block, are recorded in
+[`feedback/0006-iteration-0003-thick-tracking-smoke.md`](feedback/0006-iteration-0003-thick-tracking-smoke.md)
+and the review ledger; they are not a user-run skill test.
 
 ## Review sequence
 
