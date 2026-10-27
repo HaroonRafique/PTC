@@ -418,6 +418,31 @@ This is diagnostic campaign evidence, not benchmark completion or physics
 acceptance; no shared publication-repository file or split setting was
 changed.
 
+## 2026-10-28 — MAD-X thick and thin tracking mode investigation
+
+Investigated the blocked bounded-tracking record from user attempt
+`attempt-20261027T232957Z` using the accepted snapshot basis and pinned MAD-X
+5.02.00. Classic MAD-X `TRACK` without thin conversion stopped at the first
+thick element and produced no track file, although MAD-X returned code 0.
+MAD-X `PTC_TRACK` with a thick PTC layout completed 64 turns and retained 65
+finite samples. Because both PyPTC and this reference path use the PTC tracking
+engine, that result is not an independent tracking-engine comparison. Classic
+`TRACK` after explicit ten-slice `MAKETHIN` failed before tracking with a
+negative drift of `-0.07454545 m` between sliced dipole-fringe elements.
+
+Recipes, logs, summaries, and the successful track table are retained in
+`test_outputs/benchmark-pyptc-linear-optics-against-madx/diagnostic-tracking-modes-20261028/`.
+The formal report
+`steps/benchmark-pyptc-linear-optics-against-madx/diagnostics/tracking-mode-investigation-20261028.md`
+records each artifact hash, command-mode outcome, limitation, and proposed
+runner treatment. In the next runner, thick tracking is the default; thin
+tracking is separately optional and must remain blocked/unavailable until a
+valid slicing policy is established. This local investigation supports Task 6
+campaign evidence and Task 9 review-state maintenance in the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+It does not establish a matched PyPTC/MAD-X tracking result or physics
+acceptance.
+
 ## 2026-10-27 — PTC orbit-marker capability probe
 
 After committing the sampling-grid report as `e295f2a`, inspected the PTC

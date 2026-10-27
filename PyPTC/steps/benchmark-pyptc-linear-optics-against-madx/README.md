@@ -68,6 +68,16 @@ The follow-up
 probes the existing PTC `SETORBITMARKER` support and records a complete
 fibre-boundary identity match through the Python-accessible PTC commands.
 
+The tracking-mode probe
+[`diagnostics/tracking-mode-investigation-20261028.md`](diagnostics/tracking-mode-investigation-20261028.md)
+records the available MAD-X thick `PTC_TRACK` route, the classic thick `TRACK`
+limitation, and the failed ten-slice `MAKETHIN` experiment. The next runner
+should default to thick tracking and offer thin tracking only where a
+validated slicing recipe is available. MAD-X `PTC_TRACK` shares the PTC
+tracking engine with PyPTC and is not an independent tracking-engine
+validation; it remains useful for exercising a valid thick-mode reference and
+record path. The thin-mode investigation is still open.
+
 ## Evidence-gated publication alignment
 
 This campaign follows the prospective campaign-evidence practice in Task 6
