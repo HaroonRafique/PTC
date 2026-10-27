@@ -361,3 +361,102 @@ It links the run artefacts and relevant Task 6 longitudinal-evidence and Task
 This is diagnostic campaign evidence, not benchmark completion or physics
 acceptance; no shared publication-repository file or split setting was
 changed.
+
+## 2026-10-27 — PTC orbit-marker capability probe
+
+After committing the sampling-grid report as `e295f2a`, inspected the PTC
+source and PyPTC interfaces to determine whether matching MAD-X element exits
+requires Fortran work. PTC already reads `pre_orbit_set.txt` before building
+its orbit layout. Its `SETORBITMARKER` command adds orbit nodes at named fibre
+exits; `PRINTORBITNODES` reports orbit-node groups with integration `s`, fibre
+name, fibre position, and `CAS`. Existing Python calls `PTC.init_lattice()`
+and `PTC.run_script()` can drive those hooks.
+
+A bounded probe in an isolated test-output directory selected all 516 unique
+fibre names from the accepted 586-fibre flat file. PTC returned 804 nodes,
+retaining the LMAX internal nodes and adding element exits. Parsing the
+existing printer output matched all 586 fibre ends by fibre position, name,
+and cumulative `s` within `1e-9 m`; all 563 distinct MAD-X `s` positions were
+represented. The resulting tunes matched the unmarked user run exactly. No
+profile residuals were calculated, so this establishes sampling capability,
+not optics agreement.
+
+The follow-up report is
+`steps/benchmark-pyptc-linear-optics-against-madx/diagnostics/ptc-orbit-marker-capability-20261027.md`;
+the probe script and raw files are retained under
+`test_outputs/benchmark-pyptc-linear-optics-against-madx/diagnostic-orbit-marker-probe/`.
+This is a local Task 6 longitudinal-evidence / Task 9 event-maintenance
+campaign observation linked to the evidence-gated publication plan. It does
+not need a Fortran change: the next implementation belongs in Python
+orchestration and parsing. Arbitrary in-fibre sampling remains outside the
+demonstrated PTC marker capability. No shared publication file, skill, PTC
+Fortran, or benchmark acceptance was changed.
+
+## 2026-10-27 — Admission skill iteration 0003
+
+Reconstructed a new admission harness from the updated
+`admit-code-to-isis-rcs` skill at shared-repo commit
+`97e63b1e4ef93aee07deacf09ad9592a223fffe6` (SHA-256
+`11c415652fcb053a8f5a2844ae93619ae37ae6dd74e471e67b8801c7b5dddd59`). The
+new implementation is under
+`steps/admit-code-to-isis-rcs/iteration-0003/`; it does not import iteration
+0002. It bootstraps PyPTC before copying or reading ISIS inputs, runs 11
+focused skill-contract tests, captures exact commands and an executed API
+trace, retains the loaded library, and writes a non-self-referential artifact
+digest inventory.
+
+Agent diagnostic `attempt-20261027T192533Z` completed as `admitted-snapshot`
+pending external review. It used the authorized five-file snapshot from
+`isis_2024` tree `1bada6a2ab94edd426c52b7e97a5d335926e0646`, the 2023 strength
+overlay, zero harmonics and trims, `synchrotron`, one MAD-X TWISS calculation,
+and one zero-offset one-turn PyPTC smoke. The momentum difference was
+`8.36e-8 GeV/c`, circumference difference `1.1e-13 m`, and the smoke was
+finite and loss-free. MAD-X reported 302 ignored element redefinitions;
+PyPTC retained unresolved cavity localization, `DLMAX > LMAX`, and
+`ORBIT_WARNING 11` messages. This is an agent diagnostic, not the user's
+full skill-test run or an independent review. The report, result, manifest,
+raw evidence, and digest inventory are in
+`test_outputs/admit-code-to-isis-rcs/attempt-20261027T192533Z/`. The updated
+requirements around exact command recording and artifact inventory align
+with the evidence completeness and traceability requirements in the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md);
+no shared skill or external diary was modified.
+
+Applied the existing three-bundle retention script after confirming its dry
+run. It removed the October 26 failed bundles and the earlier October 27
+accepted snapshot bundle. The accepted attempt's limited scope and evidence
+hashes remain recorded in feedback 0006/0007 and the ledger; the raw bundle
+was removed because the standing three-newest-bundles policy applies. The
+three retained raw bundles are the iteration 0003 agent diagnostics at
+`192342Z`, `192432Z`, and `192533Z`; the first two are marked superseded in
+the ledger.
+
+## 2026-10-27 — User run of admission iteration 0003
+
+The user ran attempt `attempt-20261027T194128Z`. It completed with technical
+outcome `admitted-snapshot`; ledger disposition remains `awaiting review`.
+Assessment found the snapshot inputs, engine commands, outputs, smoke result,
+warning record, manifest/result identity, and artifact inventory inspectable.
+The post-run comparison with PyPTC's saved default simplified output showed
+that the default's no-overlay recipe differs from the specifically approved
+snapshot recipe. The user clarified this is not an admission issue. Feedback
+0008 records the assessment, comparison, and remaining report/test-coverage
+suggestions. This local evidence record follows the provenance and review
+traceability expectations in the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+No shared skill or external diary was changed.
+
+## 2026-10-27 — User accepts admission snapshot iteration 0003
+
+The user accepted snapshot admission for user-run attempt
+`attempt-20261027T194128Z`, whose technical outcome is `admitted-snapshot`.
+The review ledger now records reviewer `user`, disposition `accepted`, and
+scope `snapshot admission only`. This acceptance leaves the MAD-X
+duplicate-definition and PyPTC cavity-localization/LMAX warnings recorded and
+unresolved; it does not claim clean-checkout admission, optics validation, or
+benchmark agreement. The user's clarification that comparison with the
+default simplified-lattice generator is outside the admission criterion is
+also recorded. Feedback 0009 captures the disposition and links back to the
+attempt evidence in feedback 0008. These local provenance and review records
+support the traceability and human-review requirements in the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
