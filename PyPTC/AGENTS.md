@@ -25,6 +25,21 @@ Jan26 full-error-table workflows should resolve the 38 source records to 38
 PyPTC applications; 88 applications usually means the wrong sliced lattice was
 used.
 
+## MAD-X/PTC Resplitting Contract
+
+The standard MAD-X generator uses `workflows/madx/ptc_scripts/resplit.ptc`
+and `print_flat_file.ptc`. They currently set nominal `LMAX=0.5 m` and
+`FUZZYLMAX=1.1`; the producer may therefore retain a gap up to `0.55 m`, while
+the flat-file header records only nominal `LMAX`. PyPTC's separate runtime
+checks measured orbit-node spacing against that stored nominal value. This
+producer/consumer mismatch is tracked in admission feedback 0006 and the
+review ledger. Do not silently change `LMAX` or `FUZZYLMAX` to suppress the
+warning. Before changing the split policy, decide whether `LMAX` is a hard
+maximum or whether its fuzzy tolerance is part of the contract, then keep the
+generator, flat-file metadata, and PyPTC check consistent. Any split-policy
+change must regenerate affected lattices and compare representative optics,
+tracking results, node/fibre counts, and runtime against a retained baseline.
+
 ## Test And Example Rules
 
 - User-facing physics checks should be runnable as scripts and should write PNG
@@ -69,6 +84,17 @@ PyPTC against an ISIS RCS skill in `isis-modelling-agents`:
   `isis-modelling-agents`. Keep PyPTC-specific facts in this repository, present
   shared-skill edits for review there, and record the exact revised skill
   revision before the next fresh application.
+
+## Work Diary
+
+`WORK_DIARY.md` is the sole work-diary destination for PyPTC work. It contains
+the relevant PyPTC admission history copied from the shared
+`isis-modelling-agents` diary. From 2026-10-27 onward, append PyPTC decisions,
+investigations, and substantive handoffs here; do not update another
+repository's diary for PyPTC work. Keep attempt-specific evidence in this
+repository's feedback files and review ledger. When a change warrants a diary
+entry, make that entry before committing and include it in the same commit as
+the related PyPTC work.
 
 ## Artefact Hygiene
 

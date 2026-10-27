@@ -104,3 +104,33 @@ This feedback and the ledger preserve attempt `082315Z`. The three-bundle
 retention rule prunes the older `attempt-20261026T200752Z`; its report/result
 hashes and history remain in feedback 0003 and the ledger. No shared skill
 change or acceptance decision is implied.
+
+## Follow-up: root cause of the resplitting warning
+
+The `DLMAX > LMAX 0.51440000000000197` message exposes a producer/consumer
+contract mismatch. The attempt copied the repository's standard
+`workflows/madx/ptc_scripts/resplit.ptc`: `LMAX=0.5`, `FUZZYLMAX=1.1`, cutting
+algorithm 2, and `THINLENS=0.01`. In `source/So_fitting.f90`, resplitting only
+cuts a piece when it exceeds `LMAX * FUZZY_SPLIT`, so the producer allows up to
+`0.55 m`. But the flat-file writer stores `LMAX` and does not store
+`FUZZYLMAX` (`source/Sp_keywords.f90`); the separate PyPTC runtime therefore
+reads `0.5 m` as its limit. Its orbit-node builder compares the measured
+`0.5144 m` directly against that value (`source/Sq_orbit_ptc.f90`) and warns.
+
+Thus the attempt did use the standard resplitting recipe, but it generated a
+flat file whose measured node gap exceeds the limit advertised in the file.
+The warning is valid from the consumer's available metadata; it is not enough
+to call the gap acceptable merely because the producer used a 10% fuzzy
+allowance. Earlier runtime logs were not retained in the inspected example
+outputs, so the exact historical value `0.5144 m` cannot be confirmed. The
+source code and shared scripts show that this mismatch is systemic for all
+workflows using this recipe. Future feedback should report both configured
+limits and verify consistency with the flat-file metadata. Repair options are
+to make the producer enforce nominal `LMAX` (for example, `FUZZYLMAX=1.0`) or
+to preserve the fuzzy tolerance in the flat-file contract and have consumers
+apply it consistently. Changing `LMAX` alone does not remove the mismatch.
+
+The cavity-frequency warning is independent and is caused by the no-RF layout.
+`ORBIT_WARNING 11` is the sum of that warning's code `1` and the `DLMAX`
+warning code `10`; it is not a third independent issue. This diagnosis does
+not validate long-term tracking accuracy or establish acceptance.
