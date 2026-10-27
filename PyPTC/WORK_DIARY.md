@@ -259,3 +259,105 @@ to require the established format for all future commits. This initial local
 diary, the diary rule, the admission review disposition, and the LMAX feedback
 updates are prepared together for a style-compliant commit. `git diff --check`
 passed; no simulations or tests were run for this documentation change.
+
+## 2026-10-27 — PyPTC linear-optics benchmark skill-test preflight
+
+Created the independent campaign step
+`steps/benchmark-pyptc-linear-optics-against-madx/`, separate from admission.
+Copied only the user-accepted snapshot admission bundle
+`attempt-20261027T082315Z` into the step as its provenance basis; failed
+admission bundles were not copied. The Xsuite effort remains independent, and
+no existing PyPTC optics example/test was read to construct this first
+application. The shared benchmark skill was pinned at repository revision
+`a9aeca88bdf7e7e81c71423c8a99ca0937540d67`, file SHA-256
+`ae393dba4f719f6416b061970f5974bf00b599db25eabfdfcb6836fbc4dfefbd`.
+
+Iteration 0001 now has a no-argument runner, isolated setup/requirements, raw
+MAD-X/PyPTC records, scalar comparisons, dispersion-normalized reference data,
+capability matrix, warning evidence, mapping diagnostics, and a report. The
+runner verifies and executes the exact MAD-X 5.02.00 binary from the accepted
+admission, reuses the accepted inputs and flat file, and confirms `a1`, `b1`,
+`kqtd`, `kqtf`, and all indexed trim values are zero. Its current output is
+`attempt-20261027T143507Z`, an **agent diagnostic**, not the user's skill-test
+run. It reports `blocked-profile-mapping`; no profile residual, optics
+acceptance, skill completion, or publication record is claimed.
+
+The direct reference samples contain 586 TWISS rows; PyPTC exposes 375
+node-exit rows. Only 153 target exit positions have a unique exact MAD-X `s`
+sample at the diagnostic `1e-9 m` check, and the largest nearest-position
+residual is `2.49315 m`. Pinned source inspection confirms PyPTC Twiss values
+are recorded after tracking each node and its length belongs to the preceding
+interval. A diagnostic attempt to put unique MAD-X markers at every target
+position failed inside a thick quadrupole with a negative drift of `-0.2596
+m`. No splitting or interpolation rule was assumed. The known `LMAX` contract
+is unchanged.
+
+MAD-X's current run requests orbit, beta, alpha, dispersion, dispersion
+derivatives, phase, and `CHROM`. Its `GAMMA` yields `beta0=0.36713319993`,
+applied to MAD-X `DX`, `DPX`, `DY`, and `DPY` in the retained common-convention
+CSV. Tune and circumference differences remain `pending-tolerance`; PyPTC's
+chromaticity derivative coordinate remains unreconciled with MAD-X 5.02.00
+`dQ/dDELTAP`. The run retains 302 ignored MAD-X redefinition warnings and the
+PyPTC no-RF and DLMAX/LMAX messages.
+
+Feedback 0001 records initial runner preflight, including its failed
+cpymad-version probe; feedback 0002 records the later discovery and use of the
+pinned local MAD-X binary, marker-insertion failure, and final diagnostic.
+The local human-maintained ledger records agent attempt outcomes and hashes.
+The first user run is now recorded in feedback 0003 and the review ledger;
+review proceeded against the pinned skill first and then consulted existing
+PyPTC examples/tests for learning. Its profile map remains blocked, scalar
+differences remain pending tolerance, and no acceptance is claimed. After
+feedback and ledger records were complete, the retention helper pruned the
+oldest marker-placement bundle, leaving the latest three. All PyPTC diary work
+remains local to this repository.
+
+## 2026-10-27 — first user-run optics benchmark review
+
+The user ran `setup.sh` and the no-argument `run_benchmark.py` in the separate
+linear-optics benchmark step. The retained bundle is
+`attempt-20261027T145757Z`; report/result/manifest SHA-256 values are recorded
+in feedback 0003. The run used the accepted admission basis and pinned MAD-X
+5.02.00 successfully. It again produced 586 MAD-X TWISS rows and 375 PyPTC
+node-exit rows, with only 153/375 unique exact position matches at the
+diagnostic `1e-9 m` threshold and maximum nearest residual `2.49315 m`.
+Accordingly, the outcome remains `blocked-profile-mapping`; no profile
+residuals or optics acceptance are claimed. Tune and circumference differences
+are retained as `pending-tolerance`; chromaticity is blocked on derivative
+convention. The review identified that historical PyPTC comparison code
+interpolates onto MAD-X positions but does not establish the stricter
+element/occurrence mapping required by the current skill. See feedback 0003
+for the skill-first assessment, learning comparison, and exact run hashes.
+
+## 2026-10-27 — PyPTC/MAD-X optics sampling-grid investigation
+
+Investigated the user-run profile-map block using the accepted admission basis,
+raw MAD-X TFS, PyPTC all-node CSV, mapping diagnostic, PTC flat-file parser,
+checked-in PyPTC API, resplitting recipe, and recorded pinned-source
+inspection. The five MAD-X source inputs match the admitted snapshot; the
+PyPTC flat-file hash matches the accepted admission result. Stronger grid
+checks show the 586 MAD-X TWISS names and order match all 586 flat-file fibres,
+and every MAD-X `S` equals its cumulative fibre-end location within
+`2.85e-13 m`. There are 563 distinct `s` positions because some rows are
+zero-length/coincident entries.
+
+PyPTC returns 375 `ORBIT_N_NODE` rows covering the same circumference. Of
+these, 153 have a unique exact MAD-X position, 3 additional exact positions
+are ambiguous because multiple MAD-X rows share `s`, and 219 lie inside a
+flat-file fibre. Example PTC intervals combine several short MAD-X elements;
+other PTC samples occur inside long drifts, a thick quadrupole, and a thick
+dipole. This confirms different reporting grids and rules out one global
+start/end offset. It does not establish a physics mismatch. The current
+Python API only exposes the already-created PTC orbit nodes, without
+arbitrary-position sampling or element occurrence identity. A PTC API/core
+change or validated reference resampling could align the grids; changing
+`LMAX` alone is not demonstrated to do so and remains out of scope.
+
+The report is
+`steps/benchmark-pyptc-linear-optics-against-madx/diagnostics/sampling-grid-investigation-20261027.md`.
+It links the run artefacts and relevant Task 6 longitudinal-evidence and Task
+9 event-maintenance requirements in the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+This is diagnostic campaign evidence, not benchmark completion or physics
+acceptance; no shared publication-repository file or split setting was
+changed.
