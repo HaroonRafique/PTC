@@ -1,0 +1,57 @@
+[
+  {
+    "classification": "pending-tolerance",
+    "observable": "reference orbit x/px/y/py",
+    "reason": "named MAD-X/PyPTC element-exit rows are mapped by name, occurrence, fibre index and s"
+  },
+  {
+    "classification": "pending-tolerance",
+    "observable": "beta x/y",
+    "reason": "mapped profile values retained; no reviewed tolerance"
+  },
+  {
+    "classification": "pending-tolerance",
+    "observable": "alpha x/y",
+    "reason": "mapped profile values retained; no reviewed tolerance"
+  },
+  {
+    "classification": "pending-tolerance",
+    "observable": "dispersion and derivatives",
+    "reason": "MAD-X run-specific beta0 normalization recorded; no reviewed tolerance"
+  },
+  {
+    "classification": "pending-tolerance",
+    "observable": "phase advance",
+    "reason": "element-exit phase values and phase origin retained; no reviewed tolerance"
+  },
+  {
+    "classification": "pending-tolerance",
+    "observable": "fractional tunes",
+    "reason": "scalar values and signed differences retained; no reviewed tolerance"
+  },
+  {
+    "classification": "pending-tolerance",
+    "observable": "circumference",
+    "reason": "scalar values and signed differences retained; no reviewed tolerance"
+  },
+  {
+    "classification": "blocked",
+    "observable": "chromaticity",
+    "reason": "PyPTC lattice_GET_CHROM derivative coordinate is not documented by the public wrapper; no conversion is inferred"
+  },
+  {
+    "classification": "pending-tolerance",
+    "observable": "bounded single-particle tracking",
+    "reason": "complete matched records retained; no reviewed tolerance"
+  },
+  {
+    "classification": "pending-tolerance",
+    "observable": "corrector, field-strength, isolated misalignment, and verified-intersection responses",
+    "reason": "36 case-specific fresh-state response records are available; tolerances and minimum meaningful-response floors remain unreviewed"
+  },
+  {
+    "classification": "unsupported",
+    "observable": "full EFIELD survey-table response",
+    "reason": "current PyPTC error-table reader does not apply non-alignment field components; unexecuted case IDs: ['survey_error_table']"
+  }
+]

@@ -1,0 +1,12 @@
+test_missing_occurrence_is_blocked (test_optics_workflow.BoundaryMappingTests.test_missing_occurrence_is_blocked) ... ok
+test_preserves_duplicate_s_and_zero_length_by_occurrence (test_optics_workflow.BoundaryMappingTests.test_preserves_duplicate_s_and_zero_length_by_occurrence) ... ok
+test_rejects_position_only_or_entry_exit_shift (test_optics_workflow.BoundaryMappingTests.test_rejects_position_only_or_entry_exit_shift) ... ok
+test_dispersion_and_derivatives_use_run_beta0 (test_optics_workflow.ConventionTests.test_dispersion_and_derivatives_use_run_beta0) ... ok
+test_madx_chromaticity_version_conversion (test_optics_workflow.ConventionTests.test_madx_chromaticity_version_conversion) ... ok
+test_ptc_printer_keeps_node_identity_and_cas (test_optics_workflow.SourceAndPrinterTests.test_ptc_printer_keeps_node_identity_and_cas) ... ok
+test_source_family_uses_sequence_and_element_definitions (test_optics_workflow.SourceAndPrinterTests.test_source_family_uses_sequence_and_element_definitions) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.003s
+
+OK

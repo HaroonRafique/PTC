@@ -1,0 +1,13 @@
+family,observable,units,case_count,maximum_absolute_response_residual,worst_case_id,classification
+corrector-response,bare_horizontal_tune,tune units,28,1.0078648879863206e-05,corrector_sp2_r2hd1_plus_1mrad,pending-tolerance
+corrector-response,bare_vertical_tune,tune units,28,1.8412842759829573e-05,corrector_sp2_r2vd1_plus_1mrad,pending-tolerance
+corrector-response,circumference,m,28,0.0,corrector_sp0_r0hd1_plus_1mrad,pending-tolerance
+field-strength-response,bare_horizontal_tune,tune units,1,1.3378380514517119e-08,field_sp0_qf_k1_plus_0p1pct,pending-tolerance
+field-strength-response,bare_vertical_tune,tune units,1,4.964269884055739e-09,field_sp0_qf_k1_plus_0p1pct,pending-tolerance
+field-strength-response,circumference,m,1,0.0,field_sp0_qf_k1_plus_0p1pct,pending-tolerance
+misalignment-response,bare_horizontal_tune,tune units,6,1.389700689247153e-06,sp0_qf_dx,pending-tolerance
+misalignment-response,bare_vertical_tune,tune units,6,8.36126899828038e-07,sp0_qf_dy,pending-tolerance
+misalignment-response,circumference,m,6,0.0,sp0_qf_dx,pending-tolerance
+survey-error-table,bare_horizontal_tune,tune units,1,5.008590589938855e-06,survey_error_table_verified_intersection,pending-tolerance
+survey-error-table,bare_vertical_tune,tune units,1,3.76527585976838e-06,survey_error_table_verified_intersection,pending-tolerance
+survey-error-table,circumference,m,1,0.0,survey_error_table_verified_intersection,pending-tolerance

@@ -1,0 +1,52 @@
+ =============PTC INIT=====START===========
+  SECTOR_NMUL_MAX is changed from           10  to           10
+  SECTOR_NMUL is changed from           10  to            5
+  GLOBAL VARIABLES that can no longer be changed
+  PARENT LAYOUT NAME :NONAMEASSIGNED
+  NUMBER OF ORIGINAL LAYOUT ELEMENTS :         586
+  NUMBER OF THIN OBJECTS :        3320
+  TOTAL IDEAL LENGTH OF STRUCTURE :   163.36281999999989     
+  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   163.36281999999989     
+  COULD NOT LOCALIZE NON 0.0_dp CAVITY FREQUENCY 
+  DLMAX > LMAX   0.51440000000000197     
+ CONSIDER RESPLITTING LATTICE 
+ TWISS PARAMETERS AT THE ENTRANCE
+ BETAs    10.519291963169362        5.9630889893271792     
+ ALPHAs   0.75347593328778528       -1.0802260710906129     
+ ETAs    1.2338764006264711        0.0000000000000000     
+ ETAPs   0.16775566408651521        0.0000000000000000     
+ COs    4.8677677020619735E-014   0.0000000000000000     
+ COPs    6.7808075089206603E-015   0.0000000000000000     
+ TWISS PARAMETERS AT THE EXIT
+ BETAs    10.519291963169335        5.9630889893273675     
+ ALPHAs   0.75347593328776763       -1.0802260710906404     
+ ETAs    1.2338764006274232        0.0000000000000000     
+ ETAPs   0.16775566408656206        0.0000000000000000     
+ COs    1.4210854715202004E-013   0.0000000000000000     
+ COPs   -1.0528507237553314E-014   0.0000000000000000     
+   163.36281999999989     
+   1.0025562596199018     
+  0.36713328269532503     
+   1.2352937965129300     
+  0.37033176360876302     
+   1.0087120429124701     
+   7.0440029912470115E-002
+   1.0750742097563448     
+  0.93827201299999996       0.93827201299999996     
+  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+  ORBIT_USE_ORBIT_UNITS  T
+  ORBIT_N_NODE          375
+  ORBIT_WARNING           11
+  ORBIT_OMEGA    1.0025562596199018     
+  ORBIT_HARMONIC    71.000000000000000     
+  ORBIT_P0C   0.37033176360876302     
+  ORBIT_KINETIC    7.0440029912470115E-002
+  ORBIT_MASS_IN_AMU   0.99999999868923939     
+  ORBIT_L    163.36281999999989     
+  ORBIT_GAMMAT    5.0776587972135712     
+  ORBIT_CHARGE    1.0000000000000000     
+  ORBIT_LMAX AND LMAX   0.51440000000000197       0.50000000000000000     
+  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+  absolute_aperture     1.0000000000000000     
+  hyperbolic_aperture    10.000000000000000     
+{"library": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/admit-code-to-isis-rcs/attempt-20261027T192533Z/bootstrap/libpyptc.so", "api_level": 4, "structure": {"n_nodes": 375, "harmonic": 71, "circumference_m": 163.36281999999989, "gamma_t": 5.077658797213571, "mass_gev": 0.9999999986892394, "charge": 1, "kinetic_energy_gev": 0.07044002991247011}, "fibre_count": 586, "scalars": {"p0c_gev_c": 0.370331763608763, "beta0": 0.367133282695325, "kinetic_gev": 0.07044002991247011}, "initial": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "final": [-2.4868995751603507e-14, -2.105877638142796e-14, 0.0, 0.0, 0.0, 3.22068760549854e-14], "loss": {"lost": false, "lost_turn": 0, "lost_pos": 0}, "finite": true, "executed_api_trace": [{"call": "PTC.init_lattice", "arguments": ["/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/admit-code-to-isis-rcs/attempt-20261027T192533Z/madx_work/PTC-PyORBIT_flat_file.flt"], "return": null}, {"call": "PTC.machine_summary", "arguments": [], "return": {"n_nodes": 375, "harmonic": 71, "circumference_m": 163.36281999999989, "gamma_t": 5.077658797213571, "mass_gev": 0.9999999986892394, "charge": 1, "kinetic_energy_gev": 0.07044002991247011}}, {"call": "read_flatfile_fibres", "arguments": ["/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/admit-code-to-isis-rcs/attempt-20261027T192533Z/madx_work/PTC-PyORBIT_flat_file.flt"], "return_count": 586}, {"call": "PTC.scalar:ptc_get_p0c_", "arguments": ["ptc_get_p0c_"], "return": 0.370331763608763}, {"call": "PTC.scalar:ptc_get_beta0_", "arguments": ["ptc_get_beta0_"], "return": 0.367133282695325}, {"call": "PTC.scalar:ptc_get_kinetic_", "arguments": ["ptc_get_kinetic_"], "return": 0.07044002991247011}, {"call": "PTC.track_particle_ptc_with_loss", "arguments": ["[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]", "1"], "return": ["[-2.48689958e-14 -2.10587764e-14  0.00000000e+00  0.00000000e+00\n  0.00000000e+00  3.22068761e-14]", {"lost": false, "lost_turn": 0, "lost_pos": 0}]}]}

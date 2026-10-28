@@ -1,0 +1,25 @@
+{
+  "applied_input_override": {
+    "expression": "sp0_qf->k1 := sp0_qf->k1 * (1 + relative_delta)",
+    "file": "reference_recipe.madx",
+    "relative_delta": 0.001
+  },
+  "attribute": "k1",
+  "case_id": "field_sp0_qf_k1_plus_0p1pct",
+  "disposition": "included",
+  "element": "sp0_qf",
+  "evidence": [
+    "Xsuite attempt-029 candidate inventory",
+    "accepted ISIS.sequence places SP0_QF as a named instance",
+    "case-local MAD-X recipe and flat-file regeneration"
+  ],
+  "execution_status": "completed",
+  "family": "field-strength-response",
+  "kind": "field-error",
+  "plot_status": "produced",
+  "reason": "A case-local MAD-X instance-strength override can generate a fresh PTC flat file for PyPTC and a matching MAD-X TWISS reference.",
+  "reference_application_status": "executed; case-local MAD-X input and TWISS retained",
+  "relative_delta": 0.001,
+  "source_identity": "Xsuite attempt-029 candidate SP0_QF K1 perturbation; cross-reference only",
+  "target_application_status": "executed; fresh PyPTC load of the case-local generated flat file"
+}

@@ -692,3 +692,69 @@ After feedback 0012 and the ledger captured attempt 008, the corrected prune
 script's dry run identified attempt 005 as the oldest of four bundles. It was
 pruned under the three-bundle policy; its evidence hashes remain in feedback
 0009 and the ledger. Attempts 006-008 are retained.
+
+## 2026-10-28 — Updated optics skill iteration 0004 smoke
+
+Pinned the current modified optics skill as `iteration-0004/SKILL.md` (SHA-256
+`b6819ee834b1d3d114216ffd4bae4b52e87715e5baa4525f03394bde5241ae0b`, based on
+shared-repository commit `f5293a3754dc8c4e9a6a4ba987603924b91949f3`). The new
+inventory uses the skill's case dispositions and records evidence and
+reference/target application status for all 38 candidate cases. One nominal
+case is included; 37 perturbations remain blocked/deferred with reasons. The
+Xsuite list is a planning cross-reference only. The runner now creates a
+vertically stitched nominal PNG from 3300×1600 strips and has three focused
+inventory contract checks.
+
+Diagnostic smoke attempts 009 and 010 exposed clipped/overlapping figure
+labels. Attempt 011 completed after those fixes. It mapped 586/586 element
+exits, retained 14 profile residual summaries and complete 64-turn thick
+tracking records, and generated a 23-strip 3300×36800 nominal image. I
+visually checked working-point, orbit/residual, and tracking strips at their
+normal rendered size. Chromaticity remains blocked, all differences remain
+pending tolerance, 37 perturbations remain deferred, and phase-space plotting
+is unavailable because the comparison records contain no momentum coordinates.
+This remains an agent diagnostic, not a user-run benchmark or acceptance.
+Feedback 0013, the run index, and the review ledger preserve the attempt
+evidence and limitations.
+
+The updated runner explicitly reuses the iteration-0003 boundary/tracking
+adapter and records that limitation; it is not a from-scratch rewrite of those
+helpers. After evidence was recorded, the three-bundle policy pruned attempts
+006-008 and retained attempts 009-011; the older report/result hashes and
+assessment links remain in feedback and the ledger. Attempt 011 is the current
+smoke.
+This is local Task 6 evidence and Task 9 review maintenance under the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+## 2026-10-28 — Iteration 0004 nominal-only runner gap
+
+Review of the iteration-0004 attempt builder found that all 38 candidates were
+listed, but `run_attempt()` hard-coded one nominal MAD-X/PyPTC execution and
+one nominal plot. Its smoke test explicitly expected one included case and 37
+deferred cases, so the diagnostic passed without satisfying the skill's
+multi-case requirements. Feedback 0014 records the concrete code paths,
+requirements, and correction criteria. The 37 cases cannot be deferred merely
+because their execution paths are missing; each needs execution or a
+PyPTC-specific evidence-backed disposition. Correcting the runner and its smoke
+checks is in progress; attempt 011 remains a nominal-only diagnostic, not a
+multi-case benchmark or user-run result. This is local Task 6 and Task 9 work
+under the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+## 2026-10-28 — Multi-case runner correction complete
+
+Feedback 0015 records the completed runner correction and diagnostic evidence.
+The workflow now executes and plots nominal plus 36 supported perturbation
+cases from fresh MAD-X/PyPTC states: all 28 corrector polarities, the SP0_QF K1
+control, six isolated alignment components, and the six-component verified
+survey intersection. Each case retains profile and scalar nominal-subtracted
+responses. The full EFIELD survey case is explicitly unsupported because the
+current public PyPTC reader does not apply its non-alignment field components.
+Attempt 017 passed eight deterministic checks, mapped 586/586 reference exits,
+completed all 37 included cases, and produced 37 case plots. Its result is
+`incomplete-perturbation-coverage`, not acceptance; response tolerances remain
+unreviewed and chromaticity remains blocked. Attempts 012-016 record the
+intermediate failures and corrections; their hashes and dispositions are in
+feedback 0015 and the review ledger before pruning under the three-bundle
+policy. This is local Task 6 evidence and Task 9 maintenance under the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).

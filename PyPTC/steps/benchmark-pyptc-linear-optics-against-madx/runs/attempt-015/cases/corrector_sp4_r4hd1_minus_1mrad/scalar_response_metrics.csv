@@ -1,0 +1,6 @@
+case_id,observable,units,reference_nominal,reference_perturbed,reference_response,target_nominal,target_perturbed,target_response,response_residual,classification
+corrector_sp4_r4hd1_minus_1mrad,bare_horizontal_tune,tune units,0.3160007809999996,0.31560552100000017,-0.00039525999999945327,0.31605467692091,0.31566944573579,-0.0003852311851200163,1.0028814879436965e-05,pending-tolerance
+corrector_sp4_r4hd1_minus_1mrad,bare_vertical_tune,tune units,0.7650000879999999,0.764862446,-0.00013764199999988236,0.76510661554073,0.76497309965387,-0.00013351588686005833,4.126113139824028e-06,pending-tolerance
+corrector_sp4_r4hd1_minus_1mrad,circumference,m,163.36282,163.36282,0.0,163.36281999999989,163.36281999999989,0.0,0.0,pending-tolerance
+corrector_sp4_r4hd1_minus_1mrad,bare_horizontal_chromaticity,native derivative response; cross-code coordinate unresolved,-4.745390843,-4.744712146,0.0006786969999996728,-4.745307640951764,-4.744677484605677,0.0006301563460873183,,blocked; native chromaticity coordinate unresolved
+corrector_sp4_r4hd1_minus_1mrad,bare_vertical_chromaticity,native derivative response; cross-code coordinate unresolved,-4.806168146,-4.80602163,0.00014651600000004095,-4.806147200304224,-4.805856087057599,0.00029111324662522975,,blocked; native chromaticity coordinate unresolved

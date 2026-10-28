@@ -1,0 +1,73 @@
+@ NAME             %19s "TRACK.OBS0001.P0001"
+@ TYPE             %08s "TRACKOBS"
+@ TITLE            %36s "Bounded nominal tracking cross-check"
+@ ORIGIN           %22s "MAD-X 5.02.00 Linux 64"
+@ DATE             %08s "27/10/26"
+@ TIME             %08s "23.48.50"
+*     NUMBER       TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
+$         %d         %d                %le                %le                %le                %le                %le                %le                %le                %le 
+          1          0              0.001                  0              0.001                  0                  0                  0                  0        1.008712043
+          1          1        3.195274619      -0.8259262344    -0.000833526252   -0.0002572981709       -7.212560874                  0                  0        1.008712043
+          1          2               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1          3               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1          4               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1          5               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1          6               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1          7               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1          8               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1          9               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         10               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         11               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         12               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         13               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         14               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         15               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         16               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         17               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         18               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         19               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         20               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         21               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         22               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         23               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         24               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         25               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         26               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         27               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         28               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         29               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         30               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         31               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         32               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         33               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         34               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         35               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         36               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         37               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         38               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         39               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         40               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         41               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         42               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         43               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         44               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         45               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         46               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         47               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         48               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         49               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         50               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         51               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         52               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         53               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         54               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         55               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         56               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         57               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         58               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         59               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         60               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         61               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         62               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         63               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043
+          1         64               -nan               -nan               -nan               -nan               -nan                  0                  0        1.008712043

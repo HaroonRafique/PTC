@@ -1,0 +1,6 @@
+case_id,observable,units,reference_nominal,reference_perturbed,reference_response,target_nominal,target_perturbed,target_response,response_residual,classification
+survey_error_table_verified_intersection,bare_horizontal_tune,tune units,0.3160007809999996,0.3161734249999997,0.0001726440000000551,0.31605467692091,0.3162323295115,0.00017765259058999394,5.008590589938855e-06,pending-tolerance
+survey_error_table_verified_intersection,bare_vertical_tune,tune units,0.7650000879999999,0.765001711,1.6230000001726808e-06,0.76510661554073,0.76511200381659,5.388275859941061e-06,3.76527585976838e-06,pending-tolerance
+survey_error_table_verified_intersection,circumference,m,163.36282,163.36282,0.0,163.36281999999989,163.36281999999989,0.0,0.0,pending-tolerance
+survey_error_table_verified_intersection,bare_horizontal_chromaticity,native derivative response; cross-code coordinate unresolved,-4.745390843,-4.746430208,-0.0010393649999995702,-4.745307640951764,-4.746781909392426,-0.0014742684406616746,,blocked; native chromaticity coordinate unresolved
+survey_error_table_verified_intersection,bare_vertical_chromaticity,native derivative response; cross-code coordinate unresolved,-4.806168146,-4.805976166,0.00019198000000031357,-4.806147200304224,-4.8062391443719985,-9.194406777446318e-05,,blocked; native chromaticity coordinate unresolved

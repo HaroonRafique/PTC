@@ -1,0 +1,85 @@
+{
+  "case_id": "corrector_sp9_r9vd1_minus_1mrad",
+  "chromaticity": {
+    "classification": "blocked",
+    "planes": {
+      "x": {
+        "classification": "blocked",
+        "converted_dQ_d_delta_p": null,
+        "reason": "the target native derivative coordinate and tune estimator are undocumented here; converting or equating it to dQ/d(delta_p) would be an unsupported inference",
+        "reference_definition": "MAD-X 5.02.00 dQ/dDELTAP",
+        "reference_native": -4.745373564,
+        "signed_difference": -0.0001252377871967525,
+        "target_definition": "PTC lattice_GET_CHROM coordinate not established by the public PyPTC API",
+        "target_native": -4.745498801787197,
+        "tolerance": null
+      },
+      "y": {
+        "classification": "blocked",
+        "converted_dQ_d_delta_p": null,
+        "reason": "the target native derivative coordinate and tune estimator are undocumented here; converting or equating it to dQ/d(delta_p) would be an unsupported inference",
+        "reference_definition": "MAD-X 5.02.00 dQ/dDELTAP",
+        "reference_native": -4.806161028,
+        "signed_difference": -0.00040290904290163354,
+        "target_definition": "PTC lattice_GET_CHROM coordinate not established by the public PyPTC API",
+        "target_native": -4.806563937042902,
+        "tolerance": null
+      }
+    },
+    "reference_gamma": 1.075074172,
+    "reference_native_definition": "MAD-X 5.02.00 DQ1/DQ2=dQ/dDELTAP, DELTAP=(p-p0)/p0; conversion factor 1",
+    "target_native_values": {
+      "chromx": -4.745498801787197,
+      "chromy": -4.806563937042902
+    }
+  },
+  "disposition": "included",
+  "execution_status": "completed",
+  "plot_path": "plots/cases/corrector_sp9_r9vd1_minus_1mrad.png",
+  "plot_status": "produced",
+  "reason": null,
+  "reference_application_status": "executed; case-local MAD-X input and TWISS retained",
+  "reference_model": {
+    "binary_sha256": "426d2e88d42c14205d8930b2d720b7c5a5fffc7e499e3d0a7a4bf575e0110c04",
+    "case_override": {
+      "assignment_count": 1,
+      "file": "ISIS.strength",
+      "value_rad": -0.001,
+      "variable": "r9vd1_kick"
+    },
+    "command": [
+      "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/bin/madx-linux64_v5_02_00"
+    ],
+    "flat_file": "reference/case_flat_file.flt",
+    "flat_file_sha256": "3265a4a58c2bc2598f3e23088a2303c5fd0e3f2b44976bb559400da6d6a9fe8e",
+    "input_hashes": {
+      "2023.strength": "a66ca836e9bbdc6560b2196dbe02c12a3c1781bff0b74589d2995d7689f430ed",
+      "ISIS.elements": "33ec2aedddde548b4f19f9fe9dd26d48ce4445f36c2c118dfa82d239dda8dffa",
+      "ISIS.injected_beam": "2759a6ef97d7799412ba293c8fc788ad34c356ca3b7098acd2a106f7142c92df",
+      "ISIS.sequence": "3cfc1fbb8c39e0d455a0518c4c37abd28058e7e5937231e8bb7cc9462adc9e1d",
+      "ISIS.strength": "31fdb44949a8cfa0185827c8b51f030f70bef7c6cd4b9fcbf535a26de82c6fde"
+    },
+    "log": "reference/madx.log",
+    "log_sha256": "2a4c36f8cd1ef01148accccf79be1e28c368319827e3e35e3dfb89845274f8a3",
+    "recipe": "reference/reference_recipe.madx",
+    "recipe_sha256": "fabbe601bca4910cf64fb72e47db3c12dbfa011f67811be8e082d9bef4bbdc4c",
+    "rows": 586,
+    "tfs_sha256": "3e2172399e7ecd5c3afc45ed8d4c0f5a0b12d6af3c4fde8ebfedbe7f98e17d1f"
+  },
+  "response_metrics": "cases/corrector_sp9_r9vd1_minus_1mrad/response_metrics.csv",
+  "scalar_response_metrics": "cases/corrector_sp9_r9vd1_minus_1mrad/scalar_response_metrics.csv",
+  "target_application_status": "executed; fresh PyPTC load of the case-local generated flat file",
+  "target_model": {
+    "executed_api_calls": [
+      "PTC(library)",
+      "PTC.init_lattice(accepted_flat_file)",
+      "PTC.machine_summary()",
+      "PTC.tunes()",
+      "PTC.chromaticities()",
+      "PTC.all_node_twiss_orbit()",
+      "PTC.run_script(PRINTORBITNODES)"
+    ],
+    "flat_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/benchmark-pyptc-linear-optics-against-madx/runs/attempt-015/cases/corrector_sp9_r9vd1_minus_1mrad/reference/case_flat_file.flt",
+    "flat_file_sha256": "3265a4a58c2bc2598f3e23088a2303c5fd0e3f2b44976bb559400da6d6a9fe8e"
+  }
+}

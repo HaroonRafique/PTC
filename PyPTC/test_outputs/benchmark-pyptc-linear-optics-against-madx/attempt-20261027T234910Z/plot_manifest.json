@@ -1,0 +1,207 @@
+{
+  "case_plot_count": 1,
+  "plots": [
+    {
+      "artifact": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/benchmark-pyptc-linear-optics-against-madx/attempt-20261027T234910Z/case_nominal/nominal_optics_composite.png",
+      "case": "nominal",
+      "case_file_count": 1,
+      "mapping": "verified",
+      "marker_style": "visible distinct markers, no connecting lines",
+      "panel_groups": [
+        {
+          "classification": "sequence placement resolves through ISIS.elements declarations; drift type=drifts, sbend=main dipoles, quadrupole declarations in the source TRIM QUADRUPOLES section=trim quadrupoles, remaining quadrupoles=main quadrupoles, rbend=other bends. MAD-X-generated gaps use their TWISS KEYWORD (DRIFT); sequence start markers use KEYWORD=MARKER.",
+          "group": "magnet_family_strip",
+          "source": [
+            "snapshot_inputs/ISIS.elements",
+            "snapshot_inputs/ISIS.sequence"
+          ]
+        },
+        {
+          "effective_recipe": "accepted 2023.strength overlay; zero harmonics/trims; synchrotron",
+          "group": "nominal_master_twiss_orbit_overview",
+          "mapping": "verified",
+          "observables": [
+            "betx",
+            "bety",
+            "dx",
+            "dy",
+            "x",
+            "y"
+          ]
+        },
+        {
+          "group": "bare_working_point",
+          "observables": [
+            "bare_horizontal_tune",
+            "bare_vertical_tune",
+            "bare_horizontal_chromaticity",
+            "bare_vertical_chromaticity",
+            "circumference"
+          ]
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_x",
+          "mapping": "verified",
+          "observable": "x",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "m"
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_px",
+          "mapping": "verified",
+          "observable": "px",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "rad"
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_y",
+          "mapping": "verified",
+          "observable": "y",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "m"
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_py",
+          "mapping": "verified",
+          "observable": "py",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "rad"
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_betx",
+          "mapping": "verified",
+          "observable": "betx",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "m"
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_bety",
+          "mapping": "verified",
+          "observable": "bety",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "m"
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_alfx",
+          "mapping": "verified",
+          "observable": "alfx",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "1"
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_alfy",
+          "mapping": "verified",
+          "observable": "alfy",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "1"
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_dx",
+          "mapping": "verified",
+          "observable": "dx",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "m"
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_dpx",
+          "mapping": "verified",
+          "observable": "dpx",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "1"
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_dy",
+          "mapping": "verified",
+          "observable": "dy",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "m"
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_dpy",
+          "mapping": "verified",
+          "observable": "dpy",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "1"
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_mux",
+          "mapping": "verified",
+          "observable": "mux",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "turns"
+        },
+        {
+          "aligned_data": "aligned_profiles.csv",
+          "group": "profile_muy",
+          "mapping": "verified",
+          "observable": "muy",
+          "reference_target_overlay": true,
+          "residual_panel_fraction": 0.5,
+          "sample_count": 586,
+          "signed_residual_direction": "PyPTC - MAD-X",
+          "units": "turns"
+        }
+      ],
+      "raster": {
+        "dpi": 150,
+        "height_px": 6900,
+        "width_px": 3150
+      },
+      "sample_count": 586,
+      "sha256": "430ad40983b478a39f7acfbc546fbfe6928ce39c6afbab276ffbf5b0f7beb603",
+      "visual_readability_review": "pending normal-view inspection"
+    }
+  ]
+}

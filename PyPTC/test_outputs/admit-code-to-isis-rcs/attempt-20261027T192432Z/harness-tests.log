@@ -1,0 +1,14 @@
+test_approved_recipe_rejects_all_unapproved_departures (test_admission.SkillContractTests.test_approved_recipe_rejects_all_unapproved_departures) ... ok
+test_artifact_inventory_indexes_auxiliary_evidence_without_self_reference (test_admission.SkillContractTests.test_artifact_inventory_indexes_auxiliary_evidence_without_self_reference) ... ok
+test_build_method_and_executed_command_are_distinct_fields (test_admission.SkillContractTests.test_build_method_and_executed_command_are_distinct_fields) ... ok
+test_defaults_and_overrides_are_exposed (test_admission.SkillContractTests.test_defaults_and_overrides_are_exposed) ... ok
+test_missing_snapshot_has_actionable_blocked_error (test_admission.SkillContractTests.test_missing_snapshot_has_actionable_blocked_error) ... ok
+test_normal_runner_does_not_modify_reviewed_ledger (test_admission.SkillContractTests.test_normal_runner_does_not_modify_reviewed_ledger) ... blocked: Authorized snapshot is missing: /tmp/tmp3gyrz_sn/missing/source_manifest.json
+ok
+test_report_contract_mentions_pending_review_inventory_and_nonclaims (test_admission.SkillContractTests.test_report_contract_mentions_pending_review_inventory_and_nonclaims) ... ok
+test_snapshot_copy_has_stable_ids_and_no_writes_to_source (test_admission.SkillContractTests.test_snapshot_copy_has_stable_ids_and_no_writes_to_source) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 1.383s
+
+OK

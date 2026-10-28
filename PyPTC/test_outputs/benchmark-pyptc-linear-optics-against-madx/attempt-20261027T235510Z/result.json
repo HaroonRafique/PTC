@@ -1,0 +1,14 @@
+{
+  "aligned_profiles": "aligned_profiles.csv",
+  "attempt_class": "user-run",
+  "attempt_id": "attempt-20261027T235510Z",
+  "boundary_map": "boundary_map.csv",
+  "capability_matrix": "capability_matrix.json",
+  "manifest": "manifest.json",
+  "outcome": "incomplete-chromaticity-and-plot-review",
+  "plot_manifest": "plot_manifest.json",
+  "profile_metrics": "profile_residual_metrics.csv",
+  "report": "report.md",
+  "scalar_comparisons": "scalar_comparisons.csv",
+  "technical_status": "fresh user-facing workflow ran; benchmark is incomplete under the pinned skill"
+}

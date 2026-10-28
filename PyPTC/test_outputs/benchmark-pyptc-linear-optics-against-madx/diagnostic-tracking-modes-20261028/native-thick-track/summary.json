@@ -1,0 +1,11 @@
+{
+  "mode": "MAD-X TRACK without MAKETHIN",
+  "returncode": 0,
+  "recipe_sha256": "cb921fbc02aa3e30750d20e73ee54cf1272ff4af4c63414767e83a2c5ac39fcb",
+  "log_sha256": "a8f1d2ec81774af76c285045b7370668fa22bccfadc7496641d6f1600de81dce",
+  "track_files": [],
+  "relevant_log": [
+    " code:            3  el:   0.160000000000000         THICK ELEMENT FOUND",
+    " Track dies nicely"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "exact_position_tolerance_m": 1e-09,
+  "flat_file_fibre_end_match_misses": [],
+  "flat_file_fibre_end_matches_by_name_position_and_s": 586,
+  "flat_file_fibres": 586,
+  "madx_distinct_s_positions": 563,
+  "madx_distinct_s_positions_with_a_ptc_sample": 563,
+  "madx_twiss_rows": 586,
+  "probe": "PTC SETORBITMARKER on every distinct flat-file fibre name before ORBIT layout creation",
+  "ptc_node_rows_at_duplicate_reference_positions": 13,
+  "ptc_orbit_nodes": 804,
+  "pyptc_circumference_m": 163.36281999999989,
+  "pyptc_tunes": {
+    "qs": 0.0,
+    "qx": 0.31605467692091,
+    "qy": 0.76510661554073
+  },
+  "unique_marker_names": 516,
+  "written_files": [
+    "pre_orbit_set.txt",
+    "pyptc_marked_nodes.csv",
+    "print_orbit_nodes.ptc",
+    "def_orbit_node.txt"
+  ]
+}

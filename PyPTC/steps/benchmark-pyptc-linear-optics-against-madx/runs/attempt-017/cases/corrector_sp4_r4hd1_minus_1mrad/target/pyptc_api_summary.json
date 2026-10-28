@@ -1,0 +1,35 @@
+{
+  "api_level": 4,
+  "applied_error_records": [],
+  "chromaticities_native": {
+    "chromx": -4.744677484605677,
+    "chromy": -4.805856087057599
+  },
+  "circumference_from_node_lengths_m": 163.36281999999989,
+  "error_table": null,
+  "executed_api_calls": [
+    "PTC(library)",
+    "PTC.init_lattice(case_flat_file)",
+    "PTC.machine_summary()",
+    "PTC.tunes()",
+    "PTC.chromaticities()",
+    "PTC.all_node_twiss_orbit()",
+    "PTC.run_script(PRINTORBITNODES)"
+  ],
+  "machine_summary": {
+    "charge": 1,
+    "circumference_m": 163.36281999999989,
+    "gamma_t": 5.076931087993295,
+    "harmonic": 71,
+    "kinetic_energy_gev": 0.07044002991247011,
+    "mass_gev": 0.9999999986892394,
+    "n_nodes": 804
+  },
+  "python_api_source": "pyptc/core.py",
+  "python_api_source_sha256": "484939ccbbbf6d6cc218d5b3a97167bb6ddfd383878adf442ac49a90bcced571",
+  "tunes": {
+    "qs": 0.0,
+    "qx": 0.31566944573579,
+    "qy": 0.76497309965387
+  }
+}

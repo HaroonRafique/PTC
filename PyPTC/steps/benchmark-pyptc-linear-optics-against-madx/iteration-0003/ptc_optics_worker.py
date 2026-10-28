@@ -10,9 +10,10 @@ from pathlib import Path
 import numpy as np
 
 arguments = sys.argv[1:]
-if len(arguments) != 6:
-    raise SystemExit("internal worker expects repo, flat file, library, printer, summary, and node CSV paths")
-repo_root, flat_file, library, printer, summary_path, node_csv = map(Path, arguments)
+if len(arguments) not in {6, 7}:
+    raise SystemExit("internal worker expects repo, flat file, library, printer, summary, node CSV, and optional MAD-X error table")
+repo_root, flat_file, library, printer, summary_path, node_csv = map(Path, arguments[:6])
+error_table = Path(arguments[6]).resolve() if len(arguments) == 7 else None
 sys.path.insert(0, str(repo_root))
 from pyptc import PTC
 
@@ -25,6 +26,12 @@ summary_path = summary_path.resolve()
 node_csv = node_csv.resolve()
 ptc = PTC(library)
 ptc.init_lattice(flat_file)
+api_calls = ["PTC(library)", "PTC.init_lattice(case_flat_file)"]
+applied_errors = []
+if error_table is not None:
+    applied_errors = ptc.apply_madx_error_table(error_table, nonzero=True)
+    ptc.update_twiss()
+    api_calls.extend(["PTC.apply_madx_error_table(case_error_table, nonzero=True)", "PTC.update_twiss()"])
 machine = ptc.machine_summary()
 tunes = ptc.tunes()
 chromaticities_native = ptc.chromaticities()
@@ -36,7 +43,9 @@ for row, s_value in zip(profile, longitudinal):
 ptc.run_script(printer)
 write_csv(node_csv, profile)
 summary = {
-    "executed_api_calls": ["PTC(library)", "PTC.init_lattice(accepted_flat_file)", "PTC.machine_summary()", "PTC.tunes()", "PTC.chromaticities()", "PTC.all_node_twiss_orbit()", "PTC.run_script(PRINTORBITNODES)"],
+    "executed_api_calls": [*api_calls, "PTC.machine_summary()", "PTC.tunes()", "PTC.chromaticities()", "PTC.all_node_twiss_orbit()", "PTC.run_script(PRINTORBITNODES)"],
+    "error_table": str(error_table) if error_table else None,
+    "applied_error_records": [record.__dict__ for record in applied_errors],
     "python_api_source": "pyptc/core.py",
     "python_api_source_sha256": sha256(repo_root / "pyptc/core.py"),
     "api_level": ptc.api_level(),

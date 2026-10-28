@@ -1,6 +1,0 @@
-{
-  "blocked_reason": "The current attempt workflow has not pinned local table inputs or implemented per-engine component classification and verified-intersection response evidence.",
-  "case_id": "survey_error_table_verified_intersection",
-  "execution_status": "blocked-not-implemented",
-  "kind": "survey-error-table"
-}

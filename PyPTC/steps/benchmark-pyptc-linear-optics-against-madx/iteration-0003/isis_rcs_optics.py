@@ -493,6 +493,7 @@ def run_pyptc_optics(
     flat_file: Path,
     library: Path,
     target_dir: Path,
+    error_table: Path | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], list[Any], list[dict[str, Any]]]:
     """Load admitted PyPTC in a private directory and return all-node records."""
     sys.path.insert(0, str(repo_root))
@@ -511,6 +512,8 @@ def run_pyptc_optics(
     summary_path = target_dir / "pyptc_api_summary.json"
     worker = Path(__file__).with_name("ptc_optics_worker.py")
     command = [sys.executable, str(worker), str(repo_root), str(flat_file), str(library), str(printer), str(summary_path), str(target_dir / "node_twiss_raw.csv")]
+    if error_table is not None:
+        command.append(str(error_table.resolve()))
     with runtime_log.open("w", encoding="utf-8") as native_log:
         completed = subprocess.run(command, cwd=target_dir, stdout=native_log, stderr=subprocess.STDOUT, text=True, check=False)
     if completed.returncode != 0:
@@ -536,6 +539,7 @@ def run_pyptc_optics(
         "phase_sampling": "node_phase_advances is cumulative phase at node exits; use returned values without a second cumulative sum",
         "flat_file": str(flat_file),
         "flat_file_sha256": sha256(flat_file),
+        "error_table": str(error_table.resolve()) if error_table is not None else None,
         "pre_orbit_file": "pre_orbit_set.txt",
         "pre_orbit_sha256": sha256(target_dir / "pre_orbit_set.txt"),
         "orbit_node_dump": node_dump.name,

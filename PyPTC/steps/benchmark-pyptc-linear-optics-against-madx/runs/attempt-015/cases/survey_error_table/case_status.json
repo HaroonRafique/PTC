@@ -1,0 +1,14 @@
+{
+  "case_id": "survey_error_table",
+  "disposition": "blocked",
+  "evidence": [
+    "Xsuite attempt-029 candidate inventory",
+    "pyptc/error_table.py reads only NAME/DX/DY/DS/DPHI/DTHETA/DPSI",
+    "source EFIELD table includes multipole and alignment columns"
+  ],
+  "execution_status": "deferred",
+  "plot_status": "not-produced",
+  "reason": "The full EFIELD table contains field-error columns beyond the six alignment components currently read by PyPTC; full-table application and per-component classification are unavailable.",
+  "reference_application_status": "not-run",
+  "target_application_status": "not-run; full field component coverage unsupported by current public error-table reader"
+}

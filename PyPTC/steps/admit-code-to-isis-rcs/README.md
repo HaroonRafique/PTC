@@ -16,12 +16,15 @@ bash steps/admit-code-to-isis-rcs/setup.sh
 Run admission with no arguments:
 
 ```bash
-steps/admit-code-to-isis-rcs/.venv/bin/python \
-  steps/admit-code-to-isis-rcs/run_admission.py
+./steps/admit-code-to-isis-rcs/run_admission.py
 ```
 
 The entry point selects the highest numbered `iteration-NNNN` directory that
 contains an `admission_harness.py`, then runs it with the documented defaults.
+The current fresh skill application is
+[`iteration-0003`](iteration-0003/README.md), reconstructed from shared-skill
+commit `97e63b1e4ef93aee07deacf09ad9592a223fffe6` (SHA-256
+`11c415652fcb053a8f5a2844ae93619ae37ae6dd74e471e67b8801c7b5dddd59`).
 It builds PyPTC as part of the attempt. The current harness reads only the
 authorized files-only snapshot in `reference_snapshot/`; it does not require
 or change the external `isis_2024` checkout.
@@ -30,6 +33,9 @@ The run outputs are written under
 `test_outputs/admit-code-to-isis-rcs/<attempt-id>/`. Each attempt contains a
 human-readable report, canonical result, provenance manifest, MAD-X log,
 reference TWISS table, generated flat file, and smoke-particle record.
+Iteration 0003 additionally records exact executed commands, retains the
+loaded shared library, and indexes supporting artifacts in
+`artifact_digests.csv`.
 
 ## Approved reference recipe
 

@@ -1,0 +1,99 @@
+{
+  "case_id": "sp0_qf_dx",
+  "chromaticity": {
+    "classification": "blocked",
+    "planes": {
+      "x": {
+        "classification": "blocked",
+        "converted_dQ_d_delta_p": null,
+        "reason": "the target native derivative coordinate and tune estimator are undocumented here; converting or equating it to dQ/d(delta_p) would be an unsupported inference",
+        "reference_definition": "MAD-X 5.02.00 dQ/dDELTAP",
+        "reference_native": -4.745677797,
+        "signed_difference": 6.433938495220559e-05,
+        "target_definition": "PTC lattice_GET_CHROM coordinate not established by the public PyPTC API",
+        "target_native": -4.745613457615048,
+        "tolerance": null
+      },
+      "y": {
+        "classification": "blocked",
+        "converted_dQ_d_delta_p": null,
+        "reason": "the target native derivative coordinate and tune estimator are undocumented here; converting or equating it to dQ/d(delta_p) would be an unsupported inference",
+        "reference_definition": "MAD-X 5.02.00 dQ/dDELTAP",
+        "reference_native": -4.806234097,
+        "signed_difference": -2.5746125269066056e-05,
+        "target_definition": "PTC lattice_GET_CHROM coordinate not established by the public PyPTC API",
+        "target_native": -4.806259843125269,
+        "tolerance": null
+      }
+    },
+    "reference_gamma": 1.075074172,
+    "reference_native_definition": "MAD-X 5.02.00 DQ1/DQ2=dQ/dDELTAP, DELTAP=(p-p0)/p0; conversion factor 1",
+    "target_native_values": {
+      "chromx": -4.745613457615048,
+      "chromy": -4.806259843125269
+    }
+  },
+  "disposition": "included",
+  "execution_status": "completed",
+  "plot_path": "plots/cases/sp0_qf_dx.png",
+  "plot_status": "produced",
+  "reason": null,
+  "reference_application_status": "executed; case-local MAD-X input and TWISS retained",
+  "reference_model": {
+    "applied_error_table_sha256": "e55f94bcecbca2bbdc90de0b49ab554fc1fb528dcffb98b7b1f14cb56bca61eb",
+    "binary_sha256": "426d2e88d42c14205d8930b2d720b7c5a5fffc7e499e3d0a7a4bf575e0110c04",
+    "case_override": null,
+    "command": [
+      "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/bin/madx-linux64_v5_02_00"
+    ],
+    "error_table": "case_error_table.tfs",
+    "error_table_sha256": "561446da055184b1d8b8ac471270dbf0dc1ea1141951292d8be86c02d75106d9",
+    "flat_file": "reference/case_flat_file.flt",
+    "flat_file_sha256": "32f96fb53f37cdefcf3c540431a4da6fab9b06f4bf3687b0700a4af0fe6a9d3a",
+    "input_hashes": {
+      "2023.strength": "a66ca836e9bbdc6560b2196dbe02c12a3c1781bff0b74589d2995d7689f430ed",
+      "ISIS.elements": "33ec2aedddde548b4f19f9fe9dd26d48ce4445f36c2c118dfa82d239dda8dffa",
+      "ISIS.injected_beam": "2759a6ef97d7799412ba293c8fc788ad34c356ca3b7098acd2a106f7142c92df",
+      "ISIS.sequence": "3cfc1fbb8c39e0d455a0518c4c37abd28058e7e5937231e8bb7cc9462adc9e1d",
+      "ISIS.strength": "912286281994f76e09561b42b32335b65dbc50d6d438f2caa3c8a9f7018b04cf"
+    },
+    "log": "reference/madx.log",
+    "log_sha256": "8897851f75e0641e5115de4754346afc4f40066cd03b6dca0ee0df2654bd32e3",
+    "recipe": "reference/reference_recipe.madx",
+    "recipe_sha256": "6aec8570147a94cc038fd59b93e6f023b820514bec3938571a0525787b65bf86",
+    "rows": 586,
+    "tfs_sha256": "a2b2b64ffaa992c6d80b8417f0d6f1e26ab362a890c0fd3bacb1754c49c81f2f"
+  },
+  "response_metrics": "cases/sp0_qf_dx/response_metrics.csv",
+  "scalar_response_metrics": "cases/sp0_qf_dx/scalar_response_metrics.csv",
+  "target_application_status": "executed; fresh PyPTC load of the case-local generated flat file",
+  "target_model": {
+    "applied_error_records": [
+      {
+        "dphi": 0.0,
+        "dpsi": 0.0,
+        "ds": 0.0,
+        "dtheta": 0.0,
+        "dx": 0.001,
+        "dy": 0.0,
+        "fibre_index": 31,
+        "name": "SP0_QF",
+        "occurrence": 1
+      }
+    ],
+    "error_table": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/benchmark-pyptc-linear-optics-against-madx/runs/attempt-017/cases/sp0_qf_dx/case_error_table.tfs",
+    "executed_api_calls": [
+      "PTC(library)",
+      "PTC.init_lattice(case_flat_file)",
+      "PTC.apply_madx_error_table(case_error_table, nonzero=True)",
+      "PTC.update_twiss()",
+      "PTC.machine_summary()",
+      "PTC.tunes()",
+      "PTC.chromaticities()",
+      "PTC.all_node_twiss_orbit()",
+      "PTC.run_script(PRINTORBITNODES)"
+    ],
+    "flat_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/benchmark-pyptc-linear-optics-against-madx/runs/attempt-017/cases/sp0_qf_dx/reference/case_flat_file.flt",
+    "flat_file_sha256": "32f96fb53f37cdefcf3c540431a4da6fab9b06f4bf3687b0700a4af0fe6a9d3a"
+  }
+}

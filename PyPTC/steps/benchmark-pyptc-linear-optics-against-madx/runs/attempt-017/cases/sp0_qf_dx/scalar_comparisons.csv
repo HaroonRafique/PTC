@@ -1,0 +1,6 @@
+observable,reference,target,signed_target_minus_reference,units,tolerance,tolerance_source,classification,acceptance_owner,reference_native,target_native,signed_native_difference,converted_reference_dQ_d_delta_p,converted_target_dQ_d_delta_p
+bare_horizontal_tune,0.3161375590000004,0.3161928446216,5.528562159962114e-05,tune units,,,pending-tolerance,pending user review,,,,,
+bare_vertical_tune,0.765048121,0.76515522233168,0.00010710133168001512,tune units,,,pending-tolerance,pending user review,,,,,
+circumference,163.36282,163.36281999999989,-1.1368683772161603e-13,m,,,pending-tolerance,pending user review,,,,,
+bare_horizontal_chromaticity,,,,native derivatives; conversion to dQ/d(delta_p) unresolved,,,blocked,pending convention review,-4.745677797,-4.745613457615048,6.433938495220559e-05,-4.745677797,
+bare_vertical_chromaticity,,,,native derivatives; conversion to dQ/d(delta_p) unresolved,,,blocked,pending convention review,-4.806234097,-4.806259843125269,-2.5746125269066056e-05,-4.806234097,

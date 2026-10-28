@@ -1,0 +1,31 @@
+{
+  "mode": "MAD-X thin tracking, global 10 slices per selected thick element",
+  "returncode": 1,
+  "recipe_sha256": "fcc9619a6ddb7474ca60dfad33695afe0887aef5d9e9df8fdd49337ed2a78812",
+  "log_sha256": "63a15cc7c3248cd4c3f52034e30a7c4e4bf2ff66fceb8db57f9d900f4030df2e",
+  "track_files": [],
+  "notices": [
+    "makethin: style chosen : teapot",
+    "makethin: slicing sequence : synchrotron"
+  ],
+  "log_end": [
+    "++++++ info: kqtf_7 redefined",
+    "kqtf_8 := 0.0;",
+    "",
+    "++++++ info: kqtf_8 redefined",
+    "kqtf_9 := 0.0;",
+    "",
+    "++++++ info: kqtf_9 redefined",
+    "USE, SEQUENCE=synchrotron;",
+    "",
+    "SELECT, FLAG=MAKETHIN, SLICE=10;",
+    "",
+    "MAKETHIN, SEQUENCE=synchrotron, STYLE=TEAPOT;",
+    "",
+    "makethin: style chosen : teapot",
+    "makethin: slicing sequence : synchrotron",
+    "USE, SEQUENCE=synchrotron;",
+    "",
+    "+=+=+= fatal: negative drift between elements  sp0_dipfr9..10:1 and sp0_dipfr10..1:1, length -7.454545e-02"
+  ]
+}

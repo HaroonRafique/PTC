@@ -19,7 +19,7 @@ settings (`a1 = b1 = 0`), trim settings, or flat-file splitting.
 From this directory:
 
 ```bash
-./iteration-0003/setup.sh
+./iteration-0004/setup.sh
 ./scripts/shell/benchmark-pyptc-attempt.sh
 ```
 
@@ -31,19 +31,29 @@ under `cases/<case-id>/` and its composite plot is under
 `PYPTC_BENCHMARK_RUN_CLASS=agent-diagnostic` only for an agent smoke run; the
 default is `user-run`.
 
-The current iteration-0003 workflow records all 38 case identities from Xsuite
-attempt 029 in each run bundle, but it still executes and plots nominal only.
-The other 37 cases are explicitly `blocked-not-implemented`, with reasons in
-their case records; they have no fabricated results or plots. Do not treat the
-runner as ready for a complete multi-case benchmark until those case paths,
-application audits, response metrics, and plots are implemented. An agent
-smoke checks the inventory and existing nominal workflow only.
+Iteration 0004 uses the updated skill snapshot and records a skill-valid
+disposition, evidence-backed reason, and reference/target application status
+for all 38 candidate cases. The Xsuite list is a planning cross-reference,
+not automatic proof of applicability. Following feedback 0014, the runner now
+executes 37 of the 38 inventoried cases: nominal; all 28 corrector polarities;
+the SP0_QF K1 field control; six isolated SP0_QF alignment components; and the
+six-component verified survey-table intersection. Each executed case uses a
+fresh MAD-X/PyPTC state, retains nominal-subtracted profile and scalar
+responses, and has one composite PNG. The full EFIELD survey-table case is
+classified `unsupported` because the current PyPTC reader does not apply its
+non-alignment field components. The campaign therefore reports incomplete
+perturbation coverage. Feedback 0015 and attempt 017 record diagnostic smoke
+evidence; this is not a user-run review or tolerance/physics acceptance.
+Chromaticity responses remain native and blocked until the target derivative
+coordinate is established.
 
 Tracking defaults to thick MAD-X `PTC_TRACK` and accepts the optional
 `PYPTC_BENCHMARK_TRACKING_MODE=both` setting to also retain a separately
-classified thin-mode diagnostic. See the iteration 0003 README for the
-limitations and command details. Iteration 0003 is a feedback-driven
-correction of the prior harness, not an independent fresh skill implementation.
+classified thin-mode diagnostic. See the iteration 0003 and 0004 READMEs for
+the limitations and command details. Iteration 0004 pins a working-tree skill
+snapshot and explicitly discloses reuse of the verified iteration-0003
+boundary/tracking adapter; it is not represented as a from-scratch rewrite of
+those code-specific helpers.
 The stable shell orchestrator is under `scripts/shell/`; Python workflow code
 is under `scripts/python/`. Attempt bundles contain results and provenance,
 not executable runner scripts.

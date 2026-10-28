@@ -1,6 +1,0 @@
-{
-  "case_id": "corrector_sp3_r3vd1_plus_1mrad",
-  "execution_status": "blocked-not-implemented",
-  "plot_status": "not-produced",
-  "reason": "The current attempt workflow has no per-case corrector-strength path and no verified application audit."
-}

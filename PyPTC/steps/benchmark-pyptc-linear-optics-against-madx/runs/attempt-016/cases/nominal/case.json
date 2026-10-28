@@ -1,0 +1,14 @@
+{
+  "case_id": "nominal",
+  "disposition": "included",
+  "evidence": [
+    "accepted admission basis",
+    "iteration-0004 nominal workflow"
+  ],
+  "execution_status": "planned",
+  "family": "nominal",
+  "reason": "The accepted base recipe is available and the nominal reference/target path is implemented.",
+  "reference_application_status": "base-recipe; executed by nominal workflow",
+  "source_identity": "accepted admission basis and its hash-pinned recipe",
+  "target_application_status": "base-recipe; executed by nominal workflow"
+}

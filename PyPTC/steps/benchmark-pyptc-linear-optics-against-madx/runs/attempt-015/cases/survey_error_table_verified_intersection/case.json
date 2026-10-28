@@ -1,0 +1,16 @@
+{
+  "case_id": "survey_error_table_verified_intersection",
+  "disposition": "blocked",
+  "evidence": [
+    "Xsuite attempt-029 candidate inventory",
+    "no campaign-local verified-intersection table or hash",
+    "PyPTC misalignment semantic comparison remains unreviewed"
+  ],
+  "execution_status": "deferred",
+  "family": "survey-error-table",
+  "kind": "survey-error-table",
+  "reason": "The Xsuite verified-intersection table is not present in the PyPTC campaign inputs, and its source-to-target transform/application mapping has not been established for the common alignment components.",
+  "reference_application_status": "not-run",
+  "source_identity": "Xsuite attempt-029 candidate survey_error_table_verified_intersection; source table not adopted as PyPTC input",
+  "target_application_status": "not-run; intersection input and transform application unverified"
+}

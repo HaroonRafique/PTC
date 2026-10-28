@@ -56,7 +56,7 @@ EOF
 }
 trap failure_handler ERR
 
-[[ -x $python && -s $workflow ]] || { echo 'Benchmark environment or workflow module is missing; run iteration-0003/setup.sh.' >&2; exit 3; }
+[[ -x $python && -s $workflow ]] || { echo 'Benchmark environment or workflow module is missing; run iteration-0004/setup.sh.' >&2; exit 3; }
 mkdir -p "$runs_root"
 highest=0
 for directory in "$runs_root"/attempt-*; do
