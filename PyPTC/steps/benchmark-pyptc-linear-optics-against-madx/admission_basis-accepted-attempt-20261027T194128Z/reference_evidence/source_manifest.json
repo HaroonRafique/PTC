@@ -1,0 +1,55 @@
+{
+  "authorization": "User authorized copying only the required reference files into this PyPTC repository on 2026-10-26; no nested repository.",
+  "files_copied": 5,
+  "input_files": {
+    "Lattice_Files/00_Simplified_Lattice/2023.strength": {
+      "local_path": "2023.strength",
+      "sha256": "a66ca836e9bbdc6560b2196dbe02c12a3c1781bff0b74589d2995d7689f430ed",
+      "size_bytes": 467
+    },
+    "Lattice_Files/00_Simplified_Lattice/ISIS.elements": {
+      "local_path": "ISIS.elements",
+      "sha256": "33ec2aedddde548b4f19f9fe9dd26d48ce4445f36c2c118dfa82d239dda8dffa",
+      "size_bytes": 6754
+    },
+    "Lattice_Files/00_Simplified_Lattice/ISIS.injected_beam": {
+      "local_path": "ISIS.injected_beam",
+      "sha256": "2759a6ef97d7799412ba293c8fc788ad34c356ca3b7098acd2a106f7142c92df",
+      "size_bytes": 42
+    },
+    "Lattice_Files/00_Simplified_Lattice/ISIS.sequence": {
+      "local_path": "ISIS.sequence",
+      "sha256": "3cfc1fbb8c39e0d455a0518c4c37abd28058e7e5937231e8bb7cc9462adc9e1d",
+      "size_bytes": 46876
+    },
+    "Lattice_Files/00_Simplified_Lattice/ISIS.strength": {
+      "local_path": "ISIS.strength",
+      "sha256": "912286281994f76e09561b42b32335b65dbc50d6d438f2caa3c8a9f7018b04cf",
+      "size_bytes": 9135
+    }
+  },
+  "nested_git_metadata_copied": false,
+  "reference_mode": "working-copy-snapshot",
+  "reference_source": {
+    "checkout_branch_status": [
+      "# branch.oid 823e6c08dfa79a182548b07706b3d46f0157137a",
+      "# branch.head main",
+      "# branch.upstream origin/main",
+      "# branch.ab +0 -0"
+    ],
+    "checkout_revision_at_copy": "823e6c08dfa79a182548b07706b3d46f0157137a",
+    "checkout_status_entry_count": 206,
+    "checkout_status_evidence": "source_checkout_status.porcelain-v2.txt",
+    "checkout_status_sha256": "0de8a247d46a968b69d6af0287ad281e892d7e77c524062711ab60cae6565f6a",
+    "checkout_was_dirty": true,
+    "local_checkout_observed": "/home/hr/Repositories/isis_2024",
+    "materialization_method": "git show <materialized_revision>:<logical_input_path>",
+    "materialized_revision": "1bada6a2ab94edd426c52b7e97a5d335926e0646",
+    "repository": "git@gitlab.stfc.ac.uk:isis_accelerator_models/isis_2024.git",
+    "working_tree_file_contents_used": false
+  },
+  "scope": "Only the five directly approved files from 00_Simplified_Lattice were copied; no .git metadata or unrelated repository files were copied.",
+  "snapshot_authorization": "Explicit user instruction on 2026-10-26 to copy only the required repository files into PyPTC, with no nested repository.",
+  "snapshot_boundary": "Only the five listed direct inputs, plus provenance documentation and status evidence, are retained here; every attempt makes its own immutable run copy.",
+  "snapshot_id": "isis_2024-1bada6a2ab94edd426c52b7e97a5d335926e0646"
+}

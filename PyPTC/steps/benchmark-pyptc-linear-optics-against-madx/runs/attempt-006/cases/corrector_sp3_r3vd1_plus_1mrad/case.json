@@ -1,0 +1,10 @@
+{
+  "blocked_reason": "The current attempt workflow has no per-case corrector-strength path and no verified application audit.",
+  "case_id": "corrector_sp3_r3vd1_plus_1mrad",
+  "element": "sp3_r3vd1",
+  "execution_status": "blocked-not-implemented",
+  "kick_rad": 0.001,
+  "kind": "corrector",
+  "plane": "vertical",
+  "strength_variable": "r3vd1_kick"
+}

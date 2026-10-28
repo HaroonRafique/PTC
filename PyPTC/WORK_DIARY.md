@@ -359,6 +359,44 @@ It links the run artefacts and relevant Task 6 longitudinal-evidence and Task
 9 event-maintenance requirements in the
 [evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
 
+## 2026-10-28 — Case inventory orchestration smoke
+
+Updated the step-level optics runner to record the complete 38-case Xsuite
+attempt-029 cross-reference in every attempt bundle, with per-case configs and
+execution statuses. Agent diagnostic smoke attempt 007 validated the
+inventory, the existing nominal optics/tracking path, and the nominal plot
+status (attempt 006 exposed a stale nominal plot-status field, corrected in
+007). The smoke completed with one nominal case and 37
+`blocked-not-implemented` perturbation cases. The runner does not yet perform
+their per-engine setup, application verification, response comparisons, or
+plots; corrector and K1 controls also lack a first-class Python setter in the
+current API. Documentation now states this limitation. Feedback 0011 records
+source/code revisions, run IDs, hashes, outcomes, and scope. This is local
+Task 6 campaign evidence and Task 9 review maintenance under the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+The benchmark prune script was also corrected from the obsolete timestamped
+`test_outputs/` layout to `runs/attempt-NNN/`. After its dry run confirmed the
+ledger/feedback links, attempts 001-004 were pruned; their hashes and outcomes
+remain in feedback 0007/0008 and the review ledger. Attempts 005-007 are the
+three retained bundles.
+
+## 2026-10-28 — Skill case coverage cross-reference
+
+Reviewed the pinned PyPTC linear-optics skill against user-run benchmark
+attempt 005 and the Xsuite testbed's attempt-029 campaign inventory. The skill
+requires a declared capability-driven case inventory and gives conditional
+coverage rules for correctors, misalignments, field controls, and error tables;
+it does not enumerate Xsuite's machine-specific case IDs. Attempt 005 declared
+and ran only nominal, so its plot count did not satisfy the broader
+perturbation evidence expectations. Feedback 0010 records every one of the 38
+Xsuite attempt-029 case IDs, inventory and generator hashes, and the need to
+classify each case for PyPTC applicability before claiming equivalence. The
+case list is a planning cross-reference, not an assertion that all Xsuite cases
+are already valid PyPTC/MAD-X comparisons. This supplemental campaign record
+supports Task 6 evidence and Task 9 review maintenance in the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
 ## 2026-10-28 — Prepare benchmark iteration 0003 thick tracking default
 
 Prepared iteration 0003 in response to user-run feedback 0005 and the recorded
@@ -635,3 +673,22 @@ also recorded. Feedback 0009 captures the disposition and links back to the
 attempt evidence in feedback 0008. These local provenance and review records
 support the traceability and human-review requirements in the
 [evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+## 2026-10-28 — User-run optics attempt 008 assessment
+
+Assessed user-run attempt 008 against the pinned iteration-0003 skill, then
+compared the reused nominal workflow with existing PyPTC examples/tests as
+recorded in feedback 0009. The run mapped 586/586 MAD-X element exits, retained
+14 profile residual summaries and complete thick tracking records, and
+produced the nominal composite. Differences remain pending tolerance;
+chromaticity remains blocked; MAD-X `PTC_TRACK` and PyPTC share the PTC tracking
+engine. Attempt 008 declares all 38 cases but only executes/plots nominal; the
+other 37 perturbation cases remain blocked-not-implemented. Feedback 0012 and
+the ledger/index record this incomplete outcome with no acceptance, `REP`, or
+`EVAL`. This is local Task 6 evidence and Task 9 review maintenance in the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+After feedback 0012 and the ledger captured attempt 008, the corrected prune
+script's dry run identified attempt 005 as the oldest of four bundles. It was
+pruned under the three-bundle policy; its evidence hashes remain in feedback
+0009 and the ledger. Attempts 006-008 are retained.

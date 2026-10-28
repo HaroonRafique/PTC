@@ -31,6 +31,14 @@ under `cases/<case-id>/` and its composite plot is under
 `PYPTC_BENCHMARK_RUN_CLASS=agent-diagnostic` only for an agent smoke run; the
 default is `user-run`.
 
+The current iteration-0003 workflow records all 38 case identities from Xsuite
+attempt 029 in each run bundle, but it still executes and plots nominal only.
+The other 37 cases are explicitly `blocked-not-implemented`, with reasons in
+their case records; they have no fabricated results or plots. Do not treat the
+runner as ready for a complete multi-case benchmark until those case paths,
+application audits, response metrics, and plots are implemented. An agent
+smoke checks the inventory and existing nominal workflow only.
+
 Tracking defaults to thick MAD-X `PTC_TRACK` and accepts the optional
 `PYPTC_BENCHMARK_TRACKING_MODE=both` setting to also retain a separately
 classified thin-mode diagnostic. See the iteration 0003 README for the

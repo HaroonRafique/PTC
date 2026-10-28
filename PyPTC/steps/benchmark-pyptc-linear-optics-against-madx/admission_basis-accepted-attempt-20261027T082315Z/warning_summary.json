@@ -1,0 +1,31 @@
+{
+  "madx": {
+    "line_count": 302,
+    "categories": {
+      "implicit element re-definition ignored": 302
+    },
+    "examples": [
+      "++++++ warning: implicit element re-definition ignored: sp_d2",
+      "++++++ warning: implicit element re-definition ignored: sp_qffr1",
+      "++++++ warning: implicit element re-definition ignored: sp_qffr2",
+      "++++++ warning: implicit element re-definition ignored: sp_qffr3",
+      "++++++ warning: implicit element re-definition ignored: sp_qffr4",
+      "++++++ warning: implicit element re-definition ignored: sp_qf",
+      "++++++ warning: implicit element re-definition ignored: sp_qffr5",
+      "++++++ warning: implicit element re-definition ignored: sp_qffr6"
+    ]
+  },
+  "pyptc": {
+    "line_count": 3,
+    "relevant": [
+      "COULD NOT LOCALIZE NON 0.0_dp CAVITY FREQUENCY",
+      "DLMAX > LMAX   0.51440000000000197",
+      "ORBIT_WARNING           11"
+    ]
+  },
+  "madx_log_path": "madx_work/madx.log",
+  "madx_log_sha256": "abf52d5b5da1527f7bf76f72938627ab8ef4d0c8d6fc01e175b448a42905c47b",
+  "pyptc_log_path": "pyptc_runtime.log",
+  "pyptc_log_sha256": "9044cb0b247391a198219302f68d2bec8af617b515d279375cd43a7bf2ecb70a",
+  "disposition": "MAD-X reports repeated element definitions as ignored; these are counted and retained. PyPTC runtime warnings remain unresolved for review. Structural and reference-particle checks passed, but warning interpretation remains pending external review."
+}

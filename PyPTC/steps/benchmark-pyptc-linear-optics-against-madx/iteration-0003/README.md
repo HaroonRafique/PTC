@@ -39,10 +39,12 @@ unavailable, so no thin cross-code comparison is made. The thin diagnostic is
 not a validated slicing policy. The accepted flat file, split settings,
 strengths, harmonics, and trim values remain unchanged.
 
-Each case writes raw data under `cases/<case-id>/` and one case-level composite
-PNG under `plots/cases/<case-id>.png`; the plot manifest links each case to
-that image. The local skill feedback requests that the shared skill require
-this one-composite-per-simulation-case output.
+Every declared case has a `case.json` and explicit `case_status.json` in the
+attempt bundle. At present, only the nominal case executes and writes a
+composite PNG. The 37 Xsuite cross-reference perturbation cases remain
+`blocked-not-implemented` and have no plots; the runner records the reason for
+each. The local skill requires a case-level composite for each executed
+simulation case, and no plot is fabricated for a blocked case.
 
 The next full skill-test run should be started by the user. Any agent smoke
 run is labelled `agent-diagnostic` and is not a user-run result or acceptance.

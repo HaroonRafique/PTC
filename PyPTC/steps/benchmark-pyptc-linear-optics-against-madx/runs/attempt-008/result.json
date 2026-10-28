@@ -1,0 +1,18 @@
+{
+  "aligned_profiles": "cases/nominal/aligned_profiles.csv",
+  "attempt_class": "user-run",
+  "attempt_id": "attempt-008",
+  "boundary_map": "cases/nominal/boundary_map.csv",
+  "campaign_case_inventory": "campaign_case_inventory.json",
+  "capability_matrix": "cases/nominal/capability_matrix.json",
+  "declared_case_count": 38,
+  "manifest": "manifest.json",
+  "nominal_case_executed": true,
+  "non_nominal_cases_blocked": 37,
+  "outcome": "incomplete-chromaticity-and-plot-review",
+  "plot_manifest": "plot-manifest.json",
+  "profile_metrics": "cases/nominal/profile_residual_metrics.csv",
+  "report": "report.md",
+  "scalar_comparisons": "cases/nominal/scalar_comparisons.csv",
+  "technical_status": "fresh user-facing workflow ran; benchmark is incomplete under the pinned skill"
+}

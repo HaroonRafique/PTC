@@ -1,0 +1,9 @@
+{
+  "attribute": "k1",
+  "blocked_reason": "The current attempt workflow has no per-case quadrupole-strength path and no verified application audit.",
+  "case_id": "field_sp0_qf_k1_plus_0p1pct",
+  "element": "sp0_qf",
+  "execution_status": "blocked-not-implemented",
+  "kind": "field-error",
+  "relative_delta": 0.001
+}
