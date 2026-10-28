@@ -15,7 +15,10 @@ From the benchmark step directory:
 ./iteration-0003/run_benchmark.py
 ```
 
-The runner takes no command-line arguments. By default it uses MAD-X 5.02.00
+The runner takes no command-line arguments. New results are allocated in
+`../runs/attempt-NNN/`; run numbering starts at `attempt-001` and advances
+from directories already present. The human-maintained `../runs/INDEX.md` is
+not edited by the runner. By default it uses MAD-X 5.02.00
 `PTC_TRACK` with a thick layout as the tracking reference, and runs the PyPTC
 tracking workflow against the accepted flat file. Both routes use PTC, so
 this exercises the thick tracking path but is not an independent tracking
@@ -34,6 +37,11 @@ not invalidate the thick result. PyPTC's matching thin-lens control is marked
 unavailable, so no thin cross-code comparison is made. The thin diagnostic is
 not a validated slicing policy. The accepted flat file, split settings,
 strengths, harmonics, and trim values remain unchanged.
+
+Each case writes raw data under `cases/<case-id>/` and one case-level composite
+PNG under `plots/cases/<case-id>.png`; the plot manifest links each case to
+that image. The local skill feedback requests that the shared skill require
+this one-composite-per-simulation-case output.
 
 The next full skill-test run should be started by the user. Any agent smoke
 run is labelled `agent-diagnostic` and is not a user-run result or acceptance.

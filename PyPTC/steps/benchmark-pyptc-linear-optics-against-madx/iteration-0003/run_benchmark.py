@@ -11,14 +11,13 @@ import shutil
 import subprocess
 import sys
 import traceback
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 ITERATION_DIR = Path(__file__).resolve().parent
 STEP_DIR = ITERATION_DIR.parent
 REPO_ROOT = STEP_DIR.parents[1]
-OUTPUT_ROOT = REPO_ROOT / "test_outputs/benchmark-pyptc-linear-optics-against-madx"
+RUNS_ROOT = STEP_DIR / "runs"
 ADMISSION_ID = "attempt-20261027T194128Z"
 ADMISSION_BASIS = STEP_DIR / f"admission_basis-accepted-{ADMISSION_ID}"
 PINNED_SKILL_REVISION = "f5293a3754dc8c4e9a6a4ba987603924b91949f3"
@@ -123,6 +122,21 @@ def profile_capabilities(mapping_status: str, tracking_status: str) -> list[dict
     ]
 
 
+def allocate_attempt() -> tuple[str, Path]:
+    """Allocate the next numbered bundle without touching the human index."""
+    RUNS_ROOT.mkdir(parents=True, exist_ok=True)
+    numbers = [int(path.name.removeprefix("attempt-")) for path in RUNS_ROOT.glob("attempt-[0-9][0-9][0-9]")]
+    number = max(numbers, default=0) + 1
+    while True:
+        attempt_id = f"attempt-{number:03d}"
+        run_dir = RUNS_ROOT / attempt_id
+        try:
+            run_dir.mkdir()
+            return attempt_id, run_dir
+        except FileExistsError:
+            number += 1
+
+
 def run_attempt() -> Path:
     """Execute the fresh nominal optics application and write its evidence bundle."""
     accepted, snapshot, flat_file, library = load_admission_basis()
@@ -130,11 +144,7 @@ def run_attempt() -> Path:
     skill_file = ITERATION_DIR / "SKILL.md"
     if optics.sha256(skill_file) != PINNED_SKILL_SHA256:
         raise RuntimeError("Local skill snapshot hash differs from the iteration's pinned skill revision")
-    output_id = "attempt-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    if (OUTPUT_ROOT / output_id).exists():
-        raise FileExistsError(f"Attempt directory already exists: {OUTPUT_ROOT / output_id}")
-    run_dir = OUTPUT_ROOT / output_id
-    run_dir.mkdir(parents=True)
+    output_id, run_dir = allocate_attempt()
     run_class = os.environ.get("PYPTC_BENCHMARK_RUN_CLASS", "user-run")
     tracking_mode = os.environ.get("PYPTC_BENCHMARK_TRACKING_MODE", "thick").strip().lower()
     if tracking_mode not in {"thick", "both"}:
@@ -158,77 +168,77 @@ def run_attempt() -> Path:
         manifest["harness_checks"] = tests
         if tests["returncode"] != 0:
             raise RuntimeError("Fresh deterministic harness checks failed; see harness-tests.log")
-        reference_dir = run_dir / "reference"
-        target_dir = run_dir / "target"
-        case_dir = run_dir / "case_nominal"
+        case_dir = run_dir / "cases/nominal"
+        reference_dir = case_dir / "reference"
+        target_dir = case_dir / "target"
         tfs_path, madx_info, headers, reference_rows = optics.run_madx_reference(REPO_ROOT, snapshot, reference_dir, accepted)
         target_info, target_rows, fibres, node_groups = optics.run_pyptc_optics(REPO_ROOT, flat_file, library, target_dir)
         mapping_rows, mapping_summary = optics.build_verified_boundary_map(reference_rows, target_rows, fibres, node_groups)
-        optics.write_csv(run_dir / "boundary_map.csv", mapping_rows)
+        optics.write_csv(case_dir / "boundary_map.csv", mapping_rows)
         gamma = float(headers["GAMMA"])
         beta0 = float(np.sqrt(1.0 - gamma ** -2))
         aligned, profile_metrics = optics.align_profiles(mapping_rows, reference_rows, target_rows, beta0) if mapping_summary["status"] == "verified" else ([], [])
-        optics.write_csv(run_dir / "aligned_profiles.csv", aligned)
-        optics.write_csv(run_dir / "profile_residual_metrics.csv", profile_metrics)
+        optics.write_csv(case_dir / "aligned_profiles.csv", aligned)
+        optics.write_csv(case_dir / "profile_residual_metrics.csv", profile_metrics)
         scalar_rows, chromaticity_info = optics.scalar_comparisons(headers, target_info, mapping_summary)
-        optics.write_csv(run_dir / "scalar_comparisons.csv", scalar_rows)
-        reference_tracking, reference_turns = optics.run_madx_tracking(REPO_ROOT, snapshot, run_dir / "reference/tracking/thick", accepted, "thick") if mapping_summary["status"] == "verified" else ({"status": "blocked-prerequisite", "reason": "profile mapping is not verified"}, [])
+        optics.write_csv(case_dir / "scalar_comparisons.csv", scalar_rows)
+        reference_tracking, reference_turns = optics.run_madx_tracking(REPO_ROOT, snapshot, reference_dir / "tracking/thick", accepted, "thick") if mapping_summary["status"] == "verified" else ({"status": "blocked-prerequisite", "reason": "profile mapping is not verified"}, [])
         target_tracking: dict[str, Any] = {"status": "blocked-not-run", "reason": "profile mapping is not verified"}
         target_turns: list[dict[str, float]] = []
         tracking_records: list[dict[str, Any]] = []
         tracking_metrics: dict[str, Any] = {"status": "blocked", "reason": "both engines must produce complete records"}
         thin_tracking: dict[str, Any] = {"status": "not-requested", "target_status": "not-run; PyPTC thin-lens control is not established"}
         if mapping_summary["status"] == "verified":
-            target_tracking, target_turns = optics.run_pyptc_tracking(REPO_ROOT, flat_file, library, run_dir / "target/tracking")
+            target_tracking, target_turns = optics.run_pyptc_tracking(REPO_ROOT, flat_file, library, target_dir / "tracking")
             tracking_records, tracking_metrics = optics.compare_turn_histories(reference_tracking, reference_turns, target_tracking, target_turns)
             if tracking_mode == "both":
-                thin_info, thin_turns = optics.run_madx_tracking(REPO_ROOT, snapshot, run_dir / "reference/tracking/thin", accepted, "thin")
+                thin_info, thin_turns = optics.run_madx_tracking(REPO_ROOT, snapshot, reference_dir / "tracking/thin", accepted, "thin")
                 if thin_turns:
-                    optics.write_csv(run_dir / "reference/tracking/thin/thin_turn_history.csv", thin_turns)
+                    optics.write_csv(reference_dir / "tracking/thin/thin_turn_history.csv", thin_turns)
                 thin_tracking = {"reference": thin_info, "target_status": "unavailable; no verified matching PyPTC thin-lens control is exposed in this workflow", "comparison_status": "not-compared", "reason": "Thin tracking is a reference-only diagnostic until both the slicing policy and a matching target control are validated."}
         else:
             thin_tracking = {"status": "blocked-prerequisite", "reason": "profile mapping is not verified", "target_status": "not-run"}
         if reference_turns:
-            optics.write_csv(run_dir / "reference/tracking/thick/reference_turn_history.csv", reference_turns)
+            optics.write_csv(reference_dir / "tracking/thick/reference_turn_history.csv", reference_turns)
         if target_turns:
-            optics.write_csv(run_dir / "target/tracking/target_turn_history.csv", target_turns)
+            optics.write_csv(target_dir / "tracking/target_turn_history.csv", target_turns)
         if tracking_records:
-            optics.write_csv(run_dir / "turn_comparisons.csv", tracking_records)
+            optics.write_csv(case_dir / "turn_comparisons.csv", tracking_records)
         tracking_status = "complete" if reference_tracking.get("status") == "complete" and target_tracking.get("status") == "complete" and tracking_metrics.get("status") == "pending-tolerance" else "blocked"
         tracking_summary = {"status": tracking_status, "primary_mode": "thick", "requested_mode": tracking_mode, "reference": reference_tracking, "reference_engine_relationship": "MAD-X PTC_TRACK and PyPTC use the PTC tracking engine; this is not an independent tracking-engine validation.", "target": target_tracking, "comparison": tracking_metrics, "thin_mode": thin_tracking, "tune_estimator": {"method": "not used", "reason": "no precision tune-from-tracking claim is made"}}
-        optics.write_json(run_dir / "tracking_summary.json", tracking_summary)
+        optics.write_json(case_dir / "tracking_summary.json", tracking_summary)
         family_map, family_summary = optics.classify_source_families(snapshot, [str(row["element_name"]) for row in mapping_rows], reference_rows)
-        optics.write_json(run_dir / "magnet_family_classification.json", {"families": family_map, **family_summary})
-        optics.write_json(run_dir / "profile_mapping.json", mapping_summary)
+        optics.write_json(case_dir / "magnet_family_classification.json", {"families": family_map, **family_summary})
+        optics.write_json(case_dir / "profile_mapping.json", mapping_summary)
         capabilities = profile_capabilities(mapping_summary["status"], tracking_status)
-        optics.write_json(run_dir / "capability_matrix.json", capabilities)
+        optics.write_json(case_dir / "capability_matrix.json", capabilities)
 
         plot_info = None
         if mapping_summary["status"] == "verified":
             plot_info = optics.write_case_composite(
-                case_dir / "nominal_optics_composite.png", aligned, scalar_rows,
+                run_dir / "plots/cases/nominal.png", aligned, scalar_rows,
                 family_map, family_summary,
                 "accepted 2023.strength overlay; zero harmonics/trims; synchrotron",
                 mapping_summary,
             )
-            optics.write_json(run_dir / "plot_manifest.json", {"case_plot_count": 1, "plots": [plot_info]})
+            optics.write_json(run_dir / "plot-manifest.json", {"case_plot_count": 1, "cases": {"nominal": {"path": "plots/cases/nominal.png", **plot_info}}})
         else:
-            optics.write_json(run_dir / "plot_manifest.json", {"case_plot_count": 0, "plots": [], "reason": "No verified mapping; profile overlays and residuals were not computed."})
+            optics.write_json(run_dir / "plot-manifest.json", {"case_plot_count": 0, "cases": {}, "reason": "No verified mapping; profile overlays and residuals were not computed."})
 
         manifest.update({
             "madx": madx_info,
             "pyptc": target_info,
             "commands": {
                 "harness_checks": tests,
-                "madx": {"argv": madx_info["command"], "cwd": madx_info["working_directory"], "log": "reference/madx.log"},
-                "pyptc": {"python": sys.executable, "cwd": str(target_dir), "api_calls": target_info["executed_api_calls"], "runtime_log": "target/pyptc_runtime.log"},
+                "madx": {"argv": madx_info["command"], "cwd": madx_info["working_directory"], "log": "cases/nominal/reference/madx.log"},
+                "pyptc": {"python": sys.executable, "cwd": str(target_dir), "api_calls": target_info["executed_api_calls"], "runtime_log": "cases/nominal/target/pyptc_runtime.log"},
             },
             "profile_mapping": mapping_summary,
             "chromaticity": chromaticity_info,
             "profile_metrics": profile_metrics,
             "scalar_comparisons": scalar_rows,
-            "capability_matrix": "capability_matrix.json",
-            "plot_manifest": "plot_manifest.json",
+            "capability_matrix": "cases/nominal/capability_matrix.json",
+            "plot_manifest": "plot-manifest.json",
             "magnet_family_classification": family_summary,
             "tolerance_policy": "No observable-specific tolerance has been reviewed for this PyPTC campaign; all completed differences are pending-tolerance.",
             "tracking": tracking_summary,
@@ -243,12 +253,12 @@ def run_attempt() -> Path:
             "technical_status": "fresh user-facing workflow ran; benchmark is incomplete under the pinned skill",
             "report": "report.md",
             "manifest": "manifest.json",
-            "boundary_map": "boundary_map.csv",
-            "aligned_profiles": "aligned_profiles.csv",
-            "profile_metrics": "profile_residual_metrics.csv",
-            "scalar_comparisons": "scalar_comparisons.csv",
-            "capability_matrix": "capability_matrix.json",
-            "plot_manifest": "plot_manifest.json",
+            "boundary_map": "cases/nominal/boundary_map.csv",
+            "aligned_profiles": "cases/nominal/aligned_profiles.csv",
+            "profile_metrics": "cases/nominal/profile_residual_metrics.csv",
+            "scalar_comparisons": "cases/nominal/scalar_comparisons.csv",
+            "capability_matrix": "cases/nominal/capability_matrix.json",
+            "plot_manifest": "plot-manifest.json",
         }
         optics.write_json(run_dir / "result.json", result)
         report = [
@@ -276,10 +286,8 @@ def run_attempt() -> Path:
             "",
             "## Evidence files",
             "",
-            "- `boundary_map.csv` and `profile_mapping.json` — identity and position evidence.",
-            "- `aligned_profiles.csv` and `profile_residual_metrics.csv` — data and signed residual summaries, when mapping is verified.",
-            "- `scalar_comparisons.csv` and `capability_matrix.json` — scalar results and scope.",
-            "- `case_nominal/nominal_optics_composite.png` and `plot_manifest.json` — one nominal case composite when mapping is verified.",
+            "- `cases/nominal/` — reference and target data, boundary map, aligned profiles, residuals, scalar results, and tracking records.",
+            "- `plots/cases/nominal.png` — nominal case composite when mapping is verified; `plot-manifest.json` links each case to its PNG.",
             "- `manifest.json`, `result.json`, and `harness-tests.log` — provenance, canonical status, and harness checks.",
         ]
         (run_dir / "report.md").write_text("\n".join(report) + "\n", encoding="utf-8")

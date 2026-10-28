@@ -389,6 +389,28 @@ older bundles `234802Z`, `232957Z`, `223232Z`, and `223155Z`. Their identities,
 hashes, and findings remain recorded in feedback 0004/0005/0006 and the ledger.
 The retained newest three are `234834Z`, `234844Z`, and `234910Z`.
 
+## 2026-10-28 — Adopt Xsuite-style benchmark run layout
+
+Reworked new optics benchmark output to use sequential step-local bundles at
+`steps/benchmark-pyptc-linear-optics-against-madx/runs/attempt-NNN/`, leaving
+all existing timestamped `test_outputs/` bundles at their original paths.
+Case data is now under `cases/<case-id>/` and case composites under
+`plots/cases/<case-id>.png`. Added a human-maintained `runs/INDEX.md`; the
+runner allocates IDs but does not edit the index or review ledger. Feedback
+0007 records the user's requirement that the reusable optics skill require a
+separate composite for every simulation case, linked from the report and plot
+manifest.
+
+Agent diagnostic `attempt-001` failed after allocation because the optional
+thin summary was not initialized; the fix was applied. `attempt-002` and
+`attempt-003` then completed consecutive smoke runs, each with one nominal
+case and one manifest-linked PNG. Reports, results, manifests and plot hashes
+are in feedback 0007; all three outcomes are in the index and review ledger.
+No prior timestamped bundle was moved or removed. These are diagnostics, not a
+user-run skill assessment or physics acceptance. This update follows Task 6
+campaign evidence and Task 9 review maintenance in the evidence-gated agents
+publication plan.
+
 ## 2026-10-27 — Prepare updated PyPTC linear-optics skill attempt
 
 Generated benchmark iteration 0002 from the updated optics skill at

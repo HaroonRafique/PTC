@@ -24,8 +24,10 @@ From this directory:
 ```
 
 The runner needs no arguments and automatically uses the step's `.venv` after
-setup. Outputs are placed under
-`test_outputs/benchmark-pyptc-linear-optics-against-madx/`. Set
+setup. New numbered run bundles are placed under `runs/attempt-NNN/`; inspect
+`runs/INDEX.md` for the run list and review dispositions. Each case's data is
+under `cases/<case-id>/` and its composite plot is under
+`plots/cases/<case-id>.png`. Set
 `PYPTC_BENCHMARK_RUN_CLASS=agent-diagnostic` only for an agent smoke run; the
 default is `user-run`.
 
@@ -34,6 +36,9 @@ Tracking defaults to thick MAD-X `PTC_TRACK` and accepts the optional
 classified thin-mode diagnostic. See the iteration 0003 README for the
 limitations and command details. Iteration 0003 is a feedback-driven
 correction of the prior harness, not an independent fresh skill implementation.
+The pre-redesign timestamped bundles in
+`test_outputs/benchmark-pyptc-linear-optics-against-madx/` remain archived at
+their original paths.
 
 Iteration 0001 records the first skill attempt and its blocked profile map.
 Iteration 0002 was generated from the updated skill at
