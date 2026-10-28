@@ -9,3 +9,4 @@ Agent diagnostics are not user-run results or acceptance decisions.
 | `attempt-002` | agent diagnostic | incomplete chromaticity and plot review | pending | feedback 0007; default thick mode; nominal case plot present |
 | `attempt-003` | agent diagnostic | incomplete chromaticity and plot review | pending | feedback 0007; consecutive allocator check; nominal case plot present |
 | `attempt-004` | agent diagnostic | incomplete chromaticity and plot review | pending | feedback 0008; step-level shell orchestration smoke; nominal case plot present |
+| `attempt-005` | user run | incomplete chromaticity and plot review | assessed; no acceptance | feedback 0009; mapping and thick tracking completed; chromaticity blocked and plot-manifest data paths unresolved |

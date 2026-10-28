@@ -411,6 +411,30 @@ user-run skill assessment or physics acceptance. This update follows Task 6
 campaign evidence and Task 9 review maintenance in the evidence-gated agents
 publication plan.
 
+## 2026-10-28 — Assess user-run optics benchmark attempt 005
+
+The user ran the step-level Xsuite-style orchestrator, allocating
+`steps/benchmark-pyptc-linear-optics-against-madx/runs/attempt-005`. The
+attempt used the accepted snapshot basis and unchanged strength/split settings.
+It verified all 586 named MAD-X element exits against the PyPTC map, retained
+14 profile residual summaries pending tolerance, passed seven local fixtures,
+and completed finite thick tracking for turns 0–64 in both paths with a clear
+target loss check. MAD-X `PTC_TRACK` and PyPTC share PTC; no independent engine
+validation or tolerance acceptance is claimed. PyPTC chromaticity remains
+blocked on the derivative coordinate.
+
+Skill-first review found the nominal plot present but the plot manifest points
+to `aligned_profiles.csv` at the bundle root instead of
+`cases/nominal/aligned_profiles.csv`; report log references also omit the
+case prefix. The 3150 x 6900 composite was inspected at whole-image scale and
+its small working-point text/labels are not comfortably readable. Only
+nominal is currently declared, so the current one-case plot count is met, but
+the broader perturbation-case response requirements remain unimplemented.
+Feedback 0009 records exact artifact hashes, this assessment, and comparison
+with `compare_madx_pyptc_closed_orbits.py` and
+`test_madx_optics_benchmark.py`. The run is assessed with no acceptance,
+`REP`, or `EVAL`; its index and review-ledger rows retain that disposition.
+
 ## 2026-10-28 — Move benchmark orchestration outside run bundles
 
 Following the user's clarification, replaced iteration-local launch of the
