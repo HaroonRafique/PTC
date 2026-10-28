@@ -1,0 +1,97 @@
+{
+  "binary": "workflows/madx/bin/madx-linux64_v5_02_00",
+  "binary_sha256": "426d2e88d42c14205d8930b2d720b7c5a5fffc7e499e3d0a7a4bf575e0110c04",
+  "nominal_recipe": "steps/benchmark-pyptc-linear-optics-against-madx/runs/attempt-019/cases/nominal/reference/reference_recipe.madx",
+  "nominal_recipe_sha256": "6e59019848317a1ad57888d750bf6442fabef1e2ef0dd487a98a9aab2dd89c7e",
+  "accepted_snapshot_inputs": {
+    "ISIS.injected_beam": "2759a6ef97d7799412ba293c8fc788ad34c356ca3b7098acd2a106f7142c92df",
+    "ISIS.elements": "33ec2aedddde548b4f19f9fe9dd26d48ce4445f36c2c118dfa82d239dda8dffa",
+    "ISIS.strength": "912286281994f76e09561b42b32335b65dbc50d6d438f2caa3c8a9f7018b04cf",
+    "2023.strength": "a66ca836e9bbdc6560b2196dbe02c12a3c1781bff0b74589d2995d7689f430ed",
+    "ISIS.sequence": "3cfc1fbb8c39e0d455a0518c4c37abd28058e7e5937231e8bb7cc9462adc9e1d"
+  },
+  "twiss_option": "TWISS, DELTAP=<offset>, SAVE; no CHROM option, read Q1/Q2 from each matched physical momentum offset",
+  "deltap_values": [
+    -0.0001,
+    -5e-05,
+    0.0,
+    5e-05,
+    0.0001
+  ],
+  "rows": [
+    {
+      "deltap": -0.0001,
+      "qx_full": 4.316475501,
+      "qy_full": 3.765480782,
+      "qx_fractional": 0.3164755010000002,
+      "qy_fractional": 0.765480782,
+      "madx_gamma": 1.075074172,
+      "twiss_sha256": "4f8e1ecf35b5df690f03ed2c9655d14c92ea36516da647a6366d80420518ecab",
+      "recipe_sha256": "847740e7fdb6ab93b179170adf5b55ec6aaa3cae59f043a1dca34b1eb24e1380",
+      "log_sha256": "358fa0a023cf051b5dde0a6554ee52bca4278bb95a0b22e18fb63b4c24b2d139",
+      "returncode": 0
+    },
+    {
+      "deltap": -5e-05,
+      "qx_full": 4.316238096,
+      "qy_full": 3.765240416,
+      "qx_fractional": 0.3162380960000002,
+      "qy_fractional": 0.7652404160000001,
+      "madx_gamma": 1.075074172,
+      "twiss_sha256": "11947445186713fe0f36086f0ec86a767f1d833d262a0194f31f45e3dfa801f8",
+      "recipe_sha256": "4882857cca3b99821b90c975745bcaaad02cbf614ca82708ebc68527671fb204",
+      "log_sha256": "09d9872e9d37517e64475a3fa6f3db419e1642c3cf2f9c1024818c7cb7cc289a",
+      "returncode": 0
+    },
+    {
+      "deltap": 0.0,
+      "qx_full": 4.316000781,
+      "qy_full": 3.765000088,
+      "qx_fractional": 0.3160007809999996,
+      "qy_fractional": 0.7650000879999999,
+      "madx_gamma": 1.075074172,
+      "twiss_sha256": "34bb7e4e410cdd7a4e2fdeb68c129b741db68689aa22f132a6e3d3a313a47727",
+      "recipe_sha256": "6fbc84f54aefa7de87fddd2d7f25ad0042594e855fc1d28a3ca214d92614ab57",
+      "log_sha256": "2d50bc175bedd1df62944e87e93befe7ada86654c80435ef724ff972872fc31f",
+      "returncode": 0
+    },
+    {
+      "deltap": 5e-05,
+      "qx_full": 4.315763556,
+      "qy_full": 3.764759798,
+      "qx_fractional": 0.3157635560000003,
+      "qy_fractional": 0.764759798,
+      "madx_gamma": 1.075074172,
+      "twiss_sha256": "30cd3a7137c9f1311e913d375b7b70054dfa4fa0aa36d228f2522dd71672cf04",
+      "recipe_sha256": "d384281395f55355194cbdfb1616de58cf50fffc0f16c9b7edb60185787992d6",
+      "log_sha256": "ce610689e035b425e74428cf5259ab0c572ee33602d3c2171ee6385ae4589975",
+      "returncode": 0
+    },
+    {
+      "deltap": 0.0001,
+      "qx_full": 4.315526419,
+      "qy_full": 3.764519547,
+      "qx_fractional": 0.3155264190000002,
+      "qy_fractional": 0.7645195469999999,
+      "madx_gamma": 1.075074172,
+      "twiss_sha256": "0694297124d4fb271754d55dab690d24f49e3594908c8aace8bb618c9569f0fd",
+      "recipe_sha256": "0abeb0f4173fa51c123e921fe59c321b671c497495530d05ec228810adcd6a73",
+      "log_sha256": "b849dd90225f79abe0dae6a1e153f6cb312b2e6c678005535cd741c955cf2570",
+      "returncode": 0
+    }
+  ],
+  "central_slopes_dq_d_deltap": {
+    "step_5e-05": {
+      "dqx_d_deltap": -4.7453999999991225,
+      "dqy_d_deltap": -4.806180000000992
+    },
+    "step_0.0001": {
+      "dqx_d_deltap": -4.74540999999995,
+      "dqy_d_deltap": -4.806175000000579
+    }
+  },
+  "madx_5_02_chromaticity_header_values_from_attempt_019": {
+    "dqx_d_deltap": -4.745390843,
+    "dqy_d_deltap": -4.806168146
+  }
+}

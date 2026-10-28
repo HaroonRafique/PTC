@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 STEP_DIR = Path(__file__).resolve().parents[2]
-ITERATION_DIR = STEP_DIR / "iteration-0003"
+ITERATION_DIR = STEP_DIR / "scripts/python/iteration_0003"
 SKILL_SNAPSHOT_DIR = STEP_DIR / "iteration-0004"
 REPO_ROOT = STEP_DIR.parents[1]
 ADMISSION_ID = "attempt-20261027T194128Z"
@@ -113,10 +113,19 @@ def campaign_case_catalog() -> list[dict[str, Any]]:
         })
     for case_id in ("survey_error_table", "survey_error_table_verified_intersection"):
         if case_id == "survey_error_table":
-            reason = "The full EFIELD table contains field-error columns beyond the six alignment components currently read by PyPTC; full-table application and per-component classification are unavailable."
-            evidence = ["Xsuite attempt-029 candidate inventory", "pyptc/error_table.py reads only NAME/DX/DY/DS/DPHI/DTHETA/DPSI", "source EFIELD table includes multipole and alignment columns"]
-            target_status = "not-run; full field component coverage unsupported by current public error-table reader"
-            disposition = "unsupported"
+            reason = (
+                "PyPTC now applies MAD-X alignment and integrated normal/skew magnetic multipole fields through "
+                "apply_madx_error_table. The pinned local Apr 2026 EFIELD table has no nonzero unsupported fields. "
+                "The exact Xsuite attempt-029 table is not archived here, so this executes the PyPTC survey-table "
+                "candidate without asserting byte-for-byte equivalence to that external candidate."
+            )
+            evidence = [
+                "PyPTC EFIELD API investigation steps/benchmark-pyptc-linear-optics-against-madx/investigations/0001-efield-api.md",
+                "pyptc/error_table.py supports alignment and K0L..K20L/K0SL..K20SL fields and rejects nonzero unsupported fields",
+                "pinned workflows/madx/reference_errors/apr_2026_survey_corrected.tfs hash and field audit",
+            ]
+            target_status = "planned; fresh PyPTC apply_madx_error_table from the unchanged full survey table"
+            disposition = "included"
         else:
             reason = "The verified intersection retains the six alignment components supported by PyPTC's MAD-X error-table reader; the case-local table is derived from the pinned PyPTC survey table and shared by both fresh engines."
             evidence = ["Xsuite attempt-029 candidate inventory; six-component verified intersection", "PyPTC error_table.py supports these six MAD-X EALIGN fields", "case-local filtered table hash and PyPTC example API path"]
@@ -202,7 +211,10 @@ def load_admission_basis() -> tuple[dict[str, Any], Path, Path, Path]:
         raise RuntimeError("Admission ledger does not confirm accepted snapshot scope for this bundle")
     snapshot = ADMISSION_BASIS / "snapshot_inputs"
     flat_file = ADMISSION_BASIS / "madx_work/PTC-PyORBIT_flat_file.flt"
-    library = ADMISSION_BASIS / "bootstrap/libpyptc.so"
+    # The accepted admission library remains preserved as evidence, but the
+    # optics candidate must use the current PyPTC build so API additions under
+    # test are present. scripts/shell/setup-benchmark.sh builds this library.
+    library = REPO_ROOT / "build_pyptc/libpyptc.so"
     for required in (snapshot, flat_file, library):
         if not required.exists():
             raise FileNotFoundError(f"Required accepted admission evidence is missing: {required}")
@@ -210,7 +222,7 @@ def load_admission_basis() -> tuple[dict[str, Any], Path, Path, Path]:
 
 
 def verify_inputs(accepted: dict[str, Any], snapshot: Path, flat_file: Path, library: Path) -> dict[str, Any]:
-    """Verify the five input and target-library hashes against admission evidence."""
+    """Verify admission inputs and identify the current PyPTC candidate build."""
     input_hashes = accepted["reference"]["input_hashes"]
     files = {
         "ISIS.injected_beam": snapshot / "ISIS.injected_beam",
@@ -226,14 +238,21 @@ def verify_inputs(accepted: dict[str, Any], snapshot: Path, flat_file: Path, lib
     expected_flat = accepted["reference"]["flat_file_sha256"]
     if optics.sha256(flat_file) != expected_flat:
         raise RuntimeError("Accepted PTC flat-file digest no longer matches admission")
-    expected_library = accepted["target"]["library_sha256"]
-    if optics.sha256(library) != expected_library:
-        raise RuntimeError("Accepted PyPTC library digest no longer matches admission")
+    sys.path.insert(0, str(REPO_ROOT))
+    from pyptc import PTC
+
+    candidate_ptc = PTC(library)
+    api_level = candidate_ptc.api_level()
+    if api_level < 5:
+        raise RuntimeError(f"Current PyPTC EFIELD API level 5 is required; build reports API level {api_level}")
     return {
         "ordered_input_hashes": actual,
         "flat_file_sha256": optics.sha256(flat_file),
         "library_sha256": optics.sha256(library),
-        "accepted_target_source_revision": accepted["target"]["repository_commit"],
+        "accepted_admission_library_sha256": accepted["target"]["library_sha256"],
+        "candidate_api_level": api_level,
+        "candidate_library_path": str(library),
+        "candidate_source_revision": subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, check=True, capture_output=True, text=True).stdout.strip(),
         "accepted_source_lattice_revision": accepted["reference"]["source_revision"],
         "accepted_madx_binary_sha256": accepted["reference"].get("madx_binary_sha256", accepted["reference"].get("binary_sha256")),
     }
@@ -283,7 +302,34 @@ def materialize_case_input(snapshot: Path, case: dict[str, Any], case_dir: Path)
 
 
 def materialize_case_error_table(case: dict[str, Any], source: Path, destination: Path) -> dict[str, Any]:
-    """Create an isolated EFIELD table with exactly the declared alignment subset."""
+    """Create either an unchanged full EFIELD table or a filtered alignment case."""
+    if case.get("case_id") == "survey_error_table":
+        # Keep every source column and row byte-for-byte for the full-table
+        # case. The public API performs the definitive unsupported-field guard.
+        sys.path.insert(0, str(REPO_ROOT))
+        from pyptc.error_table import read_madx_error_table
+
+        records = read_madx_error_table(source, nonzero=True)
+        unsupported = [
+            {"name": record.name, "field": field, "value": value}
+            for record in records
+            for field, value in record.unsupported
+        ]
+        if unsupported:
+            raise ValueError(f"Pinned full EFIELD table has nonzero unsupported fields: {unsupported}")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+        return {
+            "source_sha256": optics.sha256(source),
+            "destination_sha256": optics.sha256(destination),
+            "source_type": "EFIELD",
+            "preserved_source_verbatim": source.read_bytes() == destination.read_bytes(),
+            "selected_element": "all source rows",
+            "selected_row_count": len(records),
+            "nonzero_supported_record_count": len(records),
+            "nonzero_unsupported_fields": unsupported,
+            "retained_components": "all source columns",
+        }
     lines = source.read_text(encoding="utf-8").splitlines()
     columns: list[str] | None = None
     data_start: int | None = None
@@ -447,7 +493,7 @@ def run_madx_case_model(
 def run_harness_checks(run_dir: Path) -> dict[str, Any]:
     """Run the fresh iteration's independent deterministic fixtures."""
     log_path = run_dir / "harness-tests.log"
-    command = [sys.executable, "-m", "unittest", "discover", "-s", str(SKILL_SNAPSHOT_DIR / "tests"), "-v"]
+    command = [sys.executable, "-m", "unittest", "discover", "-s", str(STEP_DIR / "tests"), "-v"]
     completed = subprocess.run(command, cwd=REPO_ROOT, capture_output=True, text=True, check=False)
     log_path.write_text(completed.stdout + completed.stderr, encoding="utf-8")
     return {
@@ -464,6 +510,7 @@ def profile_capabilities(
     tracking_status: str,
     response_case_count: int = 0,
     unsupported_cases: list[str] | None = None,
+    efield_case_status: str = "not-assessed",
 ) -> list[dict[str, Any]]:
     """Return observables and their evidence status for this nominal case."""
     profile_state = "pending-tolerance" if mapping_status == "verified" else "blocked"
@@ -478,7 +525,7 @@ def profile_capabilities(
         {"observable": "chromaticity", "classification": "blocked", "reason": "PyPTC lattice_GET_CHROM derivative coordinate is not documented by the public wrapper; no conversion is inferred"},
         {"observable": "bounded single-particle tracking", "classification": "pending-tolerance" if tracking_status == "complete" else "blocked", "reason": "complete matched records retained; no reviewed tolerance" if tracking_status == "complete" else "the reference and target did not both produce complete compatible records"},
         {"observable": "corrector, field-strength, isolated misalignment, and verified-intersection responses", "classification": "pending-tolerance" if response_case_count else "blocked", "reason": f"{response_case_count} case-specific fresh-state response records are available; tolerances and minimum meaningful-response floors remain unreviewed" if response_case_count else "no case-specific response records are available"},
-        {"observable": "full EFIELD survey-table response", "classification": "unsupported" if unsupported_cases else "not-assessed", "reason": f"current PyPTC error-table reader does not apply non-alignment field components; unexecuted case IDs: {unsupported_cases}" if unsupported_cases else "no unsupported survey-table cases"},
+        {"observable": "full EFIELD survey-table response", "classification": "unsupported" if unsupported_cases else efield_case_status, "reason": f"unexecuted unsupported full-table cases: {unsupported_cases}" if unsupported_cases else ("full-table nominal-subtracted response is retained; tolerance remains unreviewed" if efield_case_status == "pending-tolerance" else "full-table case has not completed in this run")},
     ]
 
 
@@ -950,7 +997,8 @@ def run_attempt() -> Path:
         "iteration": ITERATION,
         "skill": {"name": "benchmark-code-against-isis-rcs-optics", "revision": PINNED_SKILL_REVISION, "base_commit": "f5293a3754dc8c4e9a6a4ba987603924b91949f3", "source_worktree_modified": True, "sha256": PINNED_SKILL_SHA256, "snapshot": str(skill_file.relative_to(STEP_DIR))},
         "target_repository": {"head": subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, check=True, capture_output=True, text=True).stdout.strip(), "worktree_status": subprocess.run(["git", "status", "--short"], cwd=REPO_ROOT, check=True, capture_output=True, text=True).stdout.splitlines()},
-        "accepted_admission": {"attempt_id": ADMISSION_ID, "review_disposition": "accepted", "scope": "snapshot admission only", "bundle_path": str(ADMISSION_BASIS.relative_to(STEP_DIR)), "result_sha256": optics.sha256(ADMISSION_BASIS / "result.json"), "report_sha256": optics.sha256(ADMISSION_BASIS / "report.md")},
+        "accepted_admission": {"attempt_id": ADMISSION_ID, "review_disposition": "accepted", "scope": "snapshot admission only; its original API-4 library remains preserved as admission evidence", "bundle_path": str(ADMISSION_BASIS.relative_to(STEP_DIR)), "result_sha256": optics.sha256(ADMISSION_BASIS / "result.json"), "report_sha256": optics.sha256(ADMISSION_BASIS / "report.md")},
+        "target_code_under_test": {"source_revision": provenance["candidate_source_revision"], "api_level": provenance["candidate_api_level"], "library_path": str(library), "library_sha256": provenance["library_sha256"], "build_script": "build/build_ptc.sh"},
         "identities": provenance,
         "recipe": {"variant": "00_Simplified_Lattice with 2023.strength overlay", "sequence": "synchrotron", "reference_mode": "case-local working-copy snapshots", "ordered_inputs": ["ISIS.injected_beam", "ISIS.elements", "ISIS.strength", "2023.strength", "ISIS.sequence"], "a1": 0.0, "b1": 0.0, "kqtd": 0.0, "kqtf": 0.0, "all_individual_trim_variables": 0.0, "resplitting": "nominal uses accepted flat file; supported perturbations regenerate case-local flat files with the accepted resplit scripts", "tracking_mode": tracking_mode, "perturbation_cases": case_inventory["dispositions"]["included"][1:]},
         "campaign_case_inventory": {"path": "campaign_case_inventory.json", "case_count": case_inventory["case_count"], "dispositions": case_inventory["dispositions"]},
@@ -1068,10 +1116,13 @@ def run_attempt() -> Path:
             ],
         }
         optics.write_json(run_dir / "campaign_case_inventory.json", case_inventory)
+        efield_case = next(case for case in case_inventory["cases"] if case["case_id"] == "survey_error_table")
+        efield_case_status = "pending-tolerance" if efield_case.get("execution_status") == "completed" else "blocked"
         capabilities = profile_capabilities(
             mapping_summary["status"], tracking_status,
             response_case_count=len(case_inventory["execution_summary"]["completed_case_ids"]),
             unsupported_cases=case_inventory["execution_summary"]["unsupported_candidate_ids"],
+            efield_case_status=efield_case_status,
         )
         optics.write_json(run_dir / "cases/nominal/capability_matrix.json", capabilities)
         optics.write_json(run_dir / "plot-manifest.json", {
@@ -1157,7 +1208,7 @@ def run_attempt() -> Path:
             "",
             "## Accepted basis and recipe",
             "",
-            f"This run uses the user-accepted admission snapshot `{ADMISSION_ID}`. Its accepted scope is snapshot admission only. The exact accepted PyPTC shared library and MAD-X 5.02.00 binary were reused by digest. The effective recipe uses the five pinned inputs in admission order, the 2023 strength overlay, `synchrotron`, `a1=b1=0`, all trim variables zero, and the accepted flat file without resplitting.",
+            f"This run uses the user-accepted admission snapshot `{ADMISSION_ID}`. Its accepted scope is snapshot admission only. The five accepted source inputs and flat file, and the MAD-X 5.02.00 binary, are reused by digest. PyPTC is rebuilt from current repository source at API level {provenance['candidate_api_level']} so the EFIELD API under test is available; its source revision and library digest are recorded separately. The effective recipe uses the five pinned inputs in admission order, the 2023 strength overlay, `synchrotron`, `a1=b1=0`, all trim variables zero, and the accepted flat file without resplitting for nominal optics.",
             "",
             "## Sampling and profile comparison",
             "",
@@ -1167,7 +1218,7 @@ def run_attempt() -> Path:
             "",
             "## Chromaticity, tracking, and limitations",
             "",
-            f"The machine-readable inventory assesses all {case_inventory['case_count']} candidates from the Xsuite attempt-029 cross-reference separately for PyPTC; the list is not treated as automatic case equivalence. {len(case_inventory['executed_case_ids'])} cases executed and were plotted: {', '.join(case_inventory['executed_case_ids'])}. Corrector, field-strength, isolated misalignment, and six-component verified-intersection cases use fresh case-local inputs and independent MAD-X/PyPTC application paths. Per-engine nominal-subtracted profile and scalar responses are retained. Unexecuted candidates: {', '.join(case_inventory['execution_summary']['unexecuted_candidate_ids']) or 'none'}. The full EFIELD survey case is unsupported by the current PyPTC reader because field-error components are not applied; it is not counted as completed coverage. Response tolerances remain pending review.",
+            f"The machine-readable inventory assesses all {case_inventory['case_count']} candidates from the Xsuite attempt-029 cross-reference separately for PyPTC; the list is not treated as automatic case equivalence. {len(case_inventory['executed_case_ids'])} cases executed and were plotted: {', '.join(case_inventory['executed_case_ids'])}. Corrector, field-strength, isolated misalignment, verified-intersection, and full EFIELD survey-table cases use fresh case-local inputs and independent MAD-X/PyPTC application paths. Per-engine nominal-subtracted profile and scalar responses are retained. The full local survey table is applied unchanged; its exact source and all-field audit are retained with the case. The exact Xsuite attempt-029 EFIELD table remains unavailable, so its candidate is not claimed as byte-for-byte equivalent. Unexecuted candidates: {', '.join(case_inventory['execution_summary']['unexecuted_candidate_ids']) or 'none'}. Response tolerances remain pending review.",
             "",
             f"MAD-X 5.02.00 reports `DQ1/DQ2` as `dQ/dDELTAP`, equivalent to `dQ/d(delta_p)` with factor 1. The PyPTC native values are retained, but the public wrapper does not establish their derivative coordinate, so the cross-code chromaticity comparison is `blocked`: {chromaticity_info['planes']}.",
             "",

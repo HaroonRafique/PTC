@@ -8,10 +8,14 @@ verified element-exit mapping adapter. It is **not represented as an
 independent fresh skill implementation**: the user-run iteration 0002
 assessment and the thick/thin investigation directly motivated these changes.
 
-From the benchmark step directory:
+The iteration-0003 runner and setup entry points were retired when the
+step-level orchestration was introduced. Its verified adapter modules now
+live under `../scripts/python/iteration_0003/`; this directory retains the
+skill snapshot and historical notes only. From the benchmark step directory,
+use the current stable commands:
 
 ```bash
-./iteration-0003/setup.sh
+./scripts/shell/setup-benchmark.sh
 ./scripts/shell/benchmark-pyptc-attempt.sh
 ```
 
@@ -28,7 +32,7 @@ engine comparison.
 To request the optional additional thin-mode diagnostic:
 
 ```bash
-PYPTC_BENCHMARK_TRACKING_MODE=both ./iteration-0003/run_benchmark.py
+PYPTC_BENCHMARK_TRACKING_MODE=both ./scripts/shell/benchmark-pyptc-attempt.sh --smoke
 ```
 
 `both` retains the thick route as the primary result and separately tries

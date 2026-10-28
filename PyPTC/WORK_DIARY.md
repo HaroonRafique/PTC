@@ -806,3 +806,100 @@ are in
 README and capability documentation describe the supported fields and retained
 example. This is Task 6 implementation/evidence work; acceptance and the
 external candidate's disposition remain open for review.
+
+## 2026-10-28 — Include full EFIELD table in iteration 0004
+
+The new PyPTC EFIELD API is API level 5, while the accepted admission bundle
+preserves an API-4 library. Iteration 0004 setup now builds the current PyPTC
+shared library, checks API level 5, and records the candidate library
+separately from the immutable admission evidence. The accepted input snapshot
+and base flat file remain hash-verified.
+
+The runner now includes all 38 catalogued cases. For the full EFIELD case it
+copies `apr_2026_survey_corrected.tfs` unchanged, audits it for nonzero
+unsupported fields, and supplies that same table to fresh MAD-X and PyPTC
+runs. The exact EFIELD table from Xsuite attempt 029 remains unavailable, so
+the local table run is not described as byte-for-byte equivalent to that
+external case. The local table has no nonzero K terms; the separate synthetic
+K1L/K1SL EFIELD example exercises those new magnetic multipole fields.
+
+Nine case-inventory checks passed; setup rebuilt the library and verified API
+level 5. Agent diagnostic attempt 018 completed 38/38 cases and produced 38
+case plots, with zero failed or unexecuted candidates. It mapped 586/586
+nominal element exits and completed thick tracking for 64 turns. The result is
+`incomplete-chromaticity-and-plot-review`: chromaticity remains blocked and
+all tolerances remain pending. Feedback 0016, the run index, and review ledger
+record artifact hashes, source/API identity, the full EFIELD application, and
+review limits. This does not constitute user-run assessment or acceptance.
+This is Task 6 campaign evidence and Task 9 maintenance under the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+## 2026-10-28 — Keep benchmark entry points outside iteration folders
+
+Moved the current API-5 setup command to
+`steps/benchmark-pyptc-linear-optics-against-madx/scripts/shell/setup-benchmark.sh`.
+The single current attempt command remains in `scripts/shell/`. Removed the
+obsolete iteration-0001 through iteration-0003 setup/run entry points. Moved
+the active iteration-0003 adapters to `scripts/python/iteration_0003/`, moved
+the superseded iteration-0002 helper/test source to `scripts/archive/`, and
+moved current case tests to the step-level `tests/` directory. The iteration
+folders now contain no `.py` or `.sh` files; a test enforces that rule.
+
+The relocated setup rebuilt the API-level-5 shared library. Ten inventory
+tests passed. A bounded adapter subprocess smoke through the new path produced
+804 node rows, 586 fibres, and 804 printer groups; its outputs and report are
+in `steps/benchmark-pyptc-linear-optics-against-madx/test_outputs/benchmark-runner-layout-smoke/`.
+No new full attempt was allocated. Attempt 018 remains the evidence for the
+38-case run and was completed before this path-only reorganization. Feedback
+0017 records the old/new paths, hashes, and limits; the user command is now
+`./scripts/shell/setup-benchmark.sh` followed by
+`./scripts/shell/benchmark-pyptc-attempt.sh`. This is Task 6 campaign
+maintenance under the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+## 2026-10-28 — Assess user-run benchmark attempt 019
+
+Attempt 019 ran all 38 declared PyPTC/MAD-X optics cases and produced all 38
+per-case composite images. Its 586 MAD-X element exits map to PyPTC at the
+verified 1e-9 m tolerance, and the 64-turn thick tracking comparison completed
+with 65 samples. The full local survey EFIELD table applied 38 records through
+the API-5 build. The attempt remains incomplete and unaccepted: the PyPTC
+chromaticity derivative coordinate is unresolved, response tolerances and
+meaningful-response floors are pending, and the nominal composite is 3300 x
+36800 pixels and unreadable at normal viewing size. Feedback 0018 records the
+skill-first assessment, comparison with the existing EFIELD example/tests,
+hashes, and corrective actions; the review ledger and run index record no
+acceptance. This is Task 6 evidence and Task 9 review maintenance under the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+## 2026-10-28 — Resolve derivative coordinates and optics units
+
+Ran bounded off-momentum diagnostics from attempt 019's accepted flat-file
+basis and matched MAD-X recipe. The scan established that PyPTC's native
+`lattice_GET_CHROM` value is per PTC `PT = ΔE/p0c`, while MAD-X 5.02.00 `DQ1/DQ2`
+are per `DELTAP = Δp/p0`; the matched MAD-X tune slopes reproduce the `DQ`
+headers. The common-coordinate conversion is therefore
+`dQ/dDELTAP = beta0 * PTC.chromaticities()`. Converted values differ from
+MAD-X by about +3.00 (X) and +3.04 (Y), so the previous raw numeric near-match
+was misleading and chromaticity remains out of agreement pending cause and
+tolerance review.
+
+The same scan checked MAD-X dispersion at three named rows and found
+`dX/dDELTAP = beta0 * DX`, supporting the adapter's existing `beta0 * DX`
+conversion to PyPTC `etax`. The field-by-field coordinate/unit table also
+records that `PX/PY` are dimensionless canonical momenta; the adapter's `rad`
+labels are only paraxial approximations and need correction in a future
+benchmark revision. The low-amplitude horizontal tune slope was less stable
+than the vertical slope, which is retained as a diagnostic limit.
+
+Full calculations, source paths, hashes, artifacts, conversions, and campaign
+actions are documented in
+`steps/benchmark-pyptc-linear-optics-against-madx/investigations/0002-derivative-coordinates-and-units.md`.
+The original attempt-019 files and blocked result remain unchanged. This is
+diagnostic evidence under the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md),
+not acceptance or tolerance approval.
+
+Following the three-bundle retention rule, attempt 016 was pruned after its
+report/result hashes, superseded outcome, and feedback link were recorded in
+the review ledger. The retained raw bundles are attempts 017–019.

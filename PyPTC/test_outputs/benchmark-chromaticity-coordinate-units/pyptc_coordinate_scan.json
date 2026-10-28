@@ -1,0 +1,147 @@
+{
+  "purpose": "identify PyPTC lattice_GET_CHROM's independent variable by comparison with tune slopes from off-momentum tracking",
+  "reference_basis": "accepted snapshot attempt-20261027T194128Z; nominal accepted flat file and current API-5 build",
+  "inputs": {
+    "flat_file": "steps/benchmark-pyptc-linear-optics-against-madx/admission_basis-accepted-attempt-20261027T194128Z/madx_work/PTC-PyORBIT_flat_file.flt",
+    "flat_file_sha256": "32f96fb53f37cdefcf3c540431a4da6fab9b06f4bf3687b0700a4af0fe6a9d3a",
+    "library": "build_pyptc/libpyptc.so",
+    "library_sha256": "d999479587a829469c84e175b9bc4b85b272eb7d58a9aa5a7994cce63e13ac2c",
+    "python_api_source": "pyptc/core.py",
+    "python_api_source_sha256": "37a246d66da327f67e56b1069495c593739b5a4d69386cdb533193bd81e57ad3",
+    "chromaticity_wrapper": "fortran/pyptc_api.f90:pyptc_get_chromaticities calls lattice_GET_CHROM",
+    "reference_coordinate_source": "../source/So_fitting.f90:lattice_GET_CHROM extracts DHDJ V(1:2) coefficient 00001",
+    "species": "proton",
+    "reference_p0c_gev": 0.370331763608763,
+    "reference_beta0": 0.367133282695325,
+    "tracking_initial_transverse_offset_m": 0.001,
+    "turns_per_particle": 4096,
+    "deltap_values": [
+      -0.0001,
+      -5e-05,
+      0.0,
+      5e-05,
+      0.0001
+    ],
+    "pt_definition": "(sqrt((p0c*(1+deltap))^2 + m^2) - sqrt(p0c^2 + m^2)) / p0c"
+  },
+  "records": [
+    {
+      "deltap": -0.0001,
+      "pt": -3.6711737693239476e-05,
+      "delta_e_gev": -1.3595522565079676e-05,
+      "p0c_gev": 0.370331763608763,
+      "beta0": 0.367133282695325,
+      "qx_reference": 0.31605467692091,
+      "qy_reference": 0.76510661554073,
+      "chromx_native": -4.745307640951764,
+      "chromy_native": -4.806147200304224,
+      "qx_tracking": 0.3162284637632382,
+      "qy_tracking": 0.7652816362883053,
+      "completed_turns": 4096,
+      "lost": false,
+      "tune_valid": true
+    },
+    {
+      "deltap": -5e-05,
+      "pt": -1.8356265915620305e-05,
+      "delta_e_gev": -6.797908329803093e-06,
+      "p0c_gev": 0.370331763608763,
+      "beta0": 0.367133282695325,
+      "qx_reference": 0.31605467692091,
+      "qy_reference": 0.76510661554073,
+      "chromx_native": -4.745307640951764,
+      "chromy_native": -4.806147200304224,
+      "qx_tracking": 0.31614122867637073,
+      "qy_tracking": 0.7651899444450585,
+      "completed_turns": 4096,
+      "lost": false,
+      "tune_valid": true
+    },
+    {
+      "deltap": 0.0,
+      "pt": 0.0,
+      "delta_e_gev": 0.0,
+      "p0c_gev": 0.370331763608763,
+      "beta0": 0.367133282695325,
+      "qx_reference": 0.31605467692091,
+      "qy_reference": 0.76510661554073,
+      "chromx_native": -4.745307640951764,
+      "chromy_native": -4.806147200304224,
+      "qx_tracking": 0.31605460131525837,
+      "qy_tracking": 0.7651045384715707,
+      "completed_turns": 4096,
+      "lost": false,
+      "tune_valid": true
+    },
+    {
+      "deltap": 5e-05,
+      "pt": 1.8357060036233537e-05,
+      "delta_e_gev": 6.798202417890309e-06,
+      "p0c_gev": 0.370331763608763,
+      "beta0": 0.367133282695325,
+      "qx_reference": 0.31605467692091,
+      "qy_reference": 0.76510661554073,
+      "chromx_native": -4.745307640951764,
+      "chromy_native": -4.806147200304224,
+      "qx_tracking": 0.31596508778914945,
+      "qy_tracking": 0.7650188138248912,
+      "completed_turns": 4096,
+      "lost": false,
+      "tune_valid": true
+    },
+    {
+      "deltap": 0.0001,
+      "pt": 3.671491417809073e-05,
+      "delta_e_gev": 1.3596698918316719e-05,
+      "p0c_gev": 0.370331763608763,
+      "beta0": 0.367133282695325,
+      "qx_reference": 0.31605467692091,
+      "qy_reference": 0.76510661554073,
+      "chromx_native": -4.745307640951764,
+      "chromy_native": -4.806147200304224,
+      "qx_tracking": 0.31588313255958284,
+      "qy_tracking": 0.7649269645336616,
+      "completed_turns": 4096,
+      "lost": false,
+      "tune_valid": true
+    }
+  ],
+  "central_slope_comparisons": {
+    "step_5e-05": {
+      "x": {
+        "central_dq_d_deltap_from_tracking": -1.7614088722128773,
+        "central_dq_d_pt_from_tracking": -4.7977371337121655,
+        "native_lattice_get_chrom": -4.745307640951764,
+        "native_minus_tracking_dq_d_pt": 0.05242949276040143,
+        "beta0_times_native": -1.74216037162183,
+        "beta0_conversion_factor_at_reference": 0.367133282695325
+      },
+      "y": {
+        "central_dq_d_deltap_from_tracking": -1.711306201672702,
+        "central_dq_d_pt_from_tracking": -4.661267148383459,
+        "native_lattice_get_chrom": -4.806147200304224,
+        "native_minus_tracking_dq_d_pt": -0.14488005192076514,
+        "beta0_times_native": -1.7644965987646355,
+        "beta0_conversion_factor_at_reference": 0.367133282695325
+      }
+    },
+    "step_0.0001": {
+      "x": {
+        "central_dq_d_deltap_from_tracking": -1.726656018276873,
+        "central_dq_d_pt_from_tracking": -4.703077082426672,
+        "native_lattice_get_chrom": -4.745307640951764,
+        "native_minus_tracking_dq_d_pt": -0.042230558525091944,
+        "beta0_times_native": -1.74216037162183,
+        "beta0_conversion_factor_at_reference": 0.367133282695325
+      },
+      "y": {
+        "central_dq_d_deltap_from_tracking": -1.7733587732182698,
+        "central_dq_d_pt_from_tracking": -4.8302863552210695,
+        "native_lattice_get_chrom": -4.806147200304224,
+        "native_minus_tracking_dq_d_pt": 0.024139154916845484,
+        "beta0_times_native": -1.7644965987646355,
+        "beta0_conversion_factor_at_reference": 0.367133282695325
+      }
+    }
+  }
+}

@@ -19,7 +19,7 @@ settings (`a1 = b1 = 0`), trim settings, or flat-file splitting.
 From this directory:
 
 ```bash
-./iteration-0004/setup.sh
+./scripts/shell/setup-benchmark.sh
 ./scripts/shell/benchmark-pyptc-attempt.sh
 ```
 
@@ -31,23 +31,29 @@ under `cases/<case-id>/` and its composite plot is under
 `PYPTC_BENCHMARK_RUN_CLASS=agent-diagnostic` only for an agent smoke run; the
 default is `user-run`.
 
+Iteration folders retain skill snapshots, requirements, and explanatory
+records. Setup and user-facing run entry points live under `scripts/shell/`;
+workflow and adapter modules live under `scripts/python/`.
+
 Iteration 0004 uses the updated skill snapshot and records a skill-valid
 disposition, evidence-backed reason, and reference/target application status
 for all 38 candidate cases. The Xsuite list is a planning cross-reference,
 not automatic proof of applicability. Following feedback 0014, the runner now
-executes 37 of the 38 inventoried cases: nominal; all 28 corrector polarities;
-the SP0_QF K1 field control; six isolated SP0_QF alignment components; and the
-six-component verified survey-table intersection. Each executed case uses a
+executes all 38 inventoried cases: nominal; all 28 corrector polarities; the
+SP0_QF K1 field control; six isolated SP0_QF alignment components; the
+six-component verified survey-table intersection; and the full EFIELD survey
+table. Each executed case uses a
 fresh MAD-X/PyPTC state, retains nominal-subtracted profile and scalar
 responses, and has one composite PNG. Attempt 017's full EFIELD survey-table
 case remains historically classified `unsupported`; that attempt used the
-alignment-only reader. The feature branch now adds integrated normal/skew
-magnetic multipole support and records side-by-side evidence in
+alignment-only reader. The current runner uses an API-level-5 PyPTC build and
+applies the full pinned Apr 2026 EFIELD table unchanged in both MAD-X and
+PyPTC. The exact EFIELD source from Xsuite attempt 029 is still not archived
+here, so the local case does not assert byte-for-byte equivalence to that
+external candidate. The API investigation and side-by-side example are in
 `investigations/0001-efield-api.md` and
-`../../test_outputs/06_madx_efield_api/`. The exact EFIELD source from Xsuite
-attempt 029 is still not archived here, so its nonzero fields must be checked
-before changing that candidate's disposition. Feedback 0015 and attempt 017
-remain evidence of the earlier diagnostic, not a user-run review or
+`../../test_outputs/06_madx_efield_api/`. Feedback 0015 and attempt 017 remain
+historical evidence of the earlier diagnostic, not a user-run review or
 tolerance/physics acceptance.
 Chromaticity responses remain native and blocked until the target derivative
 coordinate is established.

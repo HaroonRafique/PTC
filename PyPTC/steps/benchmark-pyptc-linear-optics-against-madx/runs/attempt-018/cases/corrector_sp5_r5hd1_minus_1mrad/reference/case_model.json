@@ -1,0 +1,30 @@
+{
+  "applied_error_table_sha256": null,
+  "binary_sha256": "426d2e88d42c14205d8930b2d720b7c5a5fffc7e499e3d0a7a4bf575e0110c04",
+  "case_override": {
+    "assignment_count": 1,
+    "file": "ISIS.strength",
+    "value_rad": -0.001,
+    "variable": "r5hd1_kick"
+  },
+  "command": [
+    "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/bin/madx-linux64_v5_02_00"
+  ],
+  "error_table": null,
+  "error_table_sha256": null,
+  "flat_file": "reference/case_flat_file.flt",
+  "flat_file_sha256": "d8f3ad91bcf1eb0ea53d4623597763e618cca0dee38ba4c3d1650fcf5513b754",
+  "input_hashes": {
+    "2023.strength": "a66ca836e9bbdc6560b2196dbe02c12a3c1781bff0b74589d2995d7689f430ed",
+    "ISIS.elements": "33ec2aedddde548b4f19f9fe9dd26d48ce4445f36c2c118dfa82d239dda8dffa",
+    "ISIS.injected_beam": "2759a6ef97d7799412ba293c8fc788ad34c356ca3b7098acd2a106f7142c92df",
+    "ISIS.sequence": "3cfc1fbb8c39e0d455a0518c4c37abd28058e7e5937231e8bb7cc9462adc9e1d",
+    "ISIS.strength": "e88a1c4e89e179763da8c0f266f590c42cb76e10992bb0fa65a9603594a3d6e2"
+  },
+  "log": "reference/madx.log",
+  "log_sha256": "57c03d8181bee15ee5a53d02302b2b5b8b32be9a88d5e2ad59b0c7c5ccef4310",
+  "recipe": "reference/reference_recipe.madx",
+  "recipe_sha256": "aa67a1cad99bbb9bc6435c734bcb1ae5d6bfceb5eafeb67def3218b10f026dc3",
+  "rows": 586,
+  "tfs_sha256": "e5b4b3cfb64fd07f5f7b5bd9add7d6d8248d4d410ebc911a042de76086b6c4cd"
+}
