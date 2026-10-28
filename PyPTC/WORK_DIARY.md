@@ -900,6 +900,6 @@ diagnostic evidence under the
 [evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md),
 not acceptance or tolerance approval.
 
-Following the three-bundle retention rule, attempt 016 was pruned after its
-report/result hashes, superseded outcome, and feedback link were recorded in
-the review ledger. The retained raw bundles are attempts 017–019.
+Following the three-bundle retention rule, attempts 015 and 016 were pruned
+after feedback 0015 and the review ledger preserved their identities, hashes,
+and outcomes. The retained raw bundles are attempts 017–019.
