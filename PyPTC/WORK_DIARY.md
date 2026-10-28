@@ -758,3 +758,19 @@ intermediate failures and corrections; their hashes and dispositions are in
 feedback 0015 and the review ledger before pruning under the three-bundle
 policy. This is local Task 6 evidence and Task 9 maintenance under the
 [evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+## 2026-10-28 — MAD-X EFIELD API investigation started
+
+Created feature branch `feature/pyptc-efield-api` from clean commit
+`32933d9`. The current Python error-table reader retains only six alignment
+columns and calls `MAD_MISALIGN_FIBRE`; it does not implement general MAD-X
+`SETERR` field errors. The checked-in Apr 2026 corrected survey table has
+nonzero entries only in DX, DY, DPHI, DTHETA, and DPSI, so that table alone
+does not prove multipole field-error support is needed. The exact Xsuite
+attempt-029 table was not included in PyPTC attempt 017. PTC multipole
+deviation arrays are accessed by existing additive AC/ramp shims, but MAD-X
+field semantics and API sufficiency remain to be established. Investigation
+provenance and scope are recorded in
+`steps/benchmark-pyptc-linear-optics-against-madx/investigations/0001-efield-api.md`.
+This is Task 6 investigation work under the evidence-gated agents publication
+plan; no benchmark acceptance is implied.
