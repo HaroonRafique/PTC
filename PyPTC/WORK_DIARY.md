@@ -411,6 +411,24 @@ user-run skill assessment or physics acceptance. This update follows Task 6
 campaign evidence and Task 9 review maintenance in the evidence-gated agents
 publication plan.
 
+## 2026-10-28 — Move benchmark orchestration outside run bundles
+
+Following the user's clarification, replaced iteration-local launch of the
+Python workflow with a stable step-level shell orchestrator at
+`steps/benchmark-pyptc-linear-optics-against-madx/scripts/shell/benchmark-pyptc-attempt.sh`.
+It allocates the numbered run, retains a workflow log, and records stage and
+command details on failure. The implementation module lives under
+`scripts/python/`; iteration 0003 retains the pinned skill snapshot and domain
+helpers, with its old executable runner removed. Run bundles contain evidence,
+not scripts. The index and review ledger remain human-maintained.
+
+Agent diagnostic `attempt-004` completed through the new shell path and wrote
+the nominal plot. Feedback 0008 records artifact hashes and the orchestration
+contract. The outcome remains incomplete under the pinned skill and is not a
+user-run assessment or physics acceptance. This records the orchestration
+change for Task 6 evidence and Task 9 review maintenance in the evidence-gated
+agents publication plan.
+
 ## 2026-10-27 — Prepare updated PyPTC linear-optics skill attempt
 
 Generated benchmark iteration 0002 from the updated optics skill at

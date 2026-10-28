@@ -14,10 +14,9 @@ import traceback
 from pathlib import Path
 from typing import Any
 
-ITERATION_DIR = Path(__file__).resolve().parent
-STEP_DIR = ITERATION_DIR.parent
+STEP_DIR = Path(__file__).resolve().parents[2]
+ITERATION_DIR = STEP_DIR / "iteration-0003"
 REPO_ROOT = STEP_DIR.parents[1]
-RUNS_ROOT = STEP_DIR / "runs"
 ADMISSION_ID = "attempt-20261027T194128Z"
 ADMISSION_BASIS = STEP_DIR / f"admission_basis-accepted-{ADMISSION_ID}"
 PINNED_SKILL_REVISION = "f5293a3754dc8c4e9a6a4ba987603924b91949f3"
@@ -122,21 +121,6 @@ def profile_capabilities(mapping_status: str, tracking_status: str) -> list[dict
     ]
 
 
-def allocate_attempt() -> tuple[str, Path]:
-    """Allocate the next numbered bundle without touching the human index."""
-    RUNS_ROOT.mkdir(parents=True, exist_ok=True)
-    numbers = [int(path.name.removeprefix("attempt-")) for path in RUNS_ROOT.glob("attempt-[0-9][0-9][0-9]")]
-    number = max(numbers, default=0) + 1
-    while True:
-        attempt_id = f"attempt-{number:03d}"
-        run_dir = RUNS_ROOT / attempt_id
-        try:
-            run_dir.mkdir()
-            return attempt_id, run_dir
-        except FileExistsError:
-            number += 1
-
-
 def run_attempt() -> Path:
     """Execute the fresh nominal optics application and write its evidence bundle."""
     accepted, snapshot, flat_file, library = load_admission_basis()
@@ -144,7 +128,10 @@ def run_attempt() -> Path:
     skill_file = ITERATION_DIR / "SKILL.md"
     if optics.sha256(skill_file) != PINNED_SKILL_SHA256:
         raise RuntimeError("Local skill snapshot hash differs from the iteration's pinned skill revision")
-    output_id, run_dir = allocate_attempt()
+    run_dir = Path(os.environ["PYPTC_BENCHMARK_RUN_DIR"]).resolve()
+    output_id = os.environ["PYPTC_BENCHMARK_ATTEMPT_ID"]
+    if not run_dir.is_dir() or run_dir.parent != (STEP_DIR / "runs").resolve() or run_dir.name != output_id:
+        raise RuntimeError("Shell orchestrator supplied an invalid attempt bundle path")
     run_class = os.environ.get("PYPTC_BENCHMARK_RUN_CLASS", "user-run")
     tracking_mode = os.environ.get("PYPTC_BENCHMARK_TRACKING_MODE", "thick").strip().lower()
     if tracking_mode not in {"thick", "both"}:
@@ -305,5 +292,5 @@ def run_attempt() -> Path:
 
 if __name__ == "__main__":
     if len(sys.argv) != 1:
-        raise SystemExit("run_benchmark.py accepts no arguments; configure only documented environment variables")
+        raise SystemExit("benchmark_pyptc.py is an internal workflow module; invoke scripts/shell/benchmark-pyptc-attempt.sh")
     run_attempt()

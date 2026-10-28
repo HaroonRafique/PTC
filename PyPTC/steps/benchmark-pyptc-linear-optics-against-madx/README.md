@@ -20,7 +20,7 @@ From this directory:
 
 ```bash
 ./iteration-0003/setup.sh
-./iteration-0003/run_benchmark.py
+./scripts/shell/benchmark-pyptc-attempt.sh
 ```
 
 The runner needs no arguments and automatically uses the step's `.venv` after
@@ -36,6 +36,9 @@ Tracking defaults to thick MAD-X `PTC_TRACK` and accepts the optional
 classified thin-mode diagnostic. See the iteration 0003 README for the
 limitations and command details. Iteration 0003 is a feedback-driven
 correction of the prior harness, not an independent fresh skill implementation.
+The stable shell orchestrator is under `scripts/shell/`; Python workflow code
+is under `scripts/python/`. Attempt bundles contain results and provenance,
+not executable runner scripts.
 The pre-redesign timestamped bundles in
 `test_outputs/benchmark-pyptc-linear-optics-against-madx/` remain archived at
 their original paths.

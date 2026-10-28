@@ -12,10 +12,11 @@ From the benchmark step directory:
 
 ```bash
 ./iteration-0003/setup.sh
-./iteration-0003/run_benchmark.py
+./scripts/shell/benchmark-pyptc-attempt.sh
 ```
 
-The runner takes no command-line arguments. New results are allocated in
+The step-level shell orchestrator takes no arguments for a user run. Use
+`--smoke` only for an agent diagnostic. New results are allocated in
 `../runs/attempt-NNN/`; run numbering starts at `attempt-001` and advances
 from directories already present. The human-maintained `../runs/INDEX.md` is
 not edited by the runner. By default it uses MAD-X 5.02.00

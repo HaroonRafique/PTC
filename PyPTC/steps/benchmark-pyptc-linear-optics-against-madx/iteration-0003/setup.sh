@@ -36,4 +36,4 @@ print(json.dumps({
 }, indent=2))
 PY
 printf 'Benchmark environment ready.\n'
-printf 'Run from the step directory with: ./iteration-0003/run_benchmark.py\n'
+printf 'Run from the step directory with: ./scripts/shell/benchmark-pyptc-attempt.sh\n'
