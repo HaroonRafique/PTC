@@ -1,0 +1,18 @@
+TITLE, "PyPTC full EFIELD side-by-side example";
+CALL, FILE="ISIS_Lattice/ISIS.injected_beam";
+CALL, FILE="ISIS_Lattice/ISIS.elements";
+CALL, FILE="ISIS_Lattice/ISIS.strength";
+CALL, FILE="ISIS_Lattice/2023.strength";
+CALL, FILE="ISIS_Lattice/ISIS.sequence";
+USE, SEQUENCE=synchrotron;
+SELECT, FLAG=TWISS, CLEAR;
+SELECT, FLAG=TWISS, COLUMN=name, keyword, s, x, px, y, py, betx, bety, alfx, alfy, dx, dpx, dy, dpy, mux, muy;
+TWISS, CHROM, SAVE, FILE="bare_twiss.tfs";
+EOPTION, ADD=false;
+READMYTABLE, FILE="efield.tfs", TABLE=efield;
+SETERR, TABLE=efield;
+ESAVE, FILE="applied_efield.tfs";
+SELECT, FLAG=TWISS, CLEAR;
+SELECT, FLAG=TWISS, COLUMN=name, keyword, s, x, px, y, py, betx, bety, alfx, alfy, dx, dpx, dy, dpy, mux, muy;
+TWISS, CHROM, SAVE, FILE="twiss.tfs";
+STOP;

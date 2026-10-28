@@ -38,7 +38,8 @@ through `ctypes` in `PyPTC/pyptc/`.
   - `tunes()`
   - `chromaticities()`
   - deterministic fibre misalignment by index or name/occurrence
-  - MAD-X `ESAVE`/`EFIELD` error-table parsing and application
+  - MAD-X `ESAVE`/`EFIELD` application for alignment errors and integrated
+    normal/skew magnetic multipole errors (`K0L..K20L`, `K0SL..K20SL`)
   - per-fibre aperture setup/disable
   - MAD-X rectangular aperture-file parsing, full-lattice aperture application,
     and per-fibre PTC aperture readback
@@ -54,6 +55,22 @@ through `ctypes` in `PyPTC/pyptc/`.
 
 The ABI shims use the active PTC lattice loaded by `ptc_init_`; no script files
 are required for these new calls.
+
+MAD-X EFIELD application uses a fresh PyPTC lattice and is additive to its
+loaded magnet strengths. The reader rejects nonzero EFIELD columns that PyPTC
+does not yet implement; it will not silently discard monitor measurement,
+electric/RF phase, or RF frequency/harmonic/lag errors. Run the repeatable
+side-by-side example to inspect the checked-in ISIS survey table and a
+synthetic normal/skew multipole case:
+
+```bash
+python3 PyPTC/examples/06_madx_efield_api.py
+```
+
+It retains MAD-X recipes/logs/Twiss tables, PyPTC API traces, aligned element
+exit CSVs, per-case plots, and a machine-readable result under
+`PyPTC/test_outputs/06_madx_efield_api/`. Its comparisons are evidence for
+review, not tolerance-based acceptance.
 
 ## Basic Usage
 

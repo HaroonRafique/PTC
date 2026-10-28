@@ -1,0 +1,11 @@
+{
+  "flat_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/06_madx_efield_api/inputs/flatfile_generation/PTC-PyORBIT_flat_file.flt",
+  "lattice": "simplified",
+  "lattice_dir": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/lattices/00_Simplified_Lattice",
+  "log": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/06_madx_efield_api/inputs/flatfile_generation/madx.log",
+  "madx": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/bin/madx-linux64_v5_02_00",
+  "madx_aperture_file": null,
+  "output_dir": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/06_madx_efield_api/inputs/flatfile_generation",
+  "returncode": 0,
+  "twiss_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/06_madx_efield_api/inputs/flatfile_generation/optimised_flat_file.tfs"
+}

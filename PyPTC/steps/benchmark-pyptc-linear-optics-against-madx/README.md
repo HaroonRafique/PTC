@@ -39,11 +39,16 @@ executes 37 of the 38 inventoried cases: nominal; all 28 corrector polarities;
 the SP0_QF K1 field control; six isolated SP0_QF alignment components; and the
 six-component verified survey-table intersection. Each executed case uses a
 fresh MAD-X/PyPTC state, retains nominal-subtracted profile and scalar
-responses, and has one composite PNG. The full EFIELD survey-table case is
-classified `unsupported` because the current PyPTC reader does not apply its
-non-alignment field components. The campaign therefore reports incomplete
-perturbation coverage. Feedback 0015 and attempt 017 record diagnostic smoke
-evidence; this is not a user-run review or tolerance/physics acceptance.
+responses, and has one composite PNG. Attempt 017's full EFIELD survey-table
+case remains historically classified `unsupported`; that attempt used the
+alignment-only reader. The feature branch now adds integrated normal/skew
+magnetic multipole support and records side-by-side evidence in
+`investigations/0001-efield-api.md` and
+`../../test_outputs/06_madx_efield_api/`. The exact EFIELD source from Xsuite
+attempt 029 is still not archived here, so its nonzero fields must be checked
+before changing that candidate's disposition. Feedback 0015 and attempt 017
+remain evidence of the earlier diagnostic, not a user-run review or
+tolerance/physics acceptance.
 Chromaticity responses remain native and blocked until the target derivative
 coordinate is established.
 

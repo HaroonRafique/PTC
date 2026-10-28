@@ -1,0 +1,115 @@
+{
+  "aligned_profiles": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/06_madx_efield_api/cases/synthetic_normal_skew/aligned_profiles.csv",
+  "applied_table_rows": [
+    {
+      "knl_nonzero": {
+        "1": 0.0002
+      },
+      "ksl_nonzero": {
+        "1": -0.0001
+      },
+      "misalignment": {
+        "dphi": 0.0,
+        "dpsi": 0.0,
+        "ds": 0.0,
+        "dtheta": 0.0,
+        "dx": 0.0,
+        "dy": 0.0
+      },
+      "name": "SP0_QF"
+    }
+  ],
+  "bare_boundary_map": {
+    "failures": [],
+    "flat_file_fibres": 586,
+    "mapped_boundaries": 586,
+    "method": "join by flat-file fibre index, exact element name and occurrence, then verify MAD-X and PyPTC physical exit s against the flat-file cumulative end",
+    "periodic_endpoint_included": true,
+    "position_tolerance_m": 1e-09,
+    "reference_rows": 586,
+    "status": "verified",
+    "target_node_rows": 804,
+    "unique_reference_rows_mapped": 586,
+    "unique_target_nodes_mapped": 586,
+    "zero_length_elements_preserved_by_identity": true
+  },
+  "boundary_map": {
+    "failures": [],
+    "flat_file_fibres": 586,
+    "mapped_boundaries": 586,
+    "method": "join by flat-file fibre index, exact element name and occurrence, then verify MAD-X and PyPTC physical exit s against the flat-file cumulative end",
+    "periodic_endpoint_included": true,
+    "position_tolerance_m": 1e-09,
+    "reference_rows": 586,
+    "status": "verified",
+    "target_node_rows": 804,
+    "unique_reference_rows_mapped": 586,
+    "unique_target_nodes_mapped": 586,
+    "zero_length_elements_preserved_by_identity": true
+  },
+  "case_id": "synthetic_normal_skew",
+  "flat_file_sha256": "052380ab09cd8f68ff9563eefe00ee83fba4995a25506f5d7c78da7c8b592eb9",
+  "madx_log": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/06_madx_efield_api/cases/synthetic_normal_skew/reference/madx.log",
+  "madx_tune_response": {
+    "qx": 0.00027868000000008664,
+    "qy": -0.00010254799999964703
+  },
+  "madx_tunes_fractional": {
+    "qx": 0.3162794609999997,
+    "qy": 0.7648975400000002
+  },
+  "madx_twiss": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/06_madx_efield_api/cases/synthetic_normal_skew/reference/twiss.tfs",
+  "mapped_element_exits": 586,
+  "plot": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/06_madx_efield_api/cases/synthetic_normal_skew/madx_pyptc_efield_comparison.png",
+  "profile_response_metrics": [
+    {
+      "classification": "pending-tolerance",
+      "maximum_absolute_response_residual": 1.0195660372305895e-13,
+      "observable": "x",
+      "rms_response_residual": 4.4454331352608644e-14,
+      "sample_count": 586,
+      "tolerance": null
+    },
+    {
+      "classification": "pending-tolerance",
+      "maximum_absolute_response_residual": 1.1153384783781584e-16,
+      "observable": "y",
+      "rms_response_residual": 5.858201491969975e-17,
+      "sample_count": 586,
+      "tolerance": null
+    },
+    {
+      "classification": "pending-tolerance",
+      "maximum_absolute_response_residual": 0.006602316773701489,
+      "observable": "betx",
+      "rms_response_residual": 0.0024470369590396815,
+      "sample_count": 586,
+      "tolerance": null
+    },
+    {
+      "classification": "pending-tolerance",
+      "maximum_absolute_response_residual": 0.004717350178410129,
+      "observable": "bety",
+      "rms_response_residual": 0.0013781080454012516,
+      "sample_count": 586,
+      "tolerance": null
+    }
+  ],
+  "ptc_flat_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/06_madx_efield_api/inputs/flatfile_generation/PTC-PyORBIT_flat_file.flt",
+  "pyptc_tune_response": {
+    "qx": 0.0002909569071199991,
+    "qy": -0.00010343971542003949
+  },
+  "pyptc_tunes_fractional": {
+    "qx": 0.33629664477354,
+    "qy": 0.8302576426302
+  },
+  "reference_rows": 586,
+  "table": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/test_outputs/06_madx_efield_api/inputs/synthetic_normal_skew.tfs",
+  "table_sha256": "1fd3b250cd52dc57482bde9447bcc301c4408782010a14cecbaac6e087f1c144",
+  "target_rows": 804,
+  "tune_residuals_wrapped": {
+    "qx": 1.2276907119912472e-05,
+    "qy": -8.917154203924582e-07
+  }
+}

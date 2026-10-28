@@ -4,7 +4,7 @@ module pyptc_api_module
   use orbit_ptc
   use ptc_multiparticle, only: x_orbit_sync
   use S_fitting, only: lattice_GET_tune, lattice_GET_CHROM, assign_one_aperture, TURN_OFF_ONE_aperture
-  use S_FAMILY, only: MISALIGN_FIBRE, MAD_MISALIGN_FIBRE
+  use S_FAMILY, only: ADD, MISALIGN_FIBRE, MAD_MISALIGN_FIBRE
   implicit none
 
 contains
@@ -37,7 +37,7 @@ contains
 
   subroutine pyptc_get_api_level(api_level) bind(C, name="pyptc_get_api_level")
     integer(c_int), intent(out) :: api_level
-    api_level = 4_c_int
+    api_level = 5_c_int
   end subroutine pyptc_get_api_level
 
   subroutine pyptc_get_tunes(qx, qy, qs, status) bind(C, name="pyptc_get_tunes")
@@ -187,6 +187,48 @@ contains
     local_mis = real(mis, dp)
     call MAD_MISALIGN_FIBRE(p, local_mis)
   end subroutine pyptc_set_madx_misalignment
+
+  subroutine pyptc_add_madx_multipole_error(pos, order, skew, integrated_strength, status) &
+      bind(C, name="pyptc_add_madx_multipole_error")
+    integer(c_int), value, intent(in) :: pos, order, skew
+    real(c_double), value, intent(in) :: integrated_strength
+    integer(c_int), intent(out) :: status
+    type(fibre), pointer :: p
+    integer :: multipole_index
+    real(dp) :: local_strength
+
+    status = 0_c_int
+    if (.not. pyptc_valid_pos(pos)) then
+      status = 1_c_int
+      return
+    end if
+    if (order < 0_c_int .or. order > 20_c_int) then
+      status = 2_c_int
+      return
+    end if
+    if (skew /= 0_c_int .and. skew /= 1_c_int) then
+      status = 3_c_int
+      return
+    end if
+
+    call move_to(my_ering, p, int(pos))
+    multipole_index = int(order) + 1
+    if (skew == 1_c_int) multipole_index = -multipole_index
+
+    ! MAD-X EFIELD K<n>L values are integrated strengths. PTC stores the
+    ! corresponding thick-element coefficient per unit length; for a thin
+    ! element the stored coefficient is already integrated.
+    if (associated(p%mag%l)) then
+      if (abs(p%mag%l) > tiny(1.0_dp)) then
+        local_strength = real(integrated_strength, dp) / p%mag%l
+      else
+        local_strength = real(integrated_strength, dp)
+      end if
+    else
+      local_strength = real(integrated_strength, dp)
+    end if
+    call ADD(p, multipole_index, 1, local_strength)
+  end subroutine pyptc_add_madx_multipole_error
 
   subroutine pyptc_set_one_aperture(pos, kindaper, r, x, y, dx, dy, status) bind(C, name="pyptc_set_one_aperture")
     integer(c_int), value, intent(in) :: pos, kindaper

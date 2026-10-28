@@ -11,7 +11,7 @@ from typing import Iterable
 import numpy as np
 
 from .aperture import AppliedApertureRecord, normalize_aperture_name, read_madx_aperture_file
-from .error_table import AppliedErrorRecord, read_madx_error_table
+from .error_table import AppliedErrorRecord, MULTIPOLE_ORDERS, read_madx_error_table
 from .lattice import read_flatfile_fibres, resolve_fibre_index, resolve_fibre_indices
 
 
@@ -99,6 +99,14 @@ class PTC:
             self.lib.pyptc_set_misalignment.restype = None
             self.lib.pyptc_set_madx_misalignment.argtypes = [ctypes.c_int, C_DOUBLE_P, C_INT_P]
             self.lib.pyptc_set_madx_misalignment.restype = None
+            self.lib.pyptc_add_madx_multipole_error.argtypes = [
+                ctypes.c_int,
+                ctypes.c_int,
+                ctypes.c_int,
+                ctypes.c_double,
+                C_INT_P,
+            ]
+            self.lib.pyptc_add_madx_multipole_error.restype = None
             self.lib.pyptc_set_one_aperture.argtypes = [
                 ctypes.c_int,
                 ctypes.c_int,
@@ -274,6 +282,29 @@ class PTC:
         self.lib.pyptc_set_madx_misalignment(int(fibre_index), mis.ctypes.data_as(C_DOUBLE_P), ctypes.byref(status))
         self._check_status("pyptc_set_madx_misalignment", status)
 
+    def add_madx_multipole_error(
+        self,
+        fibre_index: int,
+        order: int,
+        normal: float = 0.0,
+        skew: float = 0.0,
+    ) -> None:
+        """Add MAD-X integrated normal/skew multipole errors to a PTC fibre."""
+
+        if not 0 <= int(order) < MULTIPOLE_ORDERS:
+            raise ValueError(f"MAD-X multipole order must be in [0, {MULTIPOLE_ORDERS - 1}]")
+        status = ctypes.c_int()
+        if float(normal) != 0.0:
+            self.lib.pyptc_add_madx_multipole_error(
+                int(fibre_index), int(order), 0, float(normal), ctypes.byref(status)
+            )
+            self._check_status("pyptc_add_madx_multipole_error(normal)", status)
+        if float(skew) != 0.0:
+            self.lib.pyptc_add_madx_multipole_error(
+                int(fibre_index), int(order), 1, float(skew), ctypes.byref(status)
+            )
+            self._check_status("pyptc_add_madx_multipole_error(skew)", status)
+
     def set_misalignment_by_name(self, name: str, occurrence: int = 1, **kwargs: float) -> int:
         fibre_index = self._resolve(name, occurrence)
         self.set_misalignment(fibre_index, **kwargs)
@@ -353,10 +384,79 @@ class PTC:
         nonzero: bool = True,
         atol: float = 0.0,
     ) -> list[AppliedErrorRecord]:
-        """Read and apply a MAD-X `ESAVE`/`EFIELD` error table to PTC."""
+        """Apply MAD-X alignment and magnetic multipole errors from EFIELD.
+
+        Supported fields are DX/DY/DS/DPHI/DTHETA/DPSI and integrated magnetic
+        K<n>L/K<n>SL terms for orders 0 through 20. Nonzero table fields outside
+        that set are rejected before the lattice is modified.
+        """
 
         records = read_madx_error_table(table, nonzero=nonzero, atol=atol)
-        return self.apply_misalignments(records, madx_convention=True)
+        unsupported = [
+            (record.name, column, value)
+            for record in records
+            for column, value in record.unsupported
+            if abs(value) > atol
+        ]
+        if unsupported:
+            fields = ", ".join(f"{name}:{column}={value:g}" for name, column, value in unsupported[:8])
+            remainder = " ..." if len(unsupported) > 8 else ""
+            raise ValueError(f"MAD-X EFIELD contains unsupported nonzero fields: {fields}{remainder}")
+        if self.lattice is None:
+            raise ValueError("MAD-X EFIELD application requires init_lattice(...) first.")
+
+        fibres = read_flatfile_fibres(self.lattice)
+        by_index = {fibre.index: fibre for fibre in fibres}
+        plan: list[tuple[object, int, int, float]] = []
+        name_occurrences: dict[str, int] = {}
+        for record in records:
+            key = record.name.upper()
+            indices = resolve_fibre_indices(self.lattice, record.name)
+            if len(indices) == 1:
+                occurrence = name_occurrences.get(key, 0) + 1
+                name_occurrences[key] = occurrence
+                indices = [resolve_fibre_index(self.lattice, record.name, occurrence)]
+            else:
+                occurrence = 1
+                name_occurrences[key] = name_occurrences.get(key, 0) + 1
+            lengths = [max(0.0, by_index[index].length) for index in indices]
+            total_length = sum(lengths)
+            for index, length in zip(indices, lengths):
+                if len(indices) == 1:
+                    fraction = 1.0
+                elif total_length > 0.0:
+                    fraction = length / total_length
+                else:
+                    raise ValueError(
+                        f"Cannot distribute integrated MAD-X multipoles over zero-length fibres for {record.name!r}"
+                    )
+                plan.append((record, occurrence, index, fraction))
+
+        applied: list[AppliedErrorRecord] = []
+        for record, occurrence, fibre_index, fraction in plan:
+            if record.has_misalignment(atol=atol):
+                self.set_madx_misalignment(fibre_index, **record.as_kwargs())
+            for order, (normal, skew) in enumerate(zip(record.knl, record.ksl)):
+                scaled_normal = normal * fraction
+                scaled_skew = skew * fraction
+                if abs(scaled_normal) > atol or abs(scaled_skew) > atol:
+                    self.add_madx_multipole_error(fibre_index, order, scaled_normal, scaled_skew)
+            applied.append(
+                AppliedErrorRecord(
+                    name=record.name,
+                    occurrence=occurrence,
+                    fibre_index=fibre_index,
+                    dx=record.dx,
+                    dy=record.dy,
+                    ds=record.ds,
+                    dtheta=record.dtheta,
+                    dphi=record.dphi,
+                    dpsi=record.dpsi,
+                    knl=tuple(value * fraction for value in record.knl),
+                    ksl=tuple(value * fraction for value in record.ksl),
+                )
+            )
+        return applied
 
     def set_aperture(
         self,

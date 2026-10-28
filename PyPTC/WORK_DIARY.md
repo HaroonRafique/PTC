@@ -774,3 +774,35 @@ provenance and scope are recorded in
 `steps/benchmark-pyptc-linear-optics-against-madx/investigations/0001-efield-api.md`.
 This is Task 6 investigation work under the evidence-gated agents publication
 plan; no benchmark acceptance is implied.
+
+## 2026-10-28 — MAD-X magnetic EFIELD API and side-by-side example
+
+The feature branch now exposes integrated normal/skew magnetic multipole
+errors through API level 5. The additive native shim and Python wrapper map
+orders 0–20 to PTC magnet multipole arrays; the error-table API also applies
+alignment columns and distributes parent-family integrated errors across
+slices. Nonzero fields outside the implemented magnetic/alignment set are
+rejected before lattice mutation. This required no edits to PTC core Fortran.
+
+The repeatable example `examples/06_madx_efield_api.py` runs the checked-in
+ISIS survey table and a synthetic K1L/K1SL case through fresh MAD-X and PyPTC
+states. It maps all 586 element exits, retains per-case aligned CSVs, plots,
+MAD-X recipes/logs, API traces, hashes, and machine-readable results under
+`test_outputs/06_madx_efield_api/`. The standalone native build, focused
+three-test parser suite, and full comparison example passed. Wrapped
+tune-response residuals were 8.34e-6/-1.15e-6 (survey) and
+1.23e-5/-8.92e-7 (synthetic) for Qx/Qy; synthetic orbit-response residuals
+were below 1.1e-13 m. Maximum beta response residuals were 6.61e-3 m and
+4.72e-3 m. No tolerances were supplied, so this is functional comparison
+evidence and not tolerance-based acceptance.
+
+The example also confirms that nonzero MREX is rejected. Monitor readout and
+scaling, RF phase, and RF frequency/harmonic/lag fields remain unsupported.
+The exact EFIELD table from Xsuite attempt 029 is still not archived in this
+repository and was not treated as equivalent to the checked-in survey table.
+The detailed scope, hashes, results, and evidence-gated publication-plan link
+are in
+`steps/benchmark-pyptc-linear-optics-against-madx/investigations/0001-efield-api.md`.
+README and capability documentation describe the supported fields and retained
+example. This is Task 6 implementation/evidence work; acceptance and the
+external candidate's disposition remain open for review.

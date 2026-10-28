@@ -17,7 +17,11 @@
 - Name-based and index-based misalignment application:
   - raw PTC convention through `set_misalignment(...)`
   - MAD-X convention through `set_madx_misalignment(...)`
-  - MAD-X `ESAVE`/`EFIELD` table import through `apply_madx_error_table(...)`
+  - MAD-X `ESAVE`/`EFIELD` table import through `apply_madx_error_table(...)`:
+    alignment fields plus integrated normal/skew magnetic multipoles
+    `K0L..K20L` and `K0SL..K20SL`
+  - direct integrated multipole additions through `add_madx_multipole_error(...)`
+  - unsupported nonzero EFIELD columns are rejected before lattice mutation
 - Rectangular aperture and loss tools:
   - set/disable one fibre aperture
   - read MAD-X `APERTYPE=RECTANGLE, APERTURE={half_x, half_y}` files
@@ -59,8 +63,9 @@ These features exist in PTC internals and/or the `read_ptc_command` script-comma
 
 - Normal-form and map access.
 - Element and integration-node metadata beyond the current node Twiss table.
-- Direct lattice editing beyond the current misalignment/aperture shims:
-  multipoles, fringe flags, flat-file import/export, element insertion/removal.
+- Direct lattice editing beyond the current misalignment, magnetic multipole,
+  and aperture shims: electric/RF multipole data, fringe flags, flat-file
+  import/export, element insertion/removal.
 - Family and knob controls.
 - Beam allocation/statistics tools from PTC's internal beam machinery.
 - Survey, layout translation, layout rotation, and patch transforms.

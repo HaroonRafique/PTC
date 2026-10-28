@@ -53,6 +53,7 @@ for symbol in \
   pyptc_get_node_phase_advances \
   pyptc_set_misalignment \
   pyptc_set_madx_misalignment \
+  pyptc_add_madx_multipole_error \
   pyptc_set_one_aperture \
   pyptc_get_one_aperture \
   pyptc_turn_off_one_aperture \
@@ -108,6 +109,7 @@ for name in (
     "pyptc_get_node_phase_advances",
     "pyptc_set_misalignment",
     "pyptc_set_madx_misalignment",
+    "pyptc_add_madx_multipole_error",
     "pyptc_set_one_aperture",
     "pyptc_get_one_aperture",
     "pyptc_turn_off_one_aperture",

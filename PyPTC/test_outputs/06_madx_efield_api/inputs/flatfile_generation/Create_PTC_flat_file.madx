@@ -1,0 +1,29 @@
+TITLE, "Flat file generation for PyPTC";
+/***********************************************************************
+ * ISIS Proton Synchrotron: simplified lattice
+ * Create a PTC flat file for standalone PyPTC studies.
+ *
+ * This file is run from a generated working directory containing:
+ *   ISIS_Lattice/
+ *   PTC_Scripts/
+ **********************************************************************/
+CALL, FILE = "ISIS_Lattice/ISIS.injected_beam";
+CALL, FILE = "ISIS_Lattice/ISIS.elements";
+CALL, FILE = "ISIS_Lattice/ISIS.strength";
+CALL, FILE = "ISIS_Lattice/ISIS.sequence";
+
+USE, SEQUENCE=synchrotron;
+
+propagation_method = 2;
+order_of_integrator = 6;
+integration_steps_per_element = 5;
+map_order = 5;
+
+ptc_create_universe;
+ptc_create_layout,time=true, model=propagation_method, exact=true, method=order_of_integrator, nst=integration_steps_per_element;
+ptc_script, file="./PTC_Scripts/resplit.ptc";
+ptc_script, file="./PTC_Scripts/print_flat_file.ptc";
+select, flag=ptc_twiss, clear;
+select, flag=ptc_twiss, column=name, s, betx, bety, alfx, alfy, disp1, disp2, disp3, disp4, mu1, mu2, x, px, y, py;
+ptc_twiss, icase=5, no=map_order, deltap_dependency, closed_orbit, file=optimised_flat_file.tfs, table=ptc_twiss;
+ptc_end;
