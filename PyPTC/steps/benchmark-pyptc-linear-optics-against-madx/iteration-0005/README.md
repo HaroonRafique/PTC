@@ -71,3 +71,22 @@ case-relative labels. The manifest includes 100% zoom/scroll guidance; this
 does not substitute for human visual inspection. The next run should be
 attempt 021. The skill snapshot and tolerance baseline remain unchanged, so
 this is a runner fix rather than a new skill application.
+
+User-run attempt 021 used the correction above. The generic EFIELD parsing
+worked, but `audit_error_table_esave()` then failed on a source-row indexing
+`NameError` for the same eight cases before PyPTC ran. The full assessment,
+including refreshed hashes, nominal results, and plot inspection, is in step
+feedback [`0020-user-run-attempt-021-assessment.md`](../feedback/0020-user-run-attempt-021-assessment.md).
+
+The follow-up runner correction uses the declared `source_occurrence` and
+`source_index` dictionaries, and the deterministic checks now import the
+iteration-0005 module rather than the older step-level module. A no-`S`
+duplicate-name source/ESAVE fixture verifies all records and fields. The
+working-point table and nominal overview have been simplified to avoid the
+crowding seen in attempt 021; the report now gives chromaticity values in a
+small table, describes the applied conversion and open discrepancy, and does
+not imply that failed cases reached target application. The focused runner
+suite passed 11 tests. A renderer-only preview based on attempt-021 nominal
+data is `test_outputs/benchmark-pyptc-linear-optics-against-madx/runner-preview-attempt-021.png`;
+it is not a new benchmark result. The skill and tolerance snapshot are
+unchanged. The next full run should allocate attempt 022.

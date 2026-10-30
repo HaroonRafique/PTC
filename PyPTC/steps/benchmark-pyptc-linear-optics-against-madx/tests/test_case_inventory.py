@@ -1,4 +1,4 @@
-"""Deterministic checks for the iteration-0004 case inventory contract."""
+"""Deterministic checks for the iteration-0005 benchmark runner contract."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 
 step_dir = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(step_dir / "scripts/python"))
+sys.path.insert(0, str(step_dir / "scripts/python/iteration_0005"))
 import benchmark_pyptc as workflow
 
 
@@ -23,6 +23,28 @@ class CaseInventoryTests(unittest.TestCase):
         ]
         self.assertEqual(iteration_files, [])
         self.assertTrue((workflow.ITERATION_DIR / "ptc_optics_worker.py").is_file())
+
+    def test_efield_esave_audit_handles_duplicate_names_without_s_column(self) -> None:
+        fixture_root = workflow.REPO_ROOT / "test_outputs"
+        with tempfile.TemporaryDirectory(dir=fixture_root) as temporary:
+            root = Path(temporary)
+            source = root / "source_efield.tfs"
+            saved = root / "applied_efield.tfs"
+            source_text = (
+                "@ TYPE %06s \"EFIELD\"\n"
+                "* NAME K0L DX\n"
+                "$ %s %le %le\n"
+                "\"QF\" 0 1e-3\n"
+                "\"QF\" 0 2e-3\n"
+            )
+            source.write_text(source_text, encoding="utf-8")
+            saved.write_text(source_text, encoding="utf-8")
+            summary = workflow.audit_error_table_esave(source, saved, root)
+            self.assertEqual(summary["classification"], "applied-and-verified")
+            self.assertEqual(summary["source_record_count"], 2)
+            self.assertEqual(summary["esave_record_count"], 2)
+            self.assertEqual(summary["compared_value_count"], 4)
+            self.assertEqual(summary["mismatch_count"], 0)
 
     def test_every_candidate_has_a_skill_valid_disposition_and_evidence(self) -> None:
         cases = workflow.campaign_case_catalog()
@@ -143,14 +165,14 @@ class CaseInventoryTests(unittest.TestCase):
         self.assertEqual(response_rows[0]["response_residual_x"], 2.0)
         self.assertEqual(len(metrics), len(workflow.optics.PROFILE_FIELDS))
 
-    def test_scalar_response_is_engine_specific_and_native_chromaticity_stays_blocked(self) -> None:
+    def test_converted_chromaticity_response_remains_pending(self) -> None:
         nominal = [
             {"observable": "bare_horizontal_tune", "reference": 0.25, "target": 0.26, "units": "tune units"},
-            {"observable": "bare_horizontal_chromaticity", "reference_native": -2.0, "target_native": -3.0},
+            {"observable": "bare_horizontal_chromaticity", "converted_reference_dQ_d_delta_p": -2.0, "converted_target_dQ_d_delta_p": -3.0},
         ]
         perturbed = [
             {"observable": "bare_horizontal_tune", "reference": 0.27, "target": 0.29, "units": "tune units"},
-            {"observable": "bare_horizontal_chromaticity", "reference_native": -2.1, "target_native": -3.2},
+            {"observable": "bare_horizontal_chromaticity", "converted_reference_dQ_d_delta_p": -2.1, "converted_target_dQ_d_delta_p": -3.2},
         ]
         rows = workflow.nominal_subtracted_scalar_responses(nominal, perturbed, "fixture")
         tune = rows[0]
@@ -158,8 +180,10 @@ class CaseInventoryTests(unittest.TestCase):
         self.assertAlmostEqual(tune["reference_response"], 0.02)
         self.assertAlmostEqual(tune["target_response"], 0.03)
         self.assertAlmostEqual(tune["response_residual"], 0.01)
-        self.assertIsNone(chromaticity["response_residual"])
-        self.assertIn("blocked", chromaticity["classification"])
+        self.assertAlmostEqual(chromaticity["reference_response"], -0.1)
+        self.assertAlmostEqual(chromaticity["target_response"], -0.2)
+        self.assertAlmostEqual(chromaticity["response_residual"], -0.1)
+        self.assertIn("pending-tolerance", chromaticity["classification"])
 
 
 if __name__ == "__main__":

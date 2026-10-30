@@ -539,8 +539,8 @@ def audit_error_table_esave(source: Path, saved: Path, output_dir: Path) -> dict
     saved_index: dict[tuple[str, int], dict[str, str]] = {}
     for row in source_rows:
         name = str(row["NAME"]).strip().strip('"').upper()
-        counter[name] = counter.get(name, 0) + 1
-        index[(name, counter[name])] = row
+        source_occurrence[name] = source_occurrence.get(name, 0) + 1
+        source_index[(name, source_occurrence[name])] = row
     for row in saved_rows:
         name = str(row["NAME"]).strip().strip('"').upper()
         saved_occurrence[name] = saved_occurrence.get(name, 0) + 1
@@ -680,8 +680,11 @@ def write_skill_composite(
         axis.set_xlim(float(reference_s[0]), float(reference_s[-1]))
         axis.set_yticks([])
         axis.set_xlabel("s [m]")
-        axis.set_title(f"{case_id} magnet-family map — source classification from admitted ISIS lattice")
-        axis.legend(handles=[Patch(facecolor=color, label=name) for name, color in family_colors.items() if name in set(family_map.values())], ncol=6, loc="upper center")
+        axis.set_title(f"{case_id} magnet-family map — source classification from admitted ISIS lattice", pad=25)
+        axis.legend(
+            handles=[Patch(facecolor=color, label=name) for name, color in family_colors.items() if name in set(family_map.values())],
+            ncol=5, loc="lower center", bbox_to_anchor=(0.5, 1.01), fontsize=8,
+        )
 
     render_strip("magnet_family_map", magnet_strip)
     panel_groups.append({"group": "magnet_family_map", "source": family_summary["source_files"], "classification": family_summary["rule"]})
@@ -690,7 +693,7 @@ def write_skill_composite(
         axis = figure.add_subplot(111)
         axis.axis("off")
         by_name = {row["observable"]: row for row in scalar_rows}
-        table_rows = [["Observable", "MAD-X", "PyPTC", "Target − reference", "Units / status"]]
+        table_rows = [["Observable", "MAD-X", "PyPTC", "Δ target−ref", "Units", "Screen"]]
         for label, key in (
             ("Case horizontal tune", "bare_horizontal_tune"),
             ("Case vertical tune", "bare_vertical_tune"),
@@ -698,16 +701,22 @@ def write_skill_composite(
             ("Case vertical chromaticity", "bare_vertical_chromaticity"),
         ):
             row = by_name[key]
-            if "reference" in row:
-                table_rows.append([label, f"{row['reference']:.9g}", f"{row['target']:.9g}", f"{row['signed_target_minus_reference']:+.4g}", row["units"]])
+            if row.get("reference") not in (None, ""):
+                reference, target = float(row["reference"]), float(row["target"])
+                difference = float(row["signed_target_minus_reference"])
+                units = "tune" if key.endswith("tune") else ("m" if key == "circumference" else "")
             else:
-                table_rows.append([label, f"{row.get('converted_reference_dQ_d_delta_p'):.9g}", f"{row.get('converted_target_dQ_d_delta_p'):.9g}", f"{row.get('signed_converted_difference'):+.4g}", "dQ/d(delta_p); baseline applied"])
+                reference = float(row["converted_reference_dQ_d_delta_p"])
+                target = float(row["converted_target_dQ_d_delta_p"])
+                difference = float(row["signed_converted_difference"])
+                units = "dQ/dδp"
+            table_rows.append([label, f"{reference:.7g}", f"{target:.7g}", f"{difference:+.3g}", units, row["classification"].replace("-tolerance", "")])
         circumference = by_name["circumference"]
-        table_rows.append(["Circumference", f"{circumference['reference']:.9g}", f"{circumference['target']:.9g}", f"{circumference['signed_target_minus_reference']:+.4g}", "m"])
-        table = axis.table(cellText=table_rows[1:], colLabels=table_rows[0], colWidths=[0.27, 0.14, 0.14, 0.18, 0.27], cellLoc="center", bbox=[0.02, 0.22, 0.96, 0.65])
+        table_rows.append(["Circumference", f"{float(circumference['reference']):.7g}", f"{float(circumference['target']):.7g}", f"{float(circumference['signed_target_minus_reference']):+.3g}", "m", circumference["classification"].replace("-tolerance", "")])
+        table = axis.table(cellText=table_rows[1:], colLabels=table_rows[0], colWidths=[0.27, 0.145, 0.145, 0.16, 0.12, 0.16], cellLoc="center", bbox=[0.02, 0.24, 0.96, 0.58])
         table.auto_set_font_size(False)
-        table.set_fontsize(9)
-        axis.text(0.02, 0.13, f"Recipe: {effective_recipe}; mapped boundaries={mapping_summary['mapped_boundaries']}; mapping={mapping_summary['status']}; no physics acceptance.", transform=axis.transAxes, fontsize=7, va="center")
+        table.set_fontsize(8.5)
+        axis.text(0.02, 0.12, f"Recipe recorded in manifest; mapped exits={mapping_summary['mapped_boundaries']} ({mapping_summary['status']}); screening only, no physics acceptance.", transform=axis.transAxes, fontsize=8, va="center")
         axis.set_title(f"{case_id} working-point table")
 
     render_strip("case_working_point", working_point_strip)
@@ -733,18 +742,22 @@ def write_skill_composite(
 
     overview_fields = ("betx", "bety", "dx", "dy", "x", "px", "y", "py")
     def draw_overview(figure) -> None:
-        grid = figure.add_gridspec(2, 4, hspace=0.52, wspace=0.3)
+        grid = figure.add_gridspec(2, 4, hspace=0.72, wspace=0.3)
+        overview_titles = {"betx": "βx", "bety": "βy", "dx": "Dx", "dy": "Dy", "x": "x", "px": "px", "y": "y", "py": "py"}
         for index, observable in enumerate(overview_fields):
             axis = figure.add_subplot(grid[index])
             reference = np.asarray([float(row[f"reference_{observable}"]) for row in aligned])
             target = np.asarray([float(row[f"target_{observable}"]) for row in aligned])
             axis.plot(reference_s, reference, linestyle="none", marker=".", markersize=1.2, label="MAD-X")
             axis.plot(sample_s, target, linestyle="none", marker="x", markersize=1.0, label="PyPTC")
-            axis.set_title(f"{profile_titles[observable]} [{profile_fields[observable][2]}]", fontsize=8)
-            axis.set_xlabel("s [m]", fontsize=7)
+            axis.set_title(f"{overview_titles[observable]} [{profile_fields[observable][2]}]", fontsize=10, pad=8)
+            if index // 4 == 1:
+                axis.set_xlabel("s [m]", fontsize=9)
+            else:
+                axis.tick_params(axis="x", labelbottom=False)
             axis.grid(alpha=0.2)
-            axis.tick_params(labelsize=6)
-        figure.axes[0].legend(loc="best", fontsize=6)
+            axis.tick_params(labelsize=8)
+        figure.axes[0].legend(loc="best", fontsize=8)
     render_strip("nominal_master_optics_overview", draw_overview)
     panel_groups.append({"group": "case_overview", "observables": list(overview_fields), "data": f"cases/{case_id}/aligned_profiles.csv", "mapping": mapping_summary["status"], "series": ["MAD-X reference", "PyPTC target"]})
 
@@ -1176,7 +1189,7 @@ def run_attempt() -> Path:
         "runtime": {"python": sys.version, "platform": platform.platform()},
         "output_directory": str(run_dir),
         "commands": {},
-        "nonclaims": ["No clean-checkout admission claim.", "No tolerance-based or physics acceptance claim.", "No chromaticity agreement claim until target derivative coordinate is established.", "No bounded tracking, perturbation, nonlinear, or production claim unless separately completed in this attempt."],
+        "nonclaims": ["No clean-checkout admission claim.", "No tolerance-based or physics acceptance claim.", "Chromaticity is compared in dQ/d(delta_p) using the recorded coordinate conversion; both planes are outside the provisional baseline and the cause remains unresolved.", "No nonlinear, long-term, collective-effects, or production claim."],
     }
     try:
         tests = run_harness_checks(run_dir)
@@ -1391,6 +1404,14 @@ def run_attempt() -> Path:
             "campaign_case_inventory": "campaign_case_inventory.json",
         }
         optics.write_json(run_dir / "result.json", result)
+        chromaticity_table_rows = []
+        for plane, label in (("x", "horizontal"), ("y", "vertical")):
+            chrom = chromaticity_info["planes"][plane]
+            chromaticity_table_rows.append(
+                f"| {label} | {chrom['reference_native']:.7g} | {chrom['target_native']:.7g} | "
+                f"{chrom['converted_target_dQ_d_delta_p']:.7g} | {chrom['signed_difference']:+.4g} | "
+                f"{chrom['tolerance']:.3g} | {chrom['classification']} |"
+            )
         report = [
             f"# PyPTC/MAD-X linear-optics attempt {output_id}",
             "",
@@ -1408,9 +1429,13 @@ def run_attempt() -> Path:
             "",
             "## Chromaticity, tracking, and limitations",
             "",
-            f"The machine-readable inventory assesses all {case_inventory['case_count']} candidates from the Xsuite attempt-029 cross-reference separately for PyPTC; the list is not treated as automatic case equivalence. {len(case_inventory['executed_case_ids'])} cases executed and were plotted: {', '.join(case_inventory['executed_case_ids'])}. Corrector, field-strength, isolated misalignment, verified-intersection, and full EFIELD survey-table cases use fresh case-local inputs and independent MAD-X/PyPTC application paths. Per-engine nominal-subtracted profile and scalar responses are retained. The full local survey table is applied unchanged; its exact source and all-field audit are retained with the case. The exact Xsuite attempt-029 EFIELD table remains unavailable, so its candidate is not claimed as byte-for-byte equivalent. Unexecuted candidates: {', '.join(case_inventory['execution_summary']['unexecuted_candidate_ids']) or 'none'}. Response tolerances remain pending review.",
+            f"The machine-readable inventory assesses all {case_inventory['case_count']} candidates from the Xsuite attempt-029 cross-reference separately for PyPTC; the list is not treated as automatic case equivalence. {len(case_inventory['executed_case_ids'])} cases completed and were plotted: {', '.join(case_inventory['executed_case_ids'])}. Completed perturbation cases use fresh case-local inputs and independent MAD-X/PyPTC application paths. Per-engine nominal-subtracted profile and scalar responses are retained for completed cases. The full local survey table is retained unchanged; its source-to-ESAVE audit is emitted only when that audit stage completes. Cases that fail before the PyPTC worker do not establish target application. The exact Xsuite attempt-029 EFIELD table remains unavailable, so its candidate is not claimed as byte-for-byte equivalent. Unexecuted candidates: {', '.join(case_inventory['execution_summary']['unexecuted_candidate_ids']) or 'none'}. Response tolerances remain pending review.",
             "",
-            f"MAD-X 5.02.00 reports `DQ1/DQ2` as `dQ/dDELTAP`; the PyPTC API-level-5 evidence identifies `PTC.chromaticities()` as `dQ/dPT`. The target values are multiplied by this run's beta0={beta0:.12g} to compare in `dQ/d(delta_p)`. Both native and converted values, per-plane baseline criteria, and residuals are retained: {chromaticity_info['planes']}.",
+            f"MAD-X 5.02.00 reports `DQ1/DQ2` as `dQ/dDELTAP`; the PyPTC API-level-5 evidence identifies `PTC.chromaticities()` as `dQ/dPT`. PyPTC values are converted to `dQ/d(delta_p)` with this run's beta0={beta0:.12g}. Both converted planes are outside the provisional baseline; the derivative-coordinate interpretation and cause of the large difference remain open for review.",
+            "",
+            "| Plane | MAD-X DQ | PyPTC native dQ/dPT | PyPTC converted dQ/d(delta_p) | Converted difference | Limit | Status |",
+            "|---|---:|---:|---:|---:|---:|---|",
+            *chromaticity_table_rows,
             "",
             f"Profile response residual envelopes are summarized by family and observable in `response_summary.csv`; scalar response envelopes are in `scalar_response_summary.csv`. The shared corrector x/y orbit-response criterion is recorded per signed case, but its application status remains pending because a meaningful-response floor has not been reviewed. Other response families, including optics and chromaticity, remain `pending-tolerance`. Bounded tracking status is `{tracking_status}` and is a separate diagnostic, not a transverse optics gate. Requested mode: `{tracking_mode}`; thick MAD-X `PTC_TRACK` is compared with PyPTC's thick workflow. Both use the PTC tracking engine. Optional thin MAD-X output is reference-only and separately classified because no matching PyPTC thin control is established. No target-only or partial record is presented as a cross-code comparison. No nonlinear, long-term, collective-effects, clean-checkout admission, or production claim is made.",
             "",
