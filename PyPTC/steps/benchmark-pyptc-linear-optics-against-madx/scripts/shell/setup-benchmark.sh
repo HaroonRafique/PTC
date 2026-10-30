@@ -4,7 +4,7 @@ set -euo pipefail
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
 step_dir=$(cd "$script_dir/../.." && pwd -P)
 repo_root=$(cd "$step_dir/../.." && pwd -P)
-requirements="$step_dir/iteration-0004/requirements.txt"
+requirements="$step_dir/iteration-0005/requirements.txt"
 venv_dir="$step_dir/.venv"
 mkdir -p "$step_dir/.mplconfig"
 
@@ -40,4 +40,5 @@ print(json.dumps({
 }, indent=2))
 PY
 printf 'Benchmark environment ready.\n'
+printf 'Skill snapshot: iteration-0005/SKILL.md (SHA-256 b57248367f33b0985b136bf119cb366fc03604d47a34e52fb05aaa42518994ae)\n'
 printf 'Run from the step directory with: ./scripts/shell/benchmark-pyptc-attempt.sh\n'

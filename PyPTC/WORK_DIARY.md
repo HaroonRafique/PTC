@@ -1012,3 +1012,11 @@ feedback 0019, the attempt index, and review-ledger records were complete,
 attempt 017 was pruned under the three-bundle retention rule. Its report,
 result, and manifest hashes and outcome remain in the review ledger and
 feedback 0015. Raw attempts 018–020 are retained.
+
+## 2026-10-30 — Correct iteration-0005 benchmark runner after attempt 020
+
+Committed and pushed the attempt-020 assessment as `3502760` (`<update>[pyptc] assess linear optics attempt 020`). Before requesting another user run, corrected the iteration-0005 harness based on the assessment evidence. The generic TFS reader now accepts named EFIELD tables without an `S` coordinate, while the TWISS reader still requires both `NAME` and `S`; the source and MAD-X ESAVE audit uses the generic parser and validates named rows. A targeted read-only check against attempt 020 parsed all 38 source EFIELD rows and all 38 ESAVE rows, each without `S`, and still parsed the 586-row TWISS profile.
+
+The single vertically stitched PNG per case is retained as required by the skill. Its panel strips are now 1600 × 850 pixels with more vertical space and larger table text, and the scalar panel is named `case_working_point` with case-relative labels so perturbed plots are not presented as bare optics. The plot metadata tells reviewers to open at 100% and scroll through the image. No visual readability claim is made until the next run is inspected. Python bytecode compilation passed; no full benchmark or MAD-X/PTC physics run was performed.
+
+The copied skill and tolerance baseline are unchanged. This is a runner correction, not a skill update or fresh attempt. The next user run should allocate attempt 021; assess it against iteration 0005, record new feedback, and route reusable skill changes separately under the [evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).

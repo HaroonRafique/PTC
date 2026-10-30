@@ -13,7 +13,9 @@ script_dir=$(cd "$(dirname "$script_path")" && pwd -P)
 step_root=$(cd "$script_dir/../.." && pwd -P)
 repo_root=$(cd "$step_root/../.." && pwd -P)
 python="$step_root/.venv/bin/python"
-workflow="$step_root/scripts/python/benchmark_pyptc.py"
+workflow="$step_root/scripts/python/iteration_0005/benchmark_pyptc.py"
+skill_snapshot="$step_root/iteration-0005/SKILL.md"
+baseline_snapshot="$step_root/iteration-0005/references/tolerance-baseline.md"
 runs_root="$step_root/runs"
 run_id=
 run_dir=
@@ -56,7 +58,9 @@ EOF
 }
 trap failure_handler ERR
 
-[[ -x $python && -s $workflow ]] || { echo 'Benchmark environment or workflow module is missing; run ./scripts/shell/setup-benchmark.sh.' >&2; exit 3; }
+[[ -x $python && -s $workflow && -s $skill_snapshot && -s $baseline_snapshot ]] || { echo 'Benchmark environment, workflow module, or pinned iteration-0005 snapshots are missing; run ./scripts/shell/setup-benchmark.sh.' >&2; exit 3; }
+[[ $(sha256sum "$skill_snapshot" | awk '{print $1}') == b57248367f33b0985b136bf119cb366fc03604d47a34e52fb05aaa42518994ae ]] || { echo 'Iteration-0005 skill snapshot has changed; rebuild the iteration before running.' >&2; exit 3; }
+[[ $(sha256sum "$baseline_snapshot" | awk '{print $1}') == 77bb8564d562a0a72b1eae738b097d6d614177f40db4abe01f81cb5236d671c8 ]] || { echo 'Iteration-0005 tolerance baseline snapshot has changed; rebuild the iteration before running.' >&2; exit 3; }
 mkdir -p "$runs_root"
 highest=0
 for directory in "$runs_root"/attempt-*; do
@@ -84,6 +88,13 @@ orchestrator=$script_path
 orchestrator_sha256=$(sha256sum "$script_path" | awk '{print $1}')
 workflow_module=$workflow
 workflow_module_sha256=$(sha256sum "$workflow" | awk '{print $1}')
+iteration=0005
+skill_revision=3aad35af0ad53337fc259e14d0d614fd55821aa5
+skill_snapshot=$skill_snapshot
+skill_sha256=$(sha256sum "$skill_snapshot" | awk '{print $1}')
+tolerance_baseline_id=OPTICS-BASELINE-2026-10-28-v1
+tolerance_baseline=$baseline_snapshot
+tolerance_baseline_sha256=$(sha256sum "$baseline_snapshot" | awk '{print $1}')
 EOF
 log "Allocated $run_id at $run_dir ($run_type)."
 
