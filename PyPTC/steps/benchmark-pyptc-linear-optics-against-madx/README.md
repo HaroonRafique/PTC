@@ -160,3 +160,11 @@ chronology record is required by the benchmark skill when a
 code/reference/recipe/run reaches technical completion; an incomplete attempt
 creates no `REP`, `EVAL`, physics claim, or acceptance. Keep full run bundles
 here and do not copy bulky outputs into the publication repository.
+
+The latest user run, attempt 021, is recorded in
+[`feedback/0020-user-run-attempt-021-assessment.md`](feedback/0020-user-run-attempt-021-assessment.md).
+The no-`S` EFIELD table parsing correction worked, but its audit then failed
+on an undefined source-row index variable in eight cases before the PyPTC
+worker ran. All 38 cases remain included; 30 completed and eight failed.
+Nominal and sampled response findings, plot review, and evidence hashes are in
+the feedback file. No acceptance or publication completion is implied.

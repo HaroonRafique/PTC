@@ -1,7 +1,0 @@
-{
-  "finite": true,
-  "history_file": "turn_history.csv",
-  "recorded_samples": 65,
-  "requested_turns": 64,
-  "status": "complete"
-}
