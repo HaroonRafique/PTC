@@ -1,0 +1,25 @@
+\section{Public API map}
+\label{sec:api-map}
+
+This inventory follows the names a Python user can call. Methods beginning with an underscore are internal helpers and are omitted. The signatures in source remain authoritative; this summary groups methods by the interaction they support. Values and units are not inferred from names. [claim:API-06]
+
+\begin{longtable}{L{0.31\textwidth}L{0.62\textwidth}}
+\toprule
+\textbf{User task} & \textbf{Methods} \\
+\midrule
+\endfirsthead
+\toprule \textbf{User task} & \textbf{Methods} \\
+\midrule
+\endhead
+Create/query context & \texttt{PTC(...)}; \texttt{api\_level()}, \texttt{init\_lattice()}, \texttt{run\_script()}, \texttt{read\_accel\_table()}, \texttt{update\_twiss()}, \texttt{machine\_summary()}, \texttt{scalar()} \\
+Read optics/orbit & \texttt{tunes()}, \texttt{chromaticities()}, \texttt{node\_phase\_advances()}, \texttt{node\_twiss\_orbit()}, \texttt{all\_node\_twiss\_orbit()}, \texttt{task\_type()} \\
+Track particles & \texttt{track\_particle\_ptc()}, \texttt{track\_particle\_ptc\_with\_loss()}, \texttt{track\_bunch()}, \texttt{track\_bunch\_with\_losses()}, \texttt{particle\_diagnostics()} \\
+Edit alignment/errors & \texttt{set\_misalignment()}, \texttt{set\_madx\_misalignment()}, \texttt{add\_madx\_multipole\_error()}, name-based variants, \texttt{apply\_misalignments()}, \texttt{apply\_madx\_error\_table()} \\
+Apply/query apertures & \texttt{set\_aperture()}, name-based set/get, \texttt{get\_aperture()}, \texttt{apply\_rectangular\_apertures()}, \texttt{apply\_madx\_aperture\_file()}, \texttt{all\_fibre\_apertures()}, disable methods, \texttt{absolute\_aperture()}, \texttt{set\_absolute\_aperture()} \\
+Time-dependent controls & \texttt{set\_acceleration()}, \texttt{set\_ramping()}, \texttt{set\_modulation()}, \texttt{set\_cavity()}, orbit-state methods, \texttt{energize\_lattice()}, orbit-time methods, cavity setup/power/total-path methods, AC and ramp magnet configuration \\
+\bottomrule
+\end{longtable}
+
+Module-level helpers include flat-file fibre parsing and name resolution; MAD-X aperture and error-table readers; JVT design aperture reader; matched Gaussian bunch helper; tune summary, CSV writers, and plotting helpers. The exported subset is listed in \path{pyptc/__init__.py}. Utility functions and source examples are not equivalent to one monolithic managed simulation workflow. [claim:API-01]
+
+The time-dependent control group is present in the Python wrapper and ABI, but this guide does not assert a validated ramping, RF, or acceleration procedure for the ISIS RCS. Treat those methods as interface entry points pending a separately evidenced and physics-reviewed workflow. [claim:CONTROL-01]

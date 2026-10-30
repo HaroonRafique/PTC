@@ -1,0 +1,20 @@
+\section{User path through the package}
+\label{sec:user-path}
+
+The public package exports the \texttt{PTC} class, lattice helpers, parser record types, error/aperture readers, and diagnostic plotting helpers. The package is organized into API, lattice, aperture, error-table, bunch, and plotting modules. Its initializer identifies the exported subset; method behavior is traced to its defining module. [claim:API-01]
+
+\begin{description}
+  \item[Construct] \texttt{PTC(library=DEFAULT\_LIBRARY)} loads the configured shared library and checks that the file exists; a missing library raises \texttt{FileNotFoundError}. [claim:API-02]
+  \item[Initialize] \texttt{init\_lattice(path)} stores a resolved lattice path and passes it to the PTC initialization symbol. \texttt{run\_script(path)} and \texttt{read\_accel\_table(path)} pass resolved file paths to corresponding library entry points. [claim:API-03]
+  \item[Query] Methods such as \texttt{tunes()}, \texttt{chromaticities()}, and \texttt{node\_phase\_advances()} allocate Python/ctypes outputs, call ABI symbols, check status where provided, and return Python dictionaries or NumPy arrays. [claim:API-04]
+  \item[Edit] Misalignment, aperture, error-table, and machine-control methods call dedicated C ABI functions from the Python wrapper. Their argument units and operational interpretation require review where not settled by code. [claim:API-05]
+  \item[Track] The particle-tracking methods convert Python bunch rows into the six-value PTC coordinate array, call the ring tracking entry point, and convert final values back into the package convention. [claim:TRACK-01]
+\end{description}
+
+\subsection{Python, ABI, and parent PTC boundary}
+
+The Python wrapper configures shared-library function signatures through \texttt{ctypes}. The companion \texttt{fortran/pyptc\_api.f90} contains the exposed shim implementations, which in turn call routines from the parent PTC code. The build script verifies a defined set of exported names. This note's feature claims stop at that inspected call chain; it does not provide a line-by-line account of the entire parent PTC source tree. [claim:ABI-01]
+
+\subsection{Errors and failures}
+
+The wrapper converts nonzero status values into \texttt{RuntimeError} through \texttt{\_check\_status}. Name-based fibre lookup requires an initialized or explicitly supplied lattice path; missing names and occurrences raise \texttt{ValueError}. Input shape guards reject particle coordinates that are not length six and bunch arrays that are not \texttt{N x 6}. [claim:FAIL-01]

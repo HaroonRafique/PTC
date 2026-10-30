@@ -903,3 +903,43 @@ not acceptance or tolerance approval.
 Following the three-bundle retention rule, attempts 015 and 016 were pruned
 after feedback 0015 and the review ledger preserved their identities, hashes,
 and outcomes. The retained raw bundles are attempts 017–019.
+
+## 2026-10-30 — Draft PyPTC documentation package and literature review
+
+Created `pyptc_documentation/` as a self-contained, source-grounded documentation
+package based on the maintained ISIS technical-note class. It includes a detailed
+execution plan, a narrative PTC literature review with full citations and direct
+URLs, BibTeX, a PDF retrieval/hash/access manifest, five retrieved PTC/FPP PDFs,
+source and claim ledgers, a draft technical note, editable TikZ diagrams, and
+seven byte-identical PyPTC example/comparison plots with a provenance manifest.
+The copied class's chopped-beam keyword defaults were replaced only in the local
+copy. The template source was not changed.
+
+The note follows the user path from build/import and lattice initialization
+through optics, tracking, apertures, edits, and evidence boundaries. Code claims
+are tied to PyPTC commit `8824003c956390e921a1d469f77c247859a63258` and recorded
+source hashes. Coordinate/unit semantics, field interpretation, golden-case
+status, code correspondence, physics review, and reader review remain pending.
+The review records that the 2002 CERN PDF endpoint returned anti-bot HTML and
+the historical 2006 MAD-X PTC manual URL served a distinct 2010 PTC User's
+Reference Manual; these were not conflated. PDF redistribution rights also
+remain unreviewed.
+
+The final 14-page A4 draft built with the documented pdfLaTeX/BibTeX sequence.
+LaTeX checks found no unresolved citations/references, missing files, or
+overfull boxes; the local class and report content have no chopped-beam text.
+All 14 rendered pages were visually inspected. The ISIS claim-ledger checker
+passed with 0 errors and 0 warnings; its self-test passed. Build logs, extracted
+text, metadata, and page renders are kept under
+`pyptc_documentation/test_outputs/rendered_pages/`. Draft PDF SHA-256:
+`ad761c77a3f241fe21aeb72c27e00ee77f36918accb4ea9676fbe8602b6ca337`.
+
+The package is a working draft and does not claim scientific validation or
+publication readiness. The implementation follows the evidence-gated
+documentation expectations in the
+[ISIS modelling-agent publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+Detailed task status, questions for later refinement, exact build checks, and
+retrieval limits are recorded in
+[`pyptc_documentation/PLAN.md`](pyptc_documentation/PLAN.md). No commit or push
+was made at the time this entry was drafted; this entry is included with the
+documentation package commit.

@@ -1,0 +1,30 @@
+\section{Particle and bunch tracking}
+\label{sec:tracking}
+
+The package accepts bunch input as a two-dimensional six-column array. \path{track_bunch_with_losses()} copies and validates the array, converts each row into the PTC six-coordinate representation, tracks each particle, then converts the final values back. The \path{particle_diagnostics()} routine records turn-by-turn transverse phase and survival information and returns per-particle diagnostic rows. These are implementation descriptions; the physical meaning and units of every coordinate require physics review. [claim:TRACK-01]
+
+For tracking without the loss-result wrapper, \path{track_bunch()} also requires an \texttt{N x 6} array and rejects other shapes with \texttt{ValueError}. It copies the input, walks the machine nodes for each requested turn, updates the synchronous reference at each node, and returns either the final array or one copied snapshot per turn when \texttt{record\_turns=True}. This method's Python-to-PTC coordinate conversion is likewise implementation evidence; coordinate units and physical interpretation remain pending. [claim:TRACK-03] [claim:TRACK-02]
+
+The standard bunch example creates its input with the PyParticleBunch helper, tracks a fixed-size bunch for a stated turn count, and writes before/after diagnostic dashboards and CSV files. The outputs show an example run only; they do not prove model validity for other lattices or operating conditions. [claim:EXAMPLE-02]
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.88\textwidth]{figures/bunch_initial_dashboard.png}
+  \caption{Initial bunch dashboard copied from the standard bunch example output. It records the available diagnostic view before tracking; the associated output directory contains the run summary and diagnostic data. [claim:PROV-03]}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.88\textwidth]{figures/bunch_final_dashboard.png}
+  \caption{Final bunch dashboard from the same example output. Its side-by-side interpretation is limited to this recorded run and the generated input bunch. [claim:PROV-03]}
+\end{figure}
+
+\subsection{Apertures and particle loss}
+
+The aperture helpers read rectangular aperture assignments or TFS records, and the JVT CSV reader divides its semi-aperture columns by 1000 before constructing records. The API can apply, query, disable, and set absolute apertures; tracking returns loss flags and loss turn/position fields. The dimensions and operational meaning of input columns should be confirmed by the aperture data owner. [claim:AP-01]
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.82\textwidth]{figures/aperture_loss_map.png}
+  \caption{Loss-map image from the aperture example output. It is an example visualization from the stored run and does not establish a validated physical aperture model. [claim:PROV-03] [claim:PROV-04]}
+\end{figure}

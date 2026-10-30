@@ -1,0 +1,393 @@
+[ledger]
+title = "PyPTC user guide, source claims and review ledger"
+commit = "8824003c956390e921a1d469f77c247859a63258"
+reviewers = ["Code: pending", "Physics: pending", "Reader: pending"]
+ai_use = "2026-10-30; GPT-6 Codex; literature review, source mapping, drafting and figure manifest; local hash checks, claim-ledger checker, LaTeX build and PDF inspection; human approval pending"
+
+[[sources]]
+id = "CORE"
+path = "pyptc/core.py"
+sha256 = "37a246d66da327f67e56b1069495c593739b5a4d69386cdb533193bd81e57ad3"
+role = "implementation"
+
+[[sources]]
+id = "INIT"
+path = "pyptc/__init__.py"
+sha256 = "fe8ec3d5e3c42bb88a064d6c3f28ae59f2a12874a3817f7d235731c46f563b9f"
+role = "implementation"
+
+[[sources]]
+id = "LATTICE"
+path = "pyptc/lattice.py"
+sha256 = "1efaa2c2b314e447e9a01f398c564d76b1f0c0b431dce553e263a4538350800c"
+role = "implementation"
+
+[[sources]]
+id = "OPTICS"
+path = "pyptc/optics.py"
+sha256 = "fd1ea801f512469e81feeb2c0c944d9d3a89e8fbe232450e435e6a895f1e01a7"
+role = "implementation"
+
+[[sources]]
+id = "APERTURE"
+path = "pyptc/aperture.py"
+sha256 = "1a97b46288f139712a2b66a95ac97384918213872103d80ddbefa788ecf4164b"
+role = "implementation"
+
+[[sources]]
+id = "BUILD"
+path = "build/build_ptc.sh"
+sha256 = "5f03a1d41af0748a58f2517f9d966a5a0b7c462af5f8299535c9d45569c7e25e"
+role = "implementation"
+
+[[sources]]
+id = "EX01"
+path = "examples/01_plot_bare_twiss_closed_orbit.py"
+sha256 = "a42434de475ce2696d0a9f10d975a59ba480803207aaa8462ed0df674c1aa382"
+role = "implementation"
+
+[[sources]]
+id = "EX02"
+path = "examples/02_track_bunch_dashboard.py"
+sha256 = "d8a5e429d186086c7626802a0a11d25afba91120021d763b1f6373fa8832d944"
+role = "implementation"
+
+[[sources]]
+id = "EX03"
+path = "examples/03_track_bunch_with_apertures.py"
+sha256 = "22835510f5649f9c7035ef55b3910f0d15c242d056ba2fcf21952f0d54877c63"
+role = "implementation"
+
+[[sources]]
+id = "EX04"
+path = "examples/04_single_element_misalignment.py"
+sha256 = "31b47170b39530998f86632f2e167b20e09748795a7173207d5e63dd2fbb21c7"
+role = "implementation"
+
+[[sources]]
+id = "EX06"
+path = "examples/06_madx_efield_api.py"
+sha256 = "2d152fdaa8c4fc8521266aa97d45c3cc2663b2f5efc19f24c3f14c2b27baefe7"
+role = "implementation"
+
+[[claims]]
+id = "API-01"
+section = "Package exports"
+class = "implemented"
+claim = "The pyptc package exports the PTC class, lattice/error/aperture helpers, and plotting helpers."
+source = "INIT"
+lines = [35, 67]
+status = "code_mapped"
+
+[[claims]]
+id = "BUILD-01"
+section = "Build and quick start"
+class = "implemented"
+claim = "The build script checks Meson and nm, configures and compiles libpyptc, checks selected exported symbols, and runs a ctypes load smoke check."
+source = "BUILD"
+lines = [12, 103]
+status = "code_mapped"
+
+[[claims]]
+id = "LATTICE-01"
+section = "Default lattice"
+class = "implemented"
+claim = "DEFAULT_LATTICE is the simplified flat file, and ensure_default_lattice regenerates it when requested or absent/empty."
+source = "CORE"
+lines = [18, 41]
+status = "code_mapped"
+
+[[claims]]
+id = "API-02"
+section = "PTC construction"
+class = "implemented"
+claim = "PTC construction checks the shared-library path, loads it with ctypes, and configures the ABI."
+source = "CORE"
+symbol = "PTC.__init__"
+lines = [47, 53]
+checks = [{ kind = "contains", text = "ctypes.CDLL" }]
+status = "code_mapped"
+
+[[claims]]
+id = "API-03"
+section = "Lattice initialization"
+class = "implemented"
+claim = "init_lattice resolves and stores the lattice path and passes it to the PTC initialization symbol."
+source = "CORE"
+symbol = "PTC.init_lattice"
+lines = [208, 211]
+status = "code_mapped"
+
+[[claims]]
+id = "API-04"
+section = "Optics queries"
+class = "implemented"
+claim = "The wrapper exposes tune, chromaticity, phase-advance, and per-node optics/orbit queries as Python values."
+source = "CORE"
+lines = [224, 251]
+status = "code_mapped"
+
+[[claims]]
+id = "API-05"
+section = "Error-table application"
+class = "implemented"
+claim = "apply_madx_error_table rejects unsupported nonzero fields before applying the supported alignment and integrated multipole terms."
+source = "CORE"
+symbol = "PTC.apply_madx_error_table"
+lines = [381, 459]
+status = "code_mapped"
+
+[[claims]]
+id = "API-06"
+section = "Public API map"
+class = "implemented"
+claim = "PTC exposes methods grouped for initialization, optics/orbit, tracking, lattice edits, apertures, and time-dependent controls."
+source = "CORE"
+lines = [203, 982]
+status = "code_mapped"
+
+[[claims]]
+id = "AP-01"
+section = "Aperture input"
+class = "implemented"
+claim = "read_jvt_design_aperture divides the Semi_Ap_H and Semi_Ap_V values by 1000 when building records."
+source = "APERTURE"
+symbol = "read_jvt_design_aperture"
+lines = [96, 114]
+checks = [{ kind = "contains", text = "/ 1000.0" }]
+status = "code_mapped"
+
+[[claims]]
+id = "LATTICE-02"
+section = "Flat-file lattice metadata"
+class = "implemented"
+claim = "The lattice helper parses PTC flat-file fibre blocks and resolves exact names or numbered sliced dipoles into one-based indices."
+source = "LATTICE"
+lines = [70, 124]
+status = "code_mapped"
+
+[[claims]]
+id = "TRACK-01"
+section = "Bunch tracking"
+class = "implemented"
+claim = "track_bunch_with_losses validates an N x 6 array, converts each row, tracks particles, and converts the final rows back."
+source = "CORE"
+symbol = "PTC.track_bunch_with_losses"
+lines = [624, 644]
+status = "code_mapped"
+
+[[claims]]
+id = "FAIL-01"
+section = "Failure behavior"
+class = "implemented"
+claim = "The wrapper raises RuntimeError for nonzero status and ValueError for name resolution when no lattice is available."
+source = "CORE"
+lines = [193, 201]
+status = "code_mapped"
+
+[[claims]]
+id = "FAIL-02"
+section = "Input shape guards"
+class = "implemented"
+claim = "Particle coordinates must have shape six and bunch input must be a two-dimensional N x 6 array."
+source = "CORE"
+lines = [605, 627]
+status = "code_mapped"
+
+[[claims]]
+id = "LIMIT-01"
+section = "Unexposed optics functionality"
+class = "implemented"
+claim = "The one-turn-map and normal-form convenience functions raise the explicit not-exposed exception."
+source = "OPTICS"
+lines = [14, 19]
+status = "code_mapped"
+
+[[claims]]
+id = "LIMIT-02"
+section = "Unexposed aperture functionality"
+class = "implemented"
+claim = "Normalized aperture scan and tune-smear tracking convenience functions raise the explicit not-exposed exception."
+source = "APERTURE"
+lines = [145, 150]
+status = "code_mapped"
+
+[[claims]]
+id = "CONTROL-01"
+section = "Advanced controls"
+class = "unresolved"
+claim = "The presence of ramping, acceleration, RF, and time-dependent magnet methods does not establish a reviewed ISIS RCS operating workflow."
+owner = "PyPTC maintainer and ISIS RCS physics reviewer"
+route = "Specify a use case, identify the supporting PTC and machine configuration, and verify a reproducible example before recommending the controls."
+status = "physics_review_pending"
+
+[[claims]]
+id = "EXAMPLE-01"
+section = "Example outputs"
+class = "implemented"
+claim = "The bare optics example writes a PNG plot, a CSV table, and a JSON summary under its named output directory."
+source = "EX01"
+lines = [8, 18]
+status = "code_mapped"
+
+[[claims]]
+id = "EXAMPLE-02"
+section = "Bunch example"
+class = "implemented"
+claim = "The bunch example generates a 1000-particle input, requests 64 diagnostic turns, and writes dashboard and data products."
+source = "EX02"
+lines = [8, 18]
+checks = [{ kind = "contains", text = "particles=1000" }, { kind = "contains", text = "turns=64" }]
+status = "code_mapped"
+
+[[claims]]
+id = "ERR-01"
+section = "EFIELD supported fields and guard"
+class = "implemented"
+claim = "The EFIELD API applies the named alignment and integrated normal/skew multipole columns and rejects other unsupported nonzero fields before mutation."
+source = "CORE"
+symbol = "PTC.apply_madx_error_table"
+lines = [381, 405]
+status = "code_mapped"
+
+[[claims]]
+id = "TRACK-02"
+section = "Coordinate interpretation"
+class = "unresolved"
+claim = "The physical units and complete sign/coordinate meaning of the six-value Python-to-PTC conversion require physics review."
+owner = "PyPTC physics reviewer"
+route = "Compare the wrapper conversion with the pinned PTC/MAD-X coordinate contract and record a named sign/unit review."
+status = "physics_review_pending"
+
+[[claims]]
+id = "TRACK-03"
+section = "Basic bunch tracking"
+class = "implemented"
+claim = "track_bunch validates and copies an N x 6 array, advances it through each machine node for each requested turn, and returns final values or per-turn snapshots."
+source = "CORE"
+symbol = "PTC.track_bunch"
+lines = [981, 1011]
+status = "code_mapped"
+
+[[claims]]
+id = "PHYS-01"
+section = "Optics field interpretation"
+class = "unresolved"
+claim = "The physical meaning, unit convention, and validity range of returned optics/orbit values are not established by field names alone."
+owner = "Accelerator physicist familiar with the ISIS RCS model"
+route = "Review against the current PyPTC implementation, authoritative PTC/MAD-X definitions, and benchmark evidence."
+status = "physics_review_pending"
+
+[[claims]]
+id = "ERR-02"
+section = "EFIELD field semantics"
+class = "unresolved"
+claim = "The complete physical unit/sign mapping of MAD-X EFIELD alignment and multipole fields at the PyPTC boundary awaits review."
+owner = "PyPTC physics reviewer"
+route = "Compare current MAD-X EFIELD documentation and implementation with the PyPTC shim and retained side-by-side case."
+status = "physics_review_pending"
+
+[[claims]]
+id = "LIT-01"
+section = "Literature context"
+class = "domain_interpretation"
+claim = "The literature describes PTC/FPP capabilities that must not be equated automatically with the narrower PyPTC Python interface."
+authority = "Forest, Schmidt and McIntosh (2002); Forest and Schmidt (2010); Forest, Nogiwa and Schmidt (2006); Schmidt (2005); Skowronski, Schmidt and Forest (2007)."
+status = "physics_review_pending"
+
+[[claims]]
+id = "PROV-01"
+section = "Frozen source identity"
+class = "derived"
+claim = "The document basis is frozen to commit 8824003c956390e921a1d469f77c247859a63258 and its source hashes."
+verification = "Ran git rev-parse HEAD and sha256sum for implementation files and template assets on 2026-10-30; values recorded in SOURCE_MANIFEST.csv."
+status = "derived_checked"
+
+[[claims]]
+id = "PROV-02"
+section = "Review status"
+class = "unresolved"
+claim = "Code correspondence, physics interpretation, and reader usefulness have not yet received named human review."
+owner = "PyPTC maintainer and designated physics/reader reviewers"
+route = "Name reviewers, complete the evidence skill acceptance questions, and update claim statuses only after recorded review."
+status = "reader_review_pending"
+
+[[claims]]
+id = "PROV-03"
+section = "Copied figures"
+class = "derived"
+claim = "The report plots are exact copies of the listed repository images, verified by matching SHA-256 hashes."
+verification = "Compared sha256sum of each copied PNG with its source PNG on 2026-10-30; hashes are recorded in FIGURE_MANIFEST.csv."
+status = "derived_checked"
+
+[[claims]]
+id = "PROV-04"
+section = "Golden case review"
+class = "unresolved"
+claim = "The figures are examples and have not yet been approved as golden cases or scientific acceptance evidence."
+owner = "PyPTC maintainer and physics reviewer"
+route = "Select and rerun named golden cases through their campaign evidence records before assigning acceptance meaning."
+status = "reader_review_pending"
+
+[[figures]]
+id = "FIG-01"
+path = "pyptc_documentation/tech_note/figures/bare_twiss_closed_orbit.png"
+sha256 = "f35adc8b99ad6be090cfd9d7180336e91f3a13426114cd6b45ef8bd60442c805"
+claims = ["PROV-03"]
+selection = "Representative stored output from the bare Twiss/closed-orbit example."
+quantity_units = "Plot-specific axes and field labels; interpretation review pending."
+supports = "The repository example produces an optics/orbit diagnostic image; it does not establish a reference-model comparison."
+
+[[figures]]
+id = "FIG-02"
+path = "pyptc_documentation/tech_note/figures/bunch_initial_dashboard.png"
+sha256 = "b309b064c9c68d324ebd6f70d2f26be0140286a280bed8ddf6740f674bd8c245"
+claims = ["PROV-03"]
+selection = "Stored initial dashboard from the standard bunch example."
+quantity_units = "Dashboard labels; physical conventions pending review."
+supports = "Shows an example dashboard artifact only."
+
+[[figures]]
+id = "FIG-03"
+path = "pyptc_documentation/tech_note/figures/bunch_final_dashboard.png"
+sha256 = "cb81c7f63d5601625c50f963c89ba760c7d3cefc344f9dd659018e7fffcc5f34"
+claims = ["PROV-03"]
+selection = "Stored final dashboard corresponding to FIG-02."
+quantity_units = "Dashboard labels; physical conventions pending review."
+supports = "Shows an example dashboard artifact only."
+
+[[figures]]
+id = "FIG-04"
+path = "pyptc_documentation/tech_note/figures/aperture_loss_map.png"
+sha256 = "6297553b47f5d54e2f9c870fce6388f71a15bd6a2612c1d972eecd52d7f77a7a"
+claims = ["PROV-03", "PROV-04"]
+selection = "Stored aperture/loss example map."
+quantity_units = "Axes and fields as shown; physical interpretation pending review."
+supports = "Shows output visualization and is explicitly not a validated aperture acceptance result."
+
+[[figures]]
+id = "FIG-05"
+path = "pyptc_documentation/tech_note/figures/misalignment_response.png"
+sha256 = "8d0d798343e78f04dee097e8da035ae2a012e3a56a2173209726a6ef74a9cdff"
+claims = ["PROV-03", "PROV-04"]
+selection = "Stored single-element misalignment response example."
+quantity_units = "Orbit display fields; physical interpretation pending review."
+supports = "Demonstrates a path in the example script, not a machine-calibrated prediction."
+
+[[figures]]
+id = "FIG-06"
+path = "pyptc_documentation/tech_note/figures/efield_comparison.png"
+sha256 = "031f75b5aa1158d01c7384ddc09b08a698f820f2908030734dd9ea6cfa1ea934"
+claims = ["PROV-03", "ERR-02", "PROV-04"]
+selection = "Stored survey-table MAD-X/PyPTC EFIELD side-by-side example."
+quantity_units = "Companion aligned profile CSV describes plotted quantities; interpretation pending review."
+supports = "Shows one comparison workflow and its plot; companion report explicitly disclaims tolerance-based acceptance."
+
+[[figures]]
+id = "FIG-07"
+path = "pyptc_documentation/tech_note/figures/madx_closed_orbit_comparison.png"
+sha256 = "89bb637bf2ddfa09d27d5920f83fc575172dae1359febd43da98040cbe665d91"
+claims = ["PROV-03", "PROV-04"]
+selection = "Stored full error-table closed-orbit comparison output."
+quantity_units = "Horizontal and vertical orbit fields; interpretation/tolerance review pending."
+supports = "Shows the specific stored comparison only; no universal tolerance is inferred."

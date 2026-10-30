@@ -1,0 +1,16 @@
+\section{Introduction and scope}
+\label{sec:introduction}
+
+PyPTC is the Python interface in this repository to a standalone PTC shared library. This note explains what a user can invoke through the Python package and how those calls reach the library. It is a guide to this implementation snapshot; it is not a general PTC manual, a MAD-X command guide, or a statement of ISIS operating policy. [claim:API-01]
+
+PTC literature describes a broader polymorphic tracking and map-analysis system, including real and Taylor arithmetic and geometric lattice structures \cite{ForestSchmidtMcIntosh2002}. That context explains the lineage of the underlying code, but it does not prove that a feature is available in PyPTC. The exposed Python names, ABI symbols, and explicit unsupported-feature guards define the interface documented here. [claim:LIT-01]
+
+The evidence basis is PyPTC commit \texttt{8824003c956390e921a1d469f77c247859a63258}; hashes and source roles are in \path{provenance/SOURCE_MANIFEST.csv}. This is an unreviewed draft. Physics meanings, sign conventions, operational suitability, and numerical acceptance criteria are not approved by this document. [claim:PROV-01]
+
+\subsection{How to read evidence labels}
+
+Claims tagged \texttt{implemented} describe behavior visible in the frozen source. \texttt{derived} claims report a named computation or execution. \texttt{domain\_interpretation} requires a domain authority and physics review. \texttt{unresolved} marks details not established by available evidence. The claim ledger in \path{provenance/CLAIMS.toml} records source symbols, line ranges, hashes, checks, and review status. [claim:PROV-02]
+
+\subsection{PTC literature in context}
+
+The original PTC report introduces PTC's symplectic-integrator, polymorphic Taylor, and fibre-bundle concepts \cite{ForestSchmidtMcIntosh2002}. Forest and Schmidt's PTC User's Reference Manual describes state, geometry, and tracking routines \cite{ForestSchmidtPTCManual2010}. Later author papers describe FPP and the MAD-X/PTC integration \cite{ForestNogiwaSchmidt2006FPPPTC,ForestNogiwaSchmidt2006FPPDoc,Schmidt2005MADXPTC,SkowronskiSchmidtForest2007}. These sources provide context for the underlying library and other interfaces; they are not PyPTC conformance tests. See the curated narrative and access record in \path{../literature_review.md}. [claim:LIT-01]

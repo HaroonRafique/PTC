@@ -1,0 +1,24 @@
+\section{Evidence, limitations, and review status}
+\label{sec:evidence}
+
+The figures included in this note are byte-identical copies of repository outputs. The figure manifest gives each source path, hash, command or run context, selection rationale, and the limited claim it supports. Source code hashes, the claim ledger, and literature PDF access status are maintained alongside this note. [claim:PROV-03]
+
+The literature describes broad PTC capabilities, but the current PyPTC wrapper exposes a narrower and versioned subset. This note does not establish validation for an ISIS machine model, acceptance tolerances, or operational use. Existing admission and MAD-X optics benchmark work has its own feedback, ledger, and attempt evidence and must be reviewed through those campaign records. [claim:LIT-01]
+
+\subsection{Unresolved interpretation items}
+
+The following items require named human review before this note can be treated as approved technical guidance:
+\begin{itemize}
+  \item Python bunch coordinates versus the internal PTC coordinate slots, including units, signs, and longitudinal scaling. [claim:TRACK-02]
+  \item The meaning and unit convention of returned Twiss, orbit, chromaticity, and phase fields. [claim:PHYS-01]
+  \item MAD-X EFIELD alignment/multipole unit and sign mapping at the PyPTC boundary. [claim:ERR-02]
+  \item Which repository examples and benchmark cases are suitable as approved golden cases. [claim:PROV-04]
+\end{itemize}
+
+\subsection{Review gates}
+
+Code correspondence: pending. Physics interpretation: pending. Reader usefulness: pending. No agent has marked any claim reviewed. A future reviewer should be named in \texttt{CLAIMS.toml}, answer the acceptance questions in the evidence skill, and record the review date and disposition. [claim:PROV-02]
+
+\subsection{Reproducibility record}
+
+The source manifest records the checked-out commit and hashes. The quick-start build command is \texttt{bash build/build\_ptc.sh}; the note itself is built from this directory with \texttt{pdflatex} and \texttt{bibtex}. The execution log, exact commands, result, PDF hash, and page-inspection notes are recorded in \texttt{PLAN.md}. Drafting used an AI assistant with human review pending. [claim:PROV-01]

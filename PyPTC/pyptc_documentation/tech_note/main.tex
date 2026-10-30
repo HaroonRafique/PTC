@@ -1,0 +1,39 @@
+\documentclass{isistechreport}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,shapes.geometric}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\title{PyPTC: A User Guide to the Standalone Python Interface for PTC}
+\author{Draft for code, physics, and reader review\\ISIS Neutron and Muon Source, Rutherford Appleton Laboratory}
+\documentlabel{ISIS Technical Note --- DRAFT}
+\email{Review status: pending}
+\keywords{ISIS RCS, PyPTC, PTC, Python interface, tracking, optics}
+\date{30 October 2026}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+This draft documents the standalone PyPTC Python interface in this repository. It follows the user path from building the shared library and selecting a lattice to querying optics, tracking particles, applying apertures and errors, and inspecting outputs. It distinguishes code behavior from accelerator-physics interpretation and from functions available in the underlying PTC library but not exposed by PyPTC. Claims are tied to a frozen source revision; code correspondence, physics interpretation, and reader usefulness remain pending human review.
+\end{abstract}
+\tableofcontents
+\clearpage
+
+\input{sections/introduction.tex}
+\input{sections/quick_start.tex}
+\input{sections/user_path.tex}
+\input{sections/api_map.tex}
+\input{sections/optics.tex}
+\input{sections/tracking.tex}
+\input{sections/edits_and_boundaries.tex}
+\input{sections/evidence_and_review.tex}
+
+\section{References}
+\nocite{ForestSchmidtMcIntosh2002,ForestNogiwaSchmidt2006FPPPTC,ForestNogiwaSchmidt2006FPPDoc,Schmidt2005MADXPTC,SkowronskiSchmidtForest2007,MADXPTCManual2006,ForestSchmidtPTCManual2010,Forest2016Tracking}
+\bibliographystyle{plain}
+\bibliography{../references}
+\end{document}

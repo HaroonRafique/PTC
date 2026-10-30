@@ -1,0 +1,49 @@
+\section{Quick start}
+\label{sec:quick-start}
+
+\begin{center}
+\begin{tikzpicture}[node distance=9mm and 11mm, box/.style={draw,rounded corners,align=center,text width=34mm,minimum height=10mm}, arr/.style={-{Stealth},thick}]
+\node[box] (src) {PyPTC source and compiler tools};
+\node[box,right=of src] (build) {Build \texttt{libpyptc.so}};
+\node[box,right=of build] (lattice) {Load flat-file lattice};
+\node[box,below=of lattice] (api) {Call Python API};
+\node[box,left=of api] (result) {Inspect arrays, CSV, PNG, JSON};
+\draw[arr] (src)--(build); \draw[arr] (build)--(lattice); \draw[arr] (lattice)--(api); \draw[arr] (api)--(result);
+\end{tikzpicture}
+\end{center}
+The diagram summarizes the source-level user path; each box is described in the sections that follow. [claim:API-01]
+
+\subsection{Build and import}
+
+From the repository root, run the documented local build command:
+\begin{verbatim}
+bash build/build_ptc.sh
+python3 -c "from pyptc import PTC; print('PyPTC import OK')"
+\end{verbatim}
+The build script requires \texttt{meson} and \texttt{nm}, compiles the shared library under \texttt{build\_pyptc/}, checks exported symbols, and performs a ctypes load smoke check. A successful import alone does not establish that the lattice loads or that a physical calculation is validated. [claim:BUILD-01]
+
+\subsection{Minimal lattice and optics call}
+
+The default lattice constant resolves to the generated simplified flat file. A helper generates the file if it is absent, empty, or explicitly requested for regeneration. A legacy readiness file is separately named and is not the default. [claim:LATTICE-01]
+
+\begin{verbatim}
+from pyptc import PTC, DEFAULT_LATTICE
+
+ptc = PTC()
+ptc.init_lattice(DEFAULT_LATTICE)
+ptc.update_twiss()
+print(ptc.tunes())
+rows = ptc.all_node_twiss_orbit()
+print(f"rows: {len(rows)}")
+\end{verbatim}
+The method sequence is directly exposed in the Python wrapper. The exact numeric values depend on the selected lattice and build and should be recorded with those inputs. This excerpt is a starter workflow, not a tolerance or acceptance test. [claim:API-02]
+
+\subsection{Expected output and next steps}
+
+The plotting examples write user-facing files under \texttt{test\_outputs/}; the bare optics example writes a Twiss/orbit plot, CSV rows, and a JSON summary. The bunch example writes separate initial/final dashboards and diagnostic CSV products. Run the matching example script to regenerate outputs; copied figures in this note are frozen repository artifacts and are not generated during LaTeX compilation. [claim:EXAMPLE-01]
+
+\begin{verbatim}
+python3 examples/01_plot_bare_twiss_closed_orbit.py
+python3 examples/02_track_bunch_dashboard.py
+\end{verbatim}
+For installation details, lattice generation inputs, and dependencies, follow the repository README and example-specific script. [claim:BUILD-01]
