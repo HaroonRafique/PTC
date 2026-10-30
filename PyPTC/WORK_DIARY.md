@@ -943,3 +943,72 @@ retrieval limits are recorded in
 [`pyptc_documentation/PLAN.md`](pyptc_documentation/PLAN.md). No commit or push
 was made at the time this entry was drafted; this entry is included with the
 documentation package commit.
+
+## 2026-10-30 — Prepare PyPTC linear-optics iteration 0005
+
+Captured the updated optics skill at shared-repository commit
+`3aad35af0ad53337fc259e14d0d614fd55821aa`, SHA-256
+`b57248367f33b0985b136bf119cb366fc03604d47a34e52fb05aaa42518994ae`, and its
+`OPTICS-BASELINE-2026-10-28-v1` tolerance reference, SHA-256
+`77bb8564d562a0a72b1eae738b097d6d614177f40db4abe01f81cb5236d671c8`, into
+benchmark iteration 0005. The stable step-level runner and setup now select
+that snapshot and a new `scripts/python/iteration_0005/` workflow module.
+
+Updated the run analysis for per-case baseline classifications, full tune
+branch matching, API-level-5 PyPTC `dQ/dPT` conversion to `dQ/d(delta_p)` using
+run-local beta0, explicit plane-optics/coupling/RF/harmonic scope, and a
+source-to-MAD-X-ESAVE field audit. Corrector x/y response criteria are
+recorded while application status remains pending because no meaningful
+response floor is reviewed. The new renderer makes one compact stitched PNG
+per included case; normal-size visual inspection remains outstanding until a
+user run produces plots. Thick tracking remains a separate diagnostic and
+does not gate the transverse optics outcome.
+
+The iteration carries forward the prior runner scaffolding and 38-case
+inventory, with the analysis revised against the new skill; it also reuses the
+validated PTC boundary/tracking adapters from earlier iterations. This reuse
+is recorded in the iteration README. At preparation time no benchmark attempt
+had run; Python and shell syntax and the unique 38-case inventory were checked
+only. Attempt 020 subsequently ran and is recorded below. This is preparation
+evidence for the next skill application under the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+## 2026-10-30 — Assess user-run optics attempt 020
+
+Assessed the iteration-0005 user run against the exact copied skill revision
+`3aad35af0ad53337fc259e14d0d614fd55821aa`, then compared the generated EFIELD
+path with the existing PyPTC example and parser tests. Feedback 0019 is the
+immutable attempt record; the review ledger and run index now identify the
+attempt as assessed without acceptance. The campaign README was corrected to
+link to the user-run result.
+
+The attempt's canonical outcome `incomplete-perturbation-execution` is correct:
+30/38 cases completed and were plotted, and all 586 nominal MAD-X element exits
+mapped to PyPTC nodes at `1e-9 m`. Six isolated misalignment cases and both
+survey EFIELD cases stopped in `audit_error_table_esave()` before the PyPTC
+worker ran. Root cause is that `parse_tfs()` requires `S`, which is valid for
+TWISS profiles but absent from EFIELD error tables. Existing
+`tests/test_efield_api.py` parses no-S EFIELD data and the stored EFIELD example
+uses the public application API, so this is a benchmark-harness defect, not
+evidence of unsupported PyPTC API behavior.
+
+Nominal tune and phase metrics and converted chromaticity metrics exceed the
+provisional screen. All 30 plot manifest flags remain false for normal-size
+visual inspection; inspected nominal and corrector composites are too tall to
+read at normal fit size. Thick tracking completed as a separate diagnostic,
+with agreement pending tolerance and human review. All eight failed cases,
+plot readability, response floors, physical interpretation, and the remaining
+phase/chromaticity discrepancies keep the attempt unaccepted. The report,
+result, manifest, case inventory, plot manifest and key output hashes, exact
+workflow code hashes, and required follow-up are retained in
+`steps/benchmark-pyptc-linear-optics-against-madx/feedback/0019-user-run-attempt-020-assessment.md`.
+
+No publication completion (`REP`) record is appropriate while the benchmark is
+technically incomplete. This review is local campaign evidence under the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+Attempt retention was then inspected with the step's prune-script dry run. After
+feedback 0019, the attempt index, and review-ledger records were complete,
+attempt 017 was pruned under the three-bundle retention rule. Its report,
+result, and manifest hashes and outcome remain in the review ledger and
+feedback 0015. Raw attempts 018–020 are retained.

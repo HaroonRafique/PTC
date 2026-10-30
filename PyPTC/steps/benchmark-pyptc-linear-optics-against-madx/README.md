@@ -54,9 +54,9 @@ external candidate. The API investigation and side-by-side example are in
 `investigations/0001-efield-api.md` and
 `../../test_outputs/06_madx_efield_api/`. Feedback 0015 and attempt 017 remain
 historical evidence of the earlier diagnostic, not a user-run review or
-tolerance/physics acceptance.
-Chromaticity responses remain native and blocked until the target derivative
-coordinate is established.
+tolerance/physics acceptance. The iteration-0004 chromaticity status reflects
+the evidence then available; iteration 0005 incorporates the updated API-level-5
+derivative-coordinate finding.
 
 Tracking defaults to thick MAD-X `PTC_TRACK` and accepts the optional
 `PYPTC_BENCHMARK_TRACKING_MODE=both` setting to also retain a separately
@@ -65,6 +65,17 @@ the limitations and command details. Iteration 0004 pins a working-tree skill
 snapshot and explicitly discloses reuse of the verified iteration-0003
 boundary/tracking adapter; it is not represented as a from-scratch rewrite of
 those code-specific helpers.
+Iteration 0005 pins the updated committed skill revision
+`3aad35af0ad53337fc259e14d0d614fd55821aa` and baseline
+`OPTICS-BASELINE-2026-10-28-v1`. The stable shell runner now invokes
+`scripts/python/iteration_0005/benchmark_pyptc.py`. This iteration applies the
+shared per-case profile/scalar criteria, records full-branch tunes and the
+PyPTC API-5 chromaticity conversion, includes the source-to-MAD-X-ESAVE audit,
+and declares coupling/RF/harmonic scope per case. It keeps tracking separate
+from transverse optics classification and uses a compact one-PNG-per-case
+layout. See [`iteration-0005/README.md`](iteration-0005/README.md) for exact
+hashes, reuse disclosures, and limits. User-run attempt 020 is assessed in
+[`feedback/0019-user-run-attempt-020-assessment.md`](feedback/0019-user-run-attempt-020-assessment.md): 30/38 cases completed and plotted; eight EFIELD/misalignment cases stopped in the MAD-X source-to-ESAVE audit before PyPTC ran. The nominal element map verified, but tunes/phases and converted chromaticities are out of the provisional screen; plot normal-size review is incomplete. The attempt remains technically incomplete and unaccepted.
 The stable shell orchestrator is under `scripts/shell/`; Python workflow code
 is under `scripts/python/`. Attempt bundles contain results and provenance,
 not executable runner scripts.

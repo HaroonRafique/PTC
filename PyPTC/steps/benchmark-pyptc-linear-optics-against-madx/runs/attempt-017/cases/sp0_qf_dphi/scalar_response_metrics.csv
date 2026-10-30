@@ -1,6 +1,0 @@
-case_id,observable,units,reference_nominal,reference_perturbed,reference_response,target_nominal,target_perturbed,target_response,response_residual,classification
-sp0_qf_dphi,bare_horizontal_tune,tune units,0.3160007809999996,0.31600077399999993,-6.999999691004177e-09,0.31605467692091,0.31605468004877,3.12786002654164e-09,1.0127859717545817e-08,pending-tolerance
-sp0_qf_dphi,bare_vertical_tune,tune units,0.7650000879999999,0.7649998949999999,-1.9299999998168005e-07,0.76510661554073,0.76510646329566,-1.5224506999533816e-07,4.075492998634189e-08,pending-tolerance
-sp0_qf_dphi,circumference,m,163.36282,163.36282,0.0,163.36281999999989,163.36281999999989,0.0,0.0,pending-tolerance
-sp0_qf_dphi,bare_horizontal_chromaticity,native derivative response; cross-code coordinate unresolved,-4.745390843,-4.745390878,-3.5000000231377726e-08,-4.745307640951764,-4.745307888943615,-2.479918510545076e-07,,blocked; native chromaticity coordinate unresolved
-sp0_qf_dphi,bare_vertical_chromaticity,native derivative response; cross-code coordinate unresolved,-4.806168146,-4.806168014,1.3200000026358794e-07,-4.806147200304224,-4.806146942243617,2.580606066615587e-07,,blocked; native chromaticity coordinate unresolved
