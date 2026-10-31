@@ -359,6 +359,29 @@ It links the run artefacts and relevant Task 6 longitudinal-evidence and Task
 9 event-maintenance requirements in the
 [evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
 
+## 2026-10-31 — Correct bunch tracking energy-coordinate conversion
+
+Following the source audit recorded above and committed in `f457621`, corrected
+the Python bunch helpers' fifth-coordinate conversion. The Python/PyParticleBunch
+`dE` is a total-energy offset, while the default PTC state used by these
+tracking helpers expects relative momentum deviation `delta`. The previous
+`dE/p0c` mapping treated an energy offset as a momentum offset and missed the
+relativistic beta dependence. New shared conversion helpers use the exact
+energy-momentum relation, deriving rest mass from synchronous `p0c` and
+`beta0`; the inverse conversion is applied to returned tracking coordinates.
+`track_bunch`, `track_bunch_with_losses`, and `particle_diagnostics` now share
+the mapping. The existing longitudinal `L=-z/beta0` conversion is preserved.
+Raw `track_particle_ptc` and `track_particle_ptc_with_loss` remain low-level
+interfaces that accept coordinates for the active PTC state without conversion.
+
+Updated the capability guide and technical-note tracking section and claim
+ledger to state the code/manual coordinate contract, equations, and low-level
+API boundary. Physics review remains pending for use beyond this state and
+operating regime. `python -m py_compile pyptc/core.py` passed; no physics run or
+full workflow test was performed. The earlier chromaticity reassessment is a
+separate commit; this source, documentation, provenance, and diary update is
+the follow-up implementation commit.
+
 ## 2026-10-28 — Case inventory orchestration smoke
 
 Updated the step-level optics runner to record the complete 38-case Xsuite
@@ -1044,3 +1067,44 @@ Attempt 022 used the unchanged iteration-0005 skill and the runner correction co
 Across completed cases 440/532 profile metrics are within and 92 are out of the provisional screen; 152/190 scalar metrics are out, including tunes and converted chromaticities on every case. Thick tracking completed with tolerance review pending. I inspected the nominal and one corrector plot: the nominal summary is clearer, but the corrector response table still overlaps and some titles are clipped. The plot readability gate, numerical discrepancies, provisional tolerances, and response floors remain open. No `REP` record is warranted.
 
 Feedback 0021, the run index, review ledger, iteration README, and step README now record the result. After the prune-script dry run and preserving attempt 019's report/result/manifest hashes in feedback 0018 and the ledger, attempt 019 was pruned under the three-bundle rule. Attempts 020–022 remain. This local evidence remains linked to the [evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+## 2026-10-31 — Reassess chromaticity coordinates and tracking input
+
+Reopened investigation 0002 after the user challenged the beta0 conversion:
+the near-equal MAD-X/PyPTC raw chromaticities and the established MAD-X
+dispersion scaling warranted a code-path audit. The MAD-X manual's generic
+`PT` derivative definitions are not sufficient for the pinned 5.02.00 binary;
+the official release history records that `TWISS, CHROM` changed from
+`DELTAP` to `PT` in 5.06.00, and the exact-recipe 5.02.00 finite-difference
+scan matches the retained `DQ` headers as per `DELTAP`.
+
+The PTC manual documents distinct `DELTA` and `PT` normal-form states. The
+Python/Fortran path for `PTC.chromaticities()` reaches
+`lattice_GET_CHROM`, which explicitly adds `NOCAVITY0`, `DELTA0`, and
+`ONLY_4D0` before extracting the `x5` normal-form coefficient; the PyPTC ABI
+does not scale the result. A new 8,192-turn diagnostic compared the default
+state (which expects momentum deviation) with the state used by the API. It
+reproduced the earlier factor-of-beta discrepancy when the old `dE/p0c`
+input was supplied in default state, and the state-matched `NOCAVITY + DELTA +
+ONLY_4D` scan reproduced the API slope, closely in both planes and especially
+vertically. The prior report's inference that the API was per `PT` is
+withdrawn.
+
+Attempt 022's native chromaticity fields were re-evaluated across all cases:
+all 38 horizontal cases are within provisional limits and 24/38 vertical
+cases are within, with 14 vertical cases out. Its scalar-out count changes
+from the erroneous 152/190 to 90/190; attempt files remain unmodified and
+feedback 0022 supersedes the chromaticity interpretation in feedback 0021.
+Investigation 0003 includes the requested step-by-step MAD-X manual/PTC manual
+and Python/Fortran walkthrough, citations, hashes, and remaining limitations.
+
+The source audit also identified a likely PyPTC tracking-helper defect:
+`particle_diagnostics` and related wrappers put `dE/p0c` into a default-state
+fifth slot that represents `delta`. The matching conversion and inverse,
+including longitudinal coordinate handling, need a separate code change and
+regression check. The runner and iteration-0005 skill's chromaticity
+conversion also need review before another benchmark. No production API,
+runner, or shared skill was changed in this investigation, and attempt 022 is
+still unaccepted. Feedback 0022, investigation 0003, the ledger, run index,
+README, and this diary link the correction to the
+[evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).

@@ -93,6 +93,19 @@ implied. Any later run should follow the reviewed runner/readability fixes and
 retain the same skill and tolerance hashes unless a separately reviewed skill
 update is applied.
 
+Supplemental investigation 0003 found that the attempt-022 chromaticity
+conversion was incorrect: the PyPTC getter and MAD-X 5.02.00 `DQ` are both per
+`DELTAP` for these code paths. The corrected scalar screen is 90/190 out of
+provisional limits, including 14 vertical chromaticity cases. The nominal and
+all 38 case values remain unchanged. The default-state PyPTC particle tracking
+helper also appears to supply an energy-normalized value where the state
+expects momentum deviation. See
+[`feedback/0022-chromaticity-coordinate-reassessment.md`](../feedback/0022-chromaticity-coordinate-reassessment.md)
+and [`investigations/0003-chromaticity-coordinate-reassessment.md`](../investigations/0003-chromaticity-coordinate-reassessment.md).
+Do not launch another benchmark with the current chromaticity conversion or
+assume tracking diagnostics have a verified longitudinal coordinate until the
+runner/API correction is reviewed.
+
 The follow-up runner correction uses the declared `source_occurrence` and
 `source_index` dictionaries, and the deterministic checks now import the
 iteration-0005 module rather than the older step-level module. A no-`S`

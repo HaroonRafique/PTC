@@ -166,6 +166,11 @@ The latest user run, attempt 022, is recorded in
 All 38 cases completed, including the eight EFIELD/misalignment cases that
 previously stopped in the runner audit. Their source-to-ESAVE audits each
 compare 3,838 values with zero mismatches. The run still needs human review:
-profile/scalar metrics exceed provisional limits, and the representative
-corrector response plot has overlapping table text. No acceptance or
-publication completion is implied.
+profile metrics exceed provisional limits, the representative corrector
+response plot has overlapping table text, and response tolerances remain
+pending. Supplemental feedback 0022 and investigation 0003 correct attempt
+022's chromaticity coordinate interpretation: no `beta0` factor applies to
+the PyPTC getter or MAD-X 5.02.00 `DQ`; 90/190 scalar metrics are now classified
+outside provisional limits, with 14 vertical chromaticities still out. No
+acceptance or publication completion is implied. The runner and skill need a
+separate reviewed correction before the next benchmark run.

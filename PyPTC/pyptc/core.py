@@ -24,6 +24,58 @@ C_DOUBLE_P = ctypes.POINTER(ctypes.c_double)
 C_INT_P = ctypes.POINTER(ctypes.c_int)
 
 
+def _energy_deviation_to_delta(d_e: float, p0c: float, beta0: float) -> float:
+    """Convert total-energy deviation to PTC's relative momentum deviation."""
+
+    p0c = float(p0c)
+    beta0 = float(beta0)
+    d_e = float(d_e)
+    if p0c <= 0.0 or not 0.0 < beta0 <= 1.0:
+        raise ValueError(f"Invalid synchronous reference p0c={p0c}, beta0={beta0}")
+    e0 = p0c / beta0
+    mass_squared = max(0.0, e0 * e0 - p0c * p0c)
+    energy = e0 + d_e
+    if energy <= 0.0 or energy * energy < mass_squared:
+        raise ValueError("Energy deviation gives an unphysical momentum")
+    return float(np.sqrt(max(0.0, energy * energy - mass_squared)) / p0c - 1.0)
+
+
+def _delta_to_energy_deviation(delta: float, p0c: float, beta0: float) -> float:
+    """Convert PTC's relative momentum deviation to total-energy deviation."""
+
+    p0c = float(p0c)
+    beta0 = float(beta0)
+    delta = float(delta)
+    if p0c <= 0.0 or not 0.0 < beta0 <= 1.0:
+        raise ValueError(f"Invalid synchronous reference p0c={p0c}, beta0={beta0}")
+    if delta <= -1.0:
+        raise ValueError(f"Relative momentum deviation must exceed -1, got {delta}")
+    e0 = p0c / beta0
+    mass_squared = max(0.0, e0 * e0 - p0c * p0c)
+    momentum = p0c * (1.0 + delta)
+    return float(np.sqrt(mass_squared + momentum * momentum) - e0)
+
+
+def _pyorbit_to_ptc_coordinates(coords: Iterable[float], p0c: float, beta0: float) -> np.ndarray:
+    """Map ``x,xp,y,yp,z,dE`` to default-state PTC ``x,px,y,py,delta,L``."""
+
+    x, xp, y, yp, z, d_e = np.asarray(list(coords), dtype=float)
+    return np.array(
+        [x, xp, y, yp, _energy_deviation_to_delta(d_e, p0c, beta0), -z / float(beta0)],
+        dtype=float,
+    )
+
+
+def _ptc_to_pyorbit_coordinates(coords: Iterable[float], p0c: float, beta0: float) -> np.ndarray:
+    """Map default-state PTC ``x,px,y,py,delta,L`` to ``x,xp,y,yp,z,dE``."""
+
+    x, xp, y, yp, delta, path_length = np.asarray(list(coords), dtype=float)
+    return np.array(
+        [x, xp, y, yp, -path_length * float(beta0), _delta_to_energy_deviation(delta, p0c, beta0)],
+        dtype=float,
+    )
+
+
 def ensure_default_lattice(regenerate: bool = False) -> Path:
     """Return the generated simplified flat file, creating it if needed."""
 
@@ -629,17 +681,9 @@ class PTC:
         beta0 = self.scalar("ptc_get_beta0_")
         loss_info: list[dict[str, int | bool]] = []
         for particle_index in range(rows.shape[0]):
-            x, xp, y, yp, z, d_e = rows[particle_index]
-            ptc_coords = np.array([x, xp, y, yp, d_e / p0c, -z / beta0], dtype=float)
+            ptc_coords = _pyorbit_to_ptc_coordinates(rows[particle_index], p0c, beta0)
             tracked, info = self.track_particle_ptc_with_loss(ptc_coords, turns=turns)
-            rows[particle_index] = [
-                tracked[0],
-                tracked[1],
-                tracked[2],
-                tracked[3],
-                -tracked[5] * beta0,
-                tracked[4] * p0c,
-            ]
+            rows[particle_index] = _ptc_to_pyorbit_coordinates(tracked, p0c, beta0)
             loss_info.append({"particle": particle_index, **info})
         return rows, loss_info
 
@@ -714,10 +758,7 @@ class PTC:
             jy0, phase_y0 = self._twiss_action_phase(initial[2], initial[3], alpha_y, beta_y, orbit_y, orbit_yp)
             phases_x = [phase_x0]
             phases_y = [phase_y0]
-            ptc_coords = np.array(
-                [initial[0], initial[1], initial[2], initial[3], initial[5] / p0c, -initial[4] / beta0],
-                dtype=float,
-            )
+            ptc_coords = _pyorbit_to_ptc_coordinates(initial, p0c, beta0)
             lost = False
             lost_turn = 0
             lost_pos = 0
@@ -730,19 +771,13 @@ class PTC:
                     lost_pos = int(info["lost_pos"])
                     break
                 completed_turns = turn
-                py_coords = np.array(
-                    [ptc_coords[0], ptc_coords[1], ptc_coords[2], ptc_coords[3], -ptc_coords[5] * beta0, ptc_coords[4] * p0c],
-                    dtype=float,
-                )
+                py_coords = _ptc_to_pyorbit_coordinates(ptc_coords, p0c, beta0)
                 _jx, phase_x = self._twiss_action_phase(py_coords[0], py_coords[1], alpha_x, beta_x, orbit_x, orbit_xp)
                 _jy, phase_y = self._twiss_action_phase(py_coords[2], py_coords[3], alpha_y, beta_y, orbit_y, orbit_yp)
                 phases_x.append(phase_x)
                 phases_y.append(phase_y)
 
-            final = np.array(
-                [ptc_coords[0], ptc_coords[1], ptc_coords[2], ptc_coords[3], -ptc_coords[5] * beta0, ptc_coords[4] * p0c],
-                dtype=float,
-            )
+            final = _ptc_to_pyorbit_coordinates(ptc_coords, p0c, beta0)
             jx, _phase_x_final_now = self._twiss_action_phase(final[0], final[1], alpha_x, beta_x, orbit_x, orbit_xp)
             jy, _phase_y_final_now = self._twiss_action_phase(final[2], final[3], alpha_y, beta_y, orbit_y, orbit_yp)
             valid_tune = completed_turns >= int(min_tune_turns)
@@ -992,19 +1027,11 @@ class PTC:
                 p0c_enter = self.scalar("ptc_get_p0c_")
                 beta_enter = self.scalar("ptc_get_beta0_")
                 for particle_index in range(rows.shape[0]):
-                    x, xp, y, yp, z, d_e = rows[particle_index]
-                    ptc_coords = np.array([x, xp, y, yp, d_e / p0c_enter, -z / beta_enter], dtype=float)
+                    ptc_coords = _pyorbit_to_ptc_coordinates(rows[particle_index], p0c_enter, beta_enter)
                     tracked = self.track_particle_ptc(node_index, ptc_coords)
                     p0c_exit = self.scalar("ptc_get_p0c_")
                     beta_exit = self.scalar("ptc_get_beta0_")
-                    rows[particle_index] = [
-                        tracked[0],
-                        tracked[1],
-                        tracked[2],
-                        tracked[3],
-                        -tracked[5] * beta_exit,
-                        tracked[4] * p0c_exit,
-                    ]
+                    rows[particle_index] = _ptc_to_pyorbit_coordinates(tracked, p0c_exit, beta_exit)
                 self.lib.ptc_synchronous_after_(ctypes.byref(idx))
             if record_turns:
                 snapshots.append(rows.copy())

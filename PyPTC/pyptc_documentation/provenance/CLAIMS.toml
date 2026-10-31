@@ -173,7 +173,7 @@ class = "implemented"
 claim = "track_bunch_with_losses validates an N x 6 array, converts each row, tracks particles, and converts the final rows back."
 source = "CORE"
 symbol = "PTC.track_bunch_with_losses"
-lines = [624, 644]
+lines = [676, 688]
 status = "code_mapped"
 
 [[claims]]
@@ -253,11 +253,12 @@ status = "code_mapped"
 [[claims]]
 id = "TRACK-02"
 section = "Coordinate interpretation"
-class = "unresolved"
-claim = "The physical units and complete sign/coordinate meaning of the six-value Python-to-PTC conversion require physics review."
-owner = "PyPTC physics reviewer"
-route = "Compare the wrapper conversion with the pinned PTC/MAD-X coordinate contract and record a named sign/unit review."
-status = "physics_review_pending"
+class = "implemented"
+claim = "The bunch helpers map Python/PyParticleBunch total-energy deviation to PTC default-state relative momentum deviation using the synchronous p0c and beta0 and preserve the documented longitudinal sign/scale mapping; low-level particle methods forward raw PTC coordinates."
+source = "CORE"
+symbol = "_pyorbit_to_ptc_coordinates, _ptc_to_pyorbit_coordinates"
+lines = [24, 77]
+status = "code_mapped_manual_cross_checked_physics_review_pending"
 
 [[claims]]
 id = "TRACK-03"
@@ -266,7 +267,7 @@ class = "implemented"
 claim = "track_bunch validates and copies an N x 6 array, advances it through each machine node for each requested turn, and returns final values or per-turn snapshots."
 source = "CORE"
 symbol = "PTC.track_bunch"
-lines = [981, 1011]
+lines = [1016, 1038]
 status = "code_mapped"
 
 [[claims]]

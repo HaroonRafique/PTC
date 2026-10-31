@@ -1,5 +1,5 @@
 id,role,path,sha256,revision_or_identity,documented_scope
-PYCORE,implementation,pyptc/core.py,37a246d66da327f67e56b1069495c593739b5a4d69386cdb533193bd81e57ad3,8824003c956390e921a1d469f77c247859a63258,"PTC Python wrapper, initialization, queries, edits, tracking"
+PYCORE,implementation,pyptc/core.py,352030761ae8421e4eaa415ebdf38a7f08fdd0fcd95713c1fe347a40528159c0,"worktree descendant of f457621; content hash pins coordinate-fix version","PTC Python wrapper, initialization, queries, edits, tracking"
 PYINIT,implementation,pyptc/__init__.py,fe8ec3d5e3c42bb88a064d6c3f28ae59f2a12874a3817f7d235731c46f563b9f,8824003c956390e921a1a469f77c247859a63258,"Package exports"
 PYLATTICE,implementation,pyptc/lattice.py,1efaa2c2b314e447e9a01f398c564d76b1f0c0b431dce553e263a4538350800c,8824003c956390e921a1a469f77c247859a63258,"PTC flat-file fibre parsing and name resolution"
 PYOPTICS,implementation,pyptc/optics.py,fd1ea801f512469e81feeb2c0c944d9d3a89e8fbe232450e435e6a895f1e01a7,8824003c956390e921a1a469f77c247859a63258,"Convenience optics API and explicit unexposed functions"

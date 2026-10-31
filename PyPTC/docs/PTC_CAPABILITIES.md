@@ -38,9 +38,16 @@
     `run_misalignment_experiment.py --with-tunes`
 - Ramp, AC magnet, cavity, acceleration, modulation, timing, and orbit-state
   controls through focused `pyptc_*` ABI wrappers.
-- Particle and bunch tracking using the same coordinate convention as PyORBIT3:
-  - Python/PyParticleBunch: `x, xp, y, yp, z, dE`.
-  - PTC call: `x, xp, y, yp, pt=dE/p0c, ct=-z/beta0`.
+- Particle and bunch tracking helpers accept the Python/PyParticleBunch row
+  `x, xp, y, yp, z, dE`, where `dE` is total-energy deviation. The helper
+  converts it to PTC's default-state relative momentum deviation
+  `delta=p/p0-1` using the exact relativistic energy-momentum relation and the
+  current synchronous `p0c` and `beta0`; it converts the tracked `delta` back
+  to `dE` on return. The longitudinal mapping remains `L=-z/beta0`.
+- `track_particle_ptc()` and `track_particle_ptc_with_loss()` are low-level
+  interfaces: their six values are passed to PTC without Python/PyParticleBunch
+  coordinate conversion. Callers must supply coordinates for the active PTC
+  state themselves.
 - `pyptc.generate_matched_gaussian_4d`: bunch generation through the existing `/home/hr/Codes/pyparticlebunch` repo.
 - ISIS RCS MAD-X interoperability workflows under `PyPTC/workflows/madx/`:
   - regenerate simplified and aperture-lattice PTC flat files with bundled
