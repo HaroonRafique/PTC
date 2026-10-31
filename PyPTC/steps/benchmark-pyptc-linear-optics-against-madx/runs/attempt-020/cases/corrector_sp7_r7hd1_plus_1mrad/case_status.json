@@ -1,0 +1,129 @@
+{
+  "application_verification": {
+    "reason": "the shared baseline does not define minimum meaningful-response floors; numeric response and per-engine amplitudes are retained separately",
+    "reference_response_floor": null,
+    "reference_source_to_esave": null,
+    "status": "pending-meaningful-response-floor",
+    "target_response_floor": null
+  },
+  "capability_matrix": "capability_matrix.json",
+  "case_id": "corrector_sp7_r7hd1_plus_1mrad",
+  "chromaticity": {
+    "beta0": 0.3671331999295232,
+    "classification": "comparable; screening classification is per plane",
+    "common_coordinate": "dQ/d(delta_p)",
+    "planes": {
+      "x": {
+        "acceptance_owner": "provisional shared screening baseline; user/physics review pending",
+        "beta0": 0.3671331999295232,
+        "classification": "out-of-tolerance",
+        "conversion": "dQ/d(delta_p) = beta0 * dQ/dPT for PyPTC; MAD-X 5.02.00 DQ is already dQ/dDELTAP",
+        "converted_reference_dQ_d_delta_p": -4.746226591,
+        "converted_target_dQ_d_delta_p": -1.742454431085987,
+        "reason": "matched derivative coordinates converted using the pinned skill evidence",
+        "reference_definition": "MAD-X 5.02.00 DQ1/DQ2 = dQ/dDELTAP",
+        "reference_native": -4.746226591,
+        "signed_difference": 3.0037721599140133,
+        "target_definition": "PyPTC API-level-5 PTC.chromaticities() = dQ/dPT; skill evidence identifies PT=DeltaE/p0c",
+        "target_native": -4.74610967196777,
+        "tolerance": 0.0009,
+        "tolerance_source": "OPTICS-BASELINE-2026-10-28-v1"
+      },
+      "y": {
+        "acceptance_owner": "provisional shared screening baseline; user/physics review pending",
+        "beta0": 0.3671331999295232,
+        "classification": "out-of-tolerance",
+        "conversion": "dQ/d(delta_p) = beta0 * dQ/dPT for PyPTC; MAD-X 5.02.00 DQ is already dQ/dDELTAP",
+        "converted_reference_dQ_d_delta_p": -4.80633639,
+        "converted_target_dQ_d_delta_p": -1.7645905002635411,
+        "reason": "matched derivative coordinates converted using the pinned skill evidence",
+        "reference_definition": "MAD-X 5.02.00 DQ1/DQ2 = dQ/dDELTAP",
+        "reference_native": -4.80633639,
+        "signed_difference": 3.0417458897364593,
+        "target_definition": "PyPTC API-level-5 PTC.chromaticities() = dQ/dPT; skill evidence identifies PT=DeltaE/p0c",
+        "target_native": -4.806404053357967,
+        "tolerance": 0.00035,
+        "tolerance_source": "OPTICS-BASELINE-2026-10-28-v1"
+      }
+    },
+    "reference_finite_difference_method": "MAD-X TWISS, CHROM evaluates at DELTAP and DELTAP+step",
+    "reference_finite_difference_step_delta_p": 1e-06,
+    "reference_gamma": 1.075074172,
+    "reference_madx_version": "5.02.00",
+    "reference_native_definition": "MAD-X 5.02.00 DQ1/DQ2=dQ/dDELTAP, DELTAP=(p-p0)/p0; conversion factor 1",
+    "reference_nominal_delta_p": 0.0,
+    "reference_twiss_option": "TWISS, CHROM, DELTAP=0",
+    "target_api_method": "PTC.chromaticities() via PyPTC API level 5; derivative coordinate dQ/dPT",
+    "target_native_definition": "PyPTC API-level-5 PTC.chromaticities()=dQ/dPT",
+    "target_native_values": {
+      "chromx": -4.74610967196777,
+      "chromy": -4.806404053357967
+    }
+  },
+  "disposition": "included",
+  "execution_status": "completed",
+  "plot_path": "plots/cases/corrector_sp7_r7hd1_plus_1mrad.png",
+  "plot_status": "produced",
+  "reason": null,
+  "reference_application_status": "executed; case-local MAD-X input and TWISS retained",
+  "reference_model": {
+    "applied_error_table_sha256": null,
+    "binary_sha256": "426d2e88d42c14205d8930b2d720b7c5a5fffc7e499e3d0a7a4bf575e0110c04",
+    "case_override": {
+      "assignment_count": 1,
+      "file": "ISIS.strength",
+      "value_rad": 0.001,
+      "variable": "r7hd1_kick"
+    },
+    "chromaticity_calculation": {
+      "finite_difference_method": "MAD-X TWISS, CHROM; evaluates tunes at DELTAP and DELTAP+step",
+      "madx_version_convention": "5.02.00 DQ1/DQ2 = dQ/dDELTAP",
+      "nominal_delta_p": 0.0,
+      "step_delta_p": 1e-06,
+      "summary_fields": [
+        "DQ1",
+        "DQ2"
+      ],
+      "twiss_option": "TWISS, CHROM, DELTAP=0"
+    },
+    "command": [
+      "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/bin/madx-linux64_v5_02_00"
+    ],
+    "error_table": null,
+    "error_table_sha256": null,
+    "flat_file": "reference/case_flat_file.flt",
+    "flat_file_sha256": "9fd255ddc315602adad74dd2d05b278592296ed08d3c6f1dab73e079457bbf98",
+    "input_hashes": {
+      "2023.strength": "a66ca836e9bbdc6560b2196dbe02c12a3c1781bff0b74589d2995d7689f430ed",
+      "ISIS.elements": "33ec2aedddde548b4f19f9fe9dd26d48ce4445f36c2c118dfa82d239dda8dffa",
+      "ISIS.injected_beam": "2759a6ef97d7799412ba293c8fc788ad34c356ca3b7098acd2a106f7142c92df",
+      "ISIS.sequence": "3cfc1fbb8c39e0d455a0518c4c37abd28058e7e5937231e8bb7cc9462adc9e1d",
+      "ISIS.strength": "78bdfc506d7b4ebd13941674a1f6b1c2652559e46c7fee5627acdc82f80e50a9"
+    },
+    "log": "reference/madx.log",
+    "log_sha256": "4d485c1d3a5b7099eb3400c559a8b0db1ca2dd8a8ebf0337d3a5f49a5b2b7ae0",
+    "recipe": "reference/reference_recipe.madx",
+    "recipe_sha256": "42da3562728730cd88be87071fd941db5b6045c19d1ad8502aec2e9f5681c42a",
+    "rows": 586,
+    "tfs_sha256": "256380ff25c4ce30b8ad2ad438ed93103356c4f0b161bace8b346f06b0e58ce5"
+  },
+  "response_metrics": "cases/corrector_sp7_r7hd1_plus_1mrad/response_metrics.csv",
+  "scalar_response_metrics": "cases/corrector_sp7_r7hd1_plus_1mrad/scalar_response_metrics.csv",
+  "source_to_esave_audit": null,
+  "target_application_status": "executed; fresh PyPTC load of the case-local generated flat file",
+  "target_model": {
+    "applied_error_records": [],
+    "error_table": null,
+    "executed_api_calls": [
+      "PTC(library)",
+      "PTC.init_lattice(case_flat_file)",
+      "PTC.machine_summary()",
+      "PTC.tunes()",
+      "PTC.chromaticities()",
+      "PTC.all_node_twiss_orbit()",
+      "PTC.run_script(PRINTORBITNODES)"
+    ],
+    "flat_file": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/benchmark-pyptc-linear-optics-against-madx/runs/attempt-020/cases/corrector_sp7_r7hd1_plus_1mrad/reference/case_flat_file.flt",
+    "flat_file_sha256": "9fd255ddc315602adad74dd2d05b278592296ed08d3c6f1dab73e079457bbf98"
+  }
+}

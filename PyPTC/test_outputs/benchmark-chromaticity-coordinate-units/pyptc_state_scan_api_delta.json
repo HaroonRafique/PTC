@@ -1,0 +1,75 @@
+{
+  "mode": "api_delta",
+  "turns": 8192,
+  "basis_flat_file_sha256": "32f96fb53f37cdefcf3c540431a4da6fab9b06f4bf3687b0700a4af0fe6a9d3a",
+  "library_sha256": "d999479587a829469c84e175b9bc4b85b272eb7d58a9aa5a7994cce63e13ac2c",
+  "script_sha256": "8a0c27d479110f0ea2c1509e3de8171a7c1d166544c7ff231556d9884050ec1f",
+  "python_api_sha256": "37a246d66da327f67e56b1069495c593739b5a4d69386cdb533193bd81e57ad3",
+  "fortran_api_sha256": "d85f3526b04c6c9e6e697887c0da2ab48e4ee822737414cb2ec0fcfb4ca7fa91",
+  "ptc_source_sha256": "b55cbb16f40cad4d321a898fa5ff6c454389a3c566de8638e59bbece34696d7c",
+  "p0c_gev": 0.370331763608763,
+  "beta0": 0.367133282695325,
+  "state_script_sha256": "143cc843a682cdb3f954bd614394f8e841d18b2bc20e6f59f44c5ce59e8b9410",
+  "chromaticity_api": {
+    "chromx": -4.745307640951764,
+    "chromy": -4.806147200304224
+  },
+  "rows": [
+    {
+      "deltap_label": -0.0001,
+      "input_dE_gev": -3.7033176360876304e-05,
+      "input_x5": -0.0001,
+      "qx": 0.3165302434076082,
+      "qy": 0.7655855238178066,
+      "completed_turns": 8192,
+      "lost": false
+    },
+    {
+      "deltap_label": -5e-05,
+      "input_dE_gev": -1.8516588180438152e-05,
+      "input_x5": -5e-05,
+      "qx": 0.316292877713374,
+      "qy": 0.7653448532347035,
+      "completed_turns": 8192,
+      "lost": false
+    },
+    {
+      "deltap_label": 0.0,
+      "input_dE_gev": 0.0,
+      "input_x5": 0.0,
+      "qx": 0.31605448484066073,
+      "qy": 0.7651044046874409,
+      "completed_turns": 8192,
+      "lost": false
+    },
+    {
+      "deltap_label": 5e-05,
+      "input_dE_gev": 1.8516588180438152e-05,
+      "input_x5": 5e-05,
+      "qx": 0.31581563858146744,
+      "qy": 0.7648642134256047,
+      "completed_turns": 8192,
+      "lost": false
+    },
+    {
+      "deltap_label": 0.0001,
+      "input_dE_gev": 3.7033176360876304e-05,
+      "input_x5": 0.0001,
+      "qx": 0.31557684323752705,
+      "qy": 0.7646242843409552,
+      "completed_turns": 8192,
+      "lost": false
+    }
+  ],
+  "central_slopes": {
+    "step_5e-05": {
+      "dqx_d_deltap_label": -4.772391319065594,
+      "dqy_d_deltap_label": -4.806398090987374
+    },
+    "step_0.0001": {
+      "dqx_d_deltap_label": -4.7670008504058226,
+      "dqy_d_deltap_label": -4.806197384257249
+    }
+  },
+  "state_interpretation": "explicit NOCAVITY+DELTA+ONLY_4D state, matching lattice_GET_CHROM; x5 is DELTAP"
+}

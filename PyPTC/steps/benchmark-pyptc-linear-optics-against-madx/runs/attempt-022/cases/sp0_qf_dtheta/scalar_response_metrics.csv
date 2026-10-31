@@ -1,0 +1,6 @@
+case_id,observable,units,reference_nominal,reference_perturbed,reference_response,target_nominal,target_perturbed,target_response,response_residual,classification
+sp0_qf_dtheta,bare_horizontal_tune,tune units; full tune on nearest reference branch,4.316000781,4.316036122,3.5341000000244094e-05,4.31605467692091,4.31609005506839,3.537814748000301e-05,3.7147479758914415e-08,pending-tolerance
+sp0_qf_dtheta,bare_vertical_tune,tune units; full tune on nearest reference branch,3.765000088,3.765012329,1.2241000000301483e-05,3.76510661554073,3.7651188689923,1.2253451570298779e-05,1.245156999729602e-08,pending-tolerance
+sp0_qf_dtheta,circumference,m,163.36282,163.36282,0.0,163.36281999999989,163.36281999999989,0.0,0.0,pending-tolerance
+sp0_qf_dtheta,bare_horizontal_chromaticity,tune units per unit relative momentum,-4.745390843,-4.745465296,-7.445299999986332e-05,-1.742159978872638,-1.7424491986345516,-0.0002892197619135395,-0.00021476676191367616,pending-tolerance; no chromaticity-response criterion in shared baseline
+sp0_qf_dtheta,bare_vertical_chromaticity,tune units per unit relative momentum,-4.806168146,-4.806184876,-1.672999999957625e-05,-1.764496200980009,-1.7646006074809364,-0.0001044065009274675,-8.767650092789125e-05,pending-tolerance; no chromaticity-response criterion in shared baseline

@@ -1,0 +1,26 @@
+{
+  "case_id": "nominal",
+  "coupling_assessment": "not-evaluated; plane-based output does not establish absence of coupling",
+  "disposition": "included",
+  "effective_harmonic_state": {
+    "a1": 0.0,
+    "b1": 0.0,
+    "ptc_harmonic_metadata": 71
+  },
+  "evidence": [
+    "accepted admission basis",
+    "iteration-0005 workflow"
+  ],
+  "execution_status": "planned",
+  "family": "nominal",
+  "reason": "The accepted base recipe is available and the nominal reference/target path is implemented.",
+  "reference_application_status": "base-recipe; executed by nominal workflow",
+  "rf_active": false,
+  "rf_state_evidence": "pinned ISIS source inputs contain no cavity or RF element/field declaration",
+  "scope_limit": "uncoupled plane observables only; coupled normal modes and coupling indicators are not compared",
+  "source_identity": "accepted admission basis and its hash-pinned recipe",
+  "target_application_status": "base-recipe; executed by nominal workflow",
+  "tolerance_baseline_id": "OPTICS-BASELINE-2026-10-28-v1",
+  "tolerance_baseline_sha256": "77bb8564d562a0a72b1eae738b097d6d614177f40db4abe01f81cb5236d671c8",
+  "transverse_mode": "uncoupled-transverse-twiss"
+}

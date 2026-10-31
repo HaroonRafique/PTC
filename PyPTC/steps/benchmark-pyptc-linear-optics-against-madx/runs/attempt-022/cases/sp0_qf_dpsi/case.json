@@ -1,0 +1,56 @@
+{
+  "case_id": "sp0_qf_dpsi",
+  "component": "DPSI",
+  "coupling_assessment": "not-evaluated; plane-based output does not establish absence of coupling",
+  "disposition": "included",
+  "effective_harmonic_state": {
+    "a1": 0.0,
+    "b1": 0.0,
+    "ptc_harmonic_metadata": 71
+  },
+  "element": "SP0_QF",
+  "error_table_application_audit": {
+    "destination_sha256": "8192ad3984f9648f29c6bbcfdda5be9f814e1697c1010edd24446cc6fcdad07b",
+    "retained_components": [
+      "DPSI"
+    ],
+    "selected_element": "SP0_QF",
+    "selected_row_count": 1,
+    "source_sha256": "c864ea0ac6bab8159d5763e9134d8788e6ad006352ae8034a37859bfa95351b6",
+    "source_type": "EFIELD",
+    "zeroed_nonzero_columns": [
+      "DPHI",
+      "DPSI",
+      "DTHETA",
+      "DX",
+      "DY"
+    ]
+  },
+  "error_table_path": "case_error_table.tfs",
+  "error_table_sha256": "8192ad3984f9648f29c6bbcfdda5be9f814e1697c1010edd24446cc6fcdad07b",
+  "error_table_source": {
+    "path": "workflows/madx/reference_errors/apr_2026_survey_corrected.tfs",
+    "sha256": "c864ea0ac6bab8159d5763e9134d8788e6ad006352ae8034a37859bfa95351b6"
+  },
+  "evidence": [
+    "Xsuite attempt-029 candidate inventory",
+    "PyPTC PTC.apply_madx_error_table MAD-X convention API",
+    "existing PyPTC MAD-X/PyPTC closed-orbit comparison workflow"
+  ],
+  "execution_status": "completed",
+  "family": "misalignment-response",
+  "kind": "misalignment",
+  "plot_status": "produced",
+  "reason": "The isolated component is applied through a case-local MAD-X EFIELD table; MAD-X SETERR and PyPTC apply_madx_error_table consume the same table in the documented MAD-X convention from fresh nominal states.",
+  "reference_application_status": "executed; case-local MAD-X input and TWISS retained",
+  "rf_active": false,
+  "rf_state_evidence": "pinned ISIS source inputs contain no cavity or RF element/field declaration",
+  "scope_limit": "uncoupled plane observables only; coupled normal modes and coupling indicators are not compared",
+  "source_identity": "Xsuite attempt-029 candidate SP0_QF DPSI transform; cross-reference only",
+  "target_application_status": "executed; fresh PyPTC load of the case-local generated flat file",
+  "tolerance_baseline_id": "OPTICS-BASELINE-2026-10-28-v1",
+  "tolerance_baseline_sha256": "77bb8564d562a0a72b1eae738b097d6d614177f40db4abe01f81cb5236d671c8",
+  "transverse_mode": "uncoupled-transverse-twiss",
+  "units": "rad",
+  "value": 0.001
+}

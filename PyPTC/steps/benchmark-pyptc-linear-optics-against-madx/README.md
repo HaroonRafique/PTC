@@ -161,10 +161,11 @@ code/reference/recipe/run reaches technical completion; an incomplete attempt
 creates no `REP`, `EVAL`, physics claim, or acceptance. Keep full run bundles
 here and do not copy bulky outputs into the publication repository.
 
-The latest user run, attempt 021, is recorded in
-[`feedback/0020-user-run-attempt-021-assessment.md`](feedback/0020-user-run-attempt-021-assessment.md).
-The no-`S` EFIELD table parsing correction worked, but its audit then failed
-on an undefined source-row index variable in eight cases before the PyPTC
-worker ran. All 38 cases remain included; 30 completed and eight failed.
-Nominal and sampled response findings, plot review, and evidence hashes are in
-the feedback file. No acceptance or publication completion is implied.
+The latest user run, attempt 022, is recorded in
+[`feedback/0021-user-run-attempt-022-assessment.md`](feedback/0021-user-run-attempt-022-assessment.md).
+All 38 cases completed, including the eight EFIELD/misalignment cases that
+previously stopped in the runner audit. Their source-to-ESAVE audits each
+compare 3,838 values with zero mismatches. The run still needs human review:
+profile/scalar metrics exceed provisional limits, and the representative
+corrector response plot has overlapping table text. No acceptance or
+publication completion is implied.

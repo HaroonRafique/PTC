@@ -1,0 +1,36 @@
+{
+  "applied_error_table_sha256": "b9a26b6de9c32f654c919ebcf13f365049820c5a26f77fc29b9f9cc0f14bdb7e",
+  "binary_sha256": "426d2e88d42c14205d8930b2d720b7c5a5fffc7e499e3d0a7a4bf575e0110c04",
+  "case_override": null,
+  "chromaticity_calculation": {
+    "finite_difference_method": "MAD-X TWISS, CHROM; evaluates tunes at DELTAP and DELTAP+step",
+    "madx_version_convention": "5.02.00 DQ1/DQ2 = dQ/dDELTAP",
+    "nominal_delta_p": 0.0,
+    "step_delta_p": 1e-06,
+    "summary_fields": [
+      "DQ1",
+      "DQ2"
+    ],
+    "twiss_option": "TWISS, CHROM, DELTAP=0"
+  },
+  "command": [
+    "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/bin/madx-linux64_v5_02_00"
+  ],
+  "error_table": "case_error_table.tfs",
+  "error_table_sha256": "c864ea0ac6bab8159d5763e9134d8788e6ad006352ae8034a37859bfa95351b6",
+  "flat_file": "reference/case_flat_file.flt",
+  "flat_file_sha256": "32f96fb53f37cdefcf3c540431a4da6fab9b06f4bf3687b0700a4af0fe6a9d3a",
+  "input_hashes": {
+    "2023.strength": "a66ca836e9bbdc6560b2196dbe02c12a3c1781bff0b74589d2995d7689f430ed",
+    "ISIS.elements": "33ec2aedddde548b4f19f9fe9dd26d48ce4445f36c2c118dfa82d239dda8dffa",
+    "ISIS.injected_beam": "2759a6ef97d7799412ba293c8fc788ad34c356ca3b7098acd2a106f7142c92df",
+    "ISIS.sequence": "3cfc1fbb8c39e0d455a0518c4c37abd28058e7e5937231e8bb7cc9462adc9e1d",
+    "ISIS.strength": "912286281994f76e09561b42b32335b65dbc50d6d438f2caa3c8a9f7018b04cf"
+  },
+  "log": "reference/madx.log",
+  "log_sha256": "87740d0c0eeee43617a2586519a9efb2ffa48e53adfa61f005c6bab7a3a29783",
+  "recipe": "reference/reference_recipe.madx",
+  "recipe_sha256": "d954384d13b4a488b96117039101fbc170e9f9a08cdbf5713e74d91425a973d6",
+  "rows": 586,
+  "tfs_sha256": "d64c8dd6e5954c5573079657f9655737913ed9e13d79b77b9419fd6148783e75"
+}

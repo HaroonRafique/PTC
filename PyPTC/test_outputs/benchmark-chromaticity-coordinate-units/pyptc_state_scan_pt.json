@@ -1,0 +1,75 @@
+{
+  "mode": "pt",
+  "turns": 8192,
+  "basis_flat_file_sha256": "32f96fb53f37cdefcf3c540431a4da6fab9b06f4bf3687b0700a4af0fe6a9d3a",
+  "library_sha256": "d999479587a829469c84e175b9bc4b85b272eb7d58a9aa5a7994cce63e13ac2c",
+  "script_sha256": "a042ed32e6f7410f2b42bb096d11fa6053cf95d1d7a4e983f19fe38a4c648b2c",
+  "python_api_sha256": "37a246d66da327f67e56b1069495c593739b5a4d69386cdb533193bd81e57ad3",
+  "fortran_api_sha256": "d85f3526b04c6c9e6e697887c0da2ab48e4ee822737414cb2ec0fcfb4ca7fa91",
+  "ptc_source_sha256": "b55cbb16f40cad4d321a898fa5ff6c454389a3c566de8638e59bbece34696d7c",
+  "p0c_gev": 0.370331763608763,
+  "beta0": 0.367133282695325,
+  "state_script_sha256": null,
+  "chromaticity_api": {
+    "chromx": -4.745307640951764,
+    "chromy": -4.806147200304224
+  },
+  "rows": [
+    {
+      "deltap_label": -0.0001,
+      "input_dE_gev": -1.3595522565079676e-05,
+      "input_x5": -3.6711737693239476e-05,
+      "qx": 0.3162274849886751,
+      "qy": 0.7652811513586648,
+      "completed_turns": 8192,
+      "lost": false
+    },
+    {
+      "deltap_label": -5e-05,
+      "input_dE_gev": -6.797908329803093e-06,
+      "input_x5": -1.8356265915620305e-05,
+      "qx": 0.31614079863438954,
+      "qy": 0.7651953652413683,
+      "completed_turns": 8192,
+      "lost": false
+    },
+    {
+      "deltap_label": 0.0,
+      "input_dE_gev": 0.0,
+      "input_x5": 0.0,
+      "qx": 0.31605448484066073,
+      "qy": 0.7651044046874409,
+      "completed_turns": 8192,
+      "lost": false
+    },
+    {
+      "deltap_label": 5e-05,
+      "input_dE_gev": 6.798202417890309e-06,
+      "input_x5": 1.8357060036233537e-05,
+      "qx": 0.31596829169105994,
+      "qy": 0.7650187504098385,
+      "completed_turns": 8192,
+      "lost": false
+    },
+    {
+      "deltap_label": 0.0001,
+      "input_dE_gev": 1.3596698918316719e-05,
+      "input_x5": 3.671491417809073e-05,
+      "qx": 0.31588248342921244,
+      "qy": 0.7649282817963134,
+      "completed_turns": 8192,
+      "lost": false
+    }
+  ],
+  "central_slopes": {
+    "step_5e-05": {
+      "dqx_d_deltap_label": -1.7250694332959782,
+      "dqy_d_deltap_label": -1.7661483152986435
+    },
+    "step_0.0001": {
+      "dqx_d_deltap_label": -1.7250077973132716,
+      "dqy_d_deltap_label": -1.7643478117568279
+    }
+  },
+  "interpretation": "fifth coordinate is set to the exact energy-derived PT=dE/p0c"
+}

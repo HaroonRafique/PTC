@@ -1,0 +1,9 @@
+{
+  "case_id": "sp0_qf_dtheta",
+  "disposition": "included",
+  "execution_status": "failed",
+  "plot_status": "not-produced; case execution failed",
+  "reason": "Case-specific execution failed: RuntimeError: TFS file has no named element rows: /home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/steps/benchmark-pyptc-linear-optics-against-madx/runs/attempt-020/cases/sp0_qf_dtheta/case_error_table.tfs",
+  "reference_application_status": "see case-local MAD-X files if created",
+  "target_application_status": "see case-local PyPTC files if created"
+}

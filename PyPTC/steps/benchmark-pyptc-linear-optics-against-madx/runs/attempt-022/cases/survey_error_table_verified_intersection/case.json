@@ -1,0 +1,51 @@
+{
+  "case_id": "survey_error_table_verified_intersection",
+  "coupling_assessment": "not-evaluated; plane-based output does not establish absence of coupling",
+  "disposition": "included",
+  "effective_harmonic_state": {
+    "a1": 0.0,
+    "b1": 0.0,
+    "ptc_harmonic_metadata": 71
+  },
+  "error_table_application_audit": {
+    "destination_sha256": "c864ea0ac6bab8159d5763e9134d8788e6ad006352ae8034a37859bfa95351b6",
+    "retained_components": [
+      "DPHI",
+      "DPSI",
+      "DS",
+      "DTHETA",
+      "DX",
+      "DY"
+    ],
+    "selected_element": "all source rows",
+    "selected_row_count": 1,
+    "source_sha256": "c864ea0ac6bab8159d5763e9134d8788e6ad006352ae8034a37859bfa95351b6",
+    "source_type": "EFIELD",
+    "zeroed_nonzero_columns": []
+  },
+  "error_table_path": "case_error_table.tfs",
+  "error_table_sha256": "c864ea0ac6bab8159d5763e9134d8788e6ad006352ae8034a37859bfa95351b6",
+  "error_table_source": {
+    "path": "workflows/madx/reference_errors/apr_2026_survey_corrected.tfs",
+    "sha256": "c864ea0ac6bab8159d5763e9134d8788e6ad006352ae8034a37859bfa95351b6"
+  },
+  "evidence": [
+    "Xsuite attempt-029 candidate inventory; six-component verified intersection",
+    "PyPTC error_table.py supports these six MAD-X EALIGN fields",
+    "case-local filtered table hash and PyPTC example API path"
+  ],
+  "execution_status": "completed",
+  "family": "survey-error-table",
+  "kind": "survey-error-table",
+  "plot_status": "produced",
+  "reason": "The verified intersection retains the six alignment components supported by PyPTC's MAD-X error-table reader; the case-local table is derived from the pinned PyPTC survey table and shared by both fresh engines.",
+  "reference_application_status": "executed; case-local MAD-X input and TWISS retained",
+  "rf_active": false,
+  "rf_state_evidence": "pinned ISIS source inputs contain no cavity or RF element/field declaration",
+  "scope_limit": "uncoupled plane observables only; coupled normal modes and coupling indicators are not compared",
+  "source_identity": "Xsuite attempt-029 candidate survey_error_table_verified_intersection; source table not adopted as PyPTC input",
+  "target_application_status": "executed; fresh PyPTC load of the case-local generated flat file",
+  "tolerance_baseline_id": "OPTICS-BASELINE-2026-10-28-v1",
+  "tolerance_baseline_sha256": "77bb8564d562a0a72b1eae738b097d6d614177f40db4abe01f81cb5236d671c8",
+  "transverse_mode": "uncoupled-transverse-twiss"
+}

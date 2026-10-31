@@ -1,0 +1,117 @@
+{
+  "capabilities": [
+    {
+      "classification": "comparable; per-observable tolerance status is retained",
+      "observable": "reference orbit x/px/y/py",
+      "reason": "named MAD-X/PyPTC element-exit rows are mapped by name, occurrence, fibre index and s"
+    },
+    {
+      "classification": "comparable; per-observable tolerance status is retained",
+      "observable": "beta x/y",
+      "reason": "per-case baseline status is retained in profile_residual_metrics.csv"
+    },
+    {
+      "classification": "comparable; per-observable tolerance status is retained",
+      "observable": "alpha x/y",
+      "reason": "per-case baseline status is retained in profile_residual_metrics.csv"
+    },
+    {
+      "classification": "comparable; per-observable tolerance status is retained",
+      "observable": "dispersion and derivatives",
+      "reason": "MAD-X run-specific beta0 normalization and per-case baseline status are retained"
+    },
+    {
+      "classification": "comparable; per-observable tolerance status is retained",
+      "observable": "phase advance",
+      "reason": "element-exit phase values and phase origin are retained with per-case baseline status"
+    },
+    {
+      "classification": "comparable",
+      "observable": "full tunes",
+      "reason": "full tunes are lifted to the MAD-X branch; scalar residual and baseline status are retained per case"
+    },
+    {
+      "classification": "comparable",
+      "observable": "circumference",
+      "reason": "scalar residual and baseline status are retained per case"
+    },
+    {
+      "classification": "comparable",
+      "observable": "chromaticity",
+      "reason": "API-level-5 PyPTC dQ/dPT is converted with run-local beta0; MAD-X 5.02 DQ is already dQ/dDELTAP"
+    },
+    {
+      "classification": "unbenchmarked",
+      "observable": "one-turn 4D map",
+      "reason": "optional corroborating methods were not selected or inventoried as matched outputs"
+    },
+    {
+      "classification": "unbenchmarked",
+      "observable": "eigenvalues and normal forms",
+      "reason": "optional corroborating methods were not selected or inventoried as matched outputs"
+    },
+    {
+      "classification": "unbenchmarked",
+      "observable": "coupling indicators",
+      "reason": "coupling is not evaluated; plane Twiss does not establish uncoupled dynamics"
+    },
+    {
+      "classification": "comparable",
+      "observable": "element-position sampling",
+      "reason": "named element exits are identity and position checked"
+    },
+    {
+      "classification": "out-of-scope",
+      "observable": "corrector response",
+      "reason": "corrector response is not the selected perturbation family for this case"
+    },
+    {
+      "classification": "out-of-scope",
+      "observable": "single-element field strength",
+      "reason": "single-element field strength is not the selected perturbation family for this case"
+    },
+    {
+      "classification": "pending-tolerance",
+      "observable": "alignment and verified error-table intersection",
+      "reason": "case-specific response evidence is retained separately"
+    },
+    {
+      "classification": "out-of-scope",
+      "observable": "bounded single-particle tracking",
+      "reason": "tracking is a separate optional diagnostic and is not selected for this case"
+    },
+    {
+      "classification": "pending-tolerance",
+      "observable": "corrector, field-strength, isolated misalignment, and verified-intersection responses",
+      "reason": "1 case-specific fresh-state response records are available; tolerances and minimum meaningful-response floors remain unreviewed"
+    },
+    {
+      "classification": "out-of-scope",
+      "observable": "full EFIELD survey-table response",
+      "reason": "this case is outside the full-table scope"
+    }
+  ],
+  "case_id": "sp0_qf_dx",
+  "coupling_assessment": "not-evaluated; plane-based output does not establish absence of coupling",
+  "coverage": "this case only",
+  "effective_rf_harmonic_state": {
+    "a1": 0.0,
+    "b1": 0.0,
+    "ptc_harmonic_metadata": 71
+  },
+  "reference_engine": {
+    "binary_sha256": "426d2e88d42c14205d8930b2d720b7c5a5fffc7e499e3d0a7a4bf575e0110c04",
+    "name": "MAD-X",
+    "version": "5.02.00"
+  },
+  "target_engine": {
+    "api_level": 5,
+    "library_sha256": "d999479587a829469c84e175b9bc4b85b272eb7d58a9aa5a7994cce63e13ac2c",
+    "name": "PyPTC"
+  },
+  "tolerance_baseline": {
+    "id": "OPTICS-BASELINE-2026-10-28-v1",
+    "sha256": "77bb8564d562a0a72b1eae738b097d6d614177f40db4abe01f81cb5236d671c8"
+  },
+  "transverse_mode": "uncoupled-transverse-twiss"
+}

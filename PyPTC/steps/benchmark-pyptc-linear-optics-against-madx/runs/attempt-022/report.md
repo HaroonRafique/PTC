@@ -1,0 +1,37 @@
+# PyPTC/MAD-X linear-optics attempt attempt-022
+
+**Outcome:** `completed-needs-human-review`. **Run class:** `user-run`.
+
+## Accepted basis and recipe
+
+This run uses the user-accepted admission snapshot `attempt-20261027T194128Z`. Its accepted scope is snapshot admission only. The five accepted source inputs and flat file, and the MAD-X 5.02.00 binary, are reused by digest. PyPTC is rebuilt from current repository source at API level 5 so the EFIELD API under test is available; its source revision and library digest are recorded separately. The effective recipe uses the five pinned inputs in admission order, the 2023 strength overlay, `synchrotron`, `a1=b1=0`, all trim variables zero, and the accepted flat file without resplitting for nominal optics.
+
+## Sampling and profile comparison
+
+MAD-X returned 586 named TWISS rows; PyPTC returned 804 orbit-node Twiss rows and 804 printer groups. The mapping status is `verified` with 586 matched element exits at a position tolerance of 1e-09 m. Mapping method and every row identity are retained in `boundary_map.csv`.
+
+Reference dispersion columns were multiplied by this run's beta0=0.36713319993, derived from the MAD-X TWISS GAMMA header. The pinned baseline OPTICS-BASELINE-2026-10-28-v1 was applied to every matched profile and scalar observable with a defined criterion. Profile metrics retain per-observable maximum and RMS residuals, the tolerance, source ID, and within/out-of/pending status. The baseline is provisional and user/physics review remains pending.
+
+## Chromaticity, tracking, and limitations
+
+The machine-readable inventory assesses all 38 candidates from the Xsuite attempt-029 cross-reference separately for PyPTC; the list is not treated as automatic case equivalence. 38 cases completed and were plotted: nominal, corrector_sp0_r0hd1_plus_1mrad, corrector_sp0_r0hd1_minus_1mrad, corrector_sp0_r0vd1_plus_1mrad, corrector_sp0_r0vd1_minus_1mrad, corrector_sp2_r2hd1_plus_1mrad, corrector_sp2_r2hd1_minus_1mrad, corrector_sp2_r2vd1_plus_1mrad, corrector_sp2_r2vd1_minus_1mrad, corrector_sp3_r3hd1_plus_1mrad, corrector_sp3_r3hd1_minus_1mrad, corrector_sp3_r3vd1_plus_1mrad, corrector_sp3_r3vd1_minus_1mrad, corrector_sp4_r4hd1_plus_1mrad, corrector_sp4_r4hd1_minus_1mrad, corrector_sp4_r4vd1_plus_1mrad, corrector_sp4_r4vd1_minus_1mrad, corrector_sp5_r5hd1_plus_1mrad, corrector_sp5_r5hd1_minus_1mrad, corrector_sp5_r5vd1_plus_1mrad, corrector_sp5_r5vd1_minus_1mrad, corrector_sp7_r7hd1_plus_1mrad, corrector_sp7_r7hd1_minus_1mrad, corrector_sp7_r7vd1_plus_1mrad, corrector_sp7_r7vd1_minus_1mrad, corrector_sp9_r9hd1_plus_1mrad, corrector_sp9_r9hd1_minus_1mrad, corrector_sp9_r9vd1_plus_1mrad, corrector_sp9_r9vd1_minus_1mrad, field_sp0_qf_k1_plus_0p1pct, sp0_qf_dx, sp0_qf_dy, sp0_qf_ds, sp0_qf_dphi, sp0_qf_dtheta, sp0_qf_dpsi, survey_error_table, survey_error_table_verified_intersection. Completed perturbation cases use fresh case-local inputs and independent MAD-X/PyPTC application paths. Per-engine nominal-subtracted profile and scalar responses are retained for completed cases. The full local survey table is retained unchanged; its source-to-ESAVE audit is emitted only when that audit stage completes. Cases that fail before the PyPTC worker do not establish target application. The exact Xsuite attempt-029 EFIELD table remains unavailable, so its candidate is not claimed as byte-for-byte equivalent. Unexecuted candidates: none. Response tolerances remain pending review.
+
+MAD-X 5.02.00 reports `DQ1/DQ2` as `dQ/dDELTAP`; the PyPTC API-level-5 evidence identifies `PTC.chromaticities()` as `dQ/dPT`. PyPTC values are converted to `dQ/d(delta_p)` with this run's beta0=0.36713319993. Both converted planes are outside the provisional baseline; the derivative-coordinate interpretation and cause of the large difference remain open for review.
+
+| Plane | MAD-X DQ | PyPTC native dQ/dPT | PyPTC converted dQ/d(delta_p) | Converted difference | Limit | Status |
+|---|---:|---:|---:|---:|---:|---|
+| horizontal | -4.745391 | -4.745308 | -1.74216 | +3.003 | 0.0009 | out-of-tolerance |
+| vertical | -4.806168 | -4.806147 | -1.764496 | +3.042 | 0.00035 | out-of-tolerance |
+
+Profile response residual envelopes are summarized by family and observable in `response_summary.csv`; scalar response envelopes are in `scalar_response_summary.csv`. The shared corrector x/y orbit-response criterion is recorded per signed case, but its application status remains pending because a meaningful-response floor has not been reviewed. Other response families, including optics and chromaticity, remain `pending-tolerance`. Bounded tracking status is `complete` and is a separate diagnostic, not a transverse optics gate. Requested mode: `thick`; thick MAD-X `PTC_TRACK` is compared with PyPTC's thick workflow. Both use the PTC tracking engine. Optional thin MAD-X output is reference-only and separately classified because no matching PyPTC thin control is established. No target-only or partial record is presented as a cross-code comparison. No nonlinear, long-term, collective-effects, clean-checkout admission, or production claim is made.
+
+MAD-X and PyPTC runtime warnings are retained in `reference/madx.log` and `target/pyptc_runtime.log`. They are observations, not silently discarded or interpreted as resolved.
+
+## Evidence files
+
+- `cases/<case-id>/` — isolated reference and target data, boundary map, aligned profiles, residuals, scalar results, and nominal-subtracted response records for each executed case.
+- `campaign_case_inventory.json` and `cases/<case-id>/{case.json,case_status.json}` — candidate identities, skill-valid dispositions, evidence-backed reasons, and per-engine application statuses.
+- `response_summary.csv` — maximum response residual by family and observable, with the worst-case ID; each case also retains detailed response values and residuals.
+- `scalar_response_summary.csv` — tune, circumference, and converted chromaticity response residuals; response tolerances remain pending where absent from the baseline.
+- `plots/cases/<case-id>.png` — one composite for every included case with verified mapping; `plot-manifest.json` links executed cases to their PNGs.
+- `manifest.json`, `result.json`, and `harness-tests.log` — provenance, canonical status, and harness checks.

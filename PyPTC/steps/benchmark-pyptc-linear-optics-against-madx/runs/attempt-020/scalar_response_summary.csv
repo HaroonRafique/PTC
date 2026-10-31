@@ -1,0 +1,11 @@
+family,observable,units,case_count,maximum_absolute_response_residual,worst_case_id,classification
+corrector-response,bare_horizontal_chromaticity,tune units per unit relative momentum,28,0.0005412977866887658,corrector_sp3_r3hd1_plus_1mrad,pending-tolerance
+corrector-response,bare_horizontal_tune,tune units; full tune on nearest reference branch,28,1.0078648879918717e-05,corrector_sp2_r2hd1_plus_1mrad,pending-tolerance
+corrector-response,bare_vertical_chromaticity,tune units per unit relative momentum,28,0.0002572884929126218,corrector_sp2_r2vd1_minus_1mrad,pending-tolerance
+corrector-response,bare_vertical_tune,tune units; full tune on nearest reference branch,28,1.8412842759829573e-05,corrector_sp2_r2vd1_plus_1mrad,pending-tolerance
+corrector-response,circumference,m,28,0.0,corrector_sp0_r0hd1_plus_1mrad,pending-tolerance
+field-strength-response,bare_horizontal_chromaticity,tune units per unit relative momentum,1,0.001887775276868009,field_sp0_qf_k1_plus_0p1pct,pending-tolerance
+field-strength-response,bare_horizontal_tune,tune units; full tune on nearest reference branch,1,1.3378380181450211e-08,field_sp0_qf_k1_plus_0p1pct,pending-tolerance
+field-strength-response,bare_vertical_chromaticity,tune units per unit relative momentum,1,1.4021565434285677e-05,field_sp0_qf_k1_plus_0p1pct,pending-tolerance
+field-strength-response,bare_vertical_tune,tune units; full tune on nearest reference branch,1,4.964269884055739e-09,field_sp0_qf_k1_plus_0p1pct,pending-tolerance
+field-strength-response,circumference,m,1,0.0,field_sp0_qf_k1_plus_0p1pct,pending-tolerance

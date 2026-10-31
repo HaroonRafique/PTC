@@ -1,0 +1,39 @@
+{
+  "applied_input_override": {
+    "assignment_count": 1,
+    "file": "ISIS.strength",
+    "value_rad": -0.001,
+    "variable": "r7hd1_kick"
+  },
+  "case_id": "corrector_sp7_r7hd1_minus_1mrad",
+  "coupling_assessment": "not-evaluated; plane-based output does not establish absence of coupling",
+  "disposition": "included",
+  "effective_harmonic_state": {
+    "a1": 0.0,
+    "b1": 0.0,
+    "ptc_harmonic_metadata": 71
+  },
+  "element": "sp7_r7hd1",
+  "evidence": [
+    "Xsuite attempt-029 candidate inventory",
+    "accepted ISIS.elements and ISIS.strength source definitions",
+    "case-local MAD-X recipe and flat-file regeneration"
+  ],
+  "execution_status": "completed",
+  "family": "corrector-response",
+  "kick_rad": -0.001,
+  "kind": "corrector",
+  "plane": "horizontal",
+  "plot_status": "produced",
+  "reason": "The accepted MAD-X source model defines this corrector kick as a strength variable; a case-local strength input and freshly generated PTC flat file provide an isolated reference/target state.",
+  "reference_application_status": "executed; case-local MAD-X input and TWISS retained",
+  "rf_active": false,
+  "rf_state_evidence": "pinned ISIS source inputs contain no cavity or RF element/field declaration",
+  "scope_limit": "uncoupled plane observables only; coupled normal modes and coupling indicators are not compared",
+  "source_identity": "Xsuite attempt-029 candidate sp7_r7hd1, horizontal, minus; cross-reference only",
+  "strength_variable": "r7hd1_kick",
+  "target_application_status": "executed; fresh PyPTC load of the case-local generated flat file",
+  "tolerance_baseline_id": "OPTICS-BASELINE-2026-10-28-v1",
+  "tolerance_baseline_sha256": "77bb8564d562a0a72b1eae738b097d6d614177f40db4abe01f81cb5236d671c8",
+  "transverse_mode": "uncoupled-transverse-twiss"
+}

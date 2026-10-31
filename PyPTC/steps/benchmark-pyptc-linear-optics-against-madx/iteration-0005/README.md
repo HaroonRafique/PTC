@@ -78,6 +78,21 @@ worked, but `audit_error_table_esave()` then failed on a source-row indexing
 including refreshed hashes, nominal results, and plot inspection, is in step
 feedback [`0020-user-run-attempt-021-assessment.md`](../feedback/0020-user-run-attempt-021-assessment.md).
 
+User-run attempt 022 completed all 38 cases using the corrected audit indexer.
+The six isolated misalignment and two survey EFIELD cases each passed their
+source-to-ESAVE audit with 3,838 compared values and zero mismatches. Attempt
+022's profile and scalar results remain outside provisional limits, and the
+corrector response table still has a readability defect. See
+[`0021-user-run-attempt-022-assessment.md`](../feedback/0021-user-run-attempt-022-assessment.md)
+for exact findings and hashes. The run is complete for human review, not
+accepted.
+
+Attempt 022 is the latest user-run result for this skill snapshot. Its full
+execution resolves the previous runner audit failure; no new skill revision is
+implied. Any later run should follow the reviewed runner/readability fixes and
+retain the same skill and tolerance hashes unless a separately reviewed skill
+update is applied.
+
 The follow-up runner correction uses the declared `source_occurrence` and
 `source_index` dictionaries, and the deterministic checks now import the
 iteration-0005 module rather than the older step-level module. A no-`S`
