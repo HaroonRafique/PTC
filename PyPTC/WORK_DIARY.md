@@ -1108,3 +1108,28 @@ runner, or shared skill was changed in this investigation, and attempt 022 is
 still unaccepted. Feedback 0022, investigation 0003, the ledger, run index,
 README, and this diary link the correction to the
 [evidence-gated agents publication plan](/home/hr/Repositories/isis-modelling-agents/docs/plans/2026-10-23-evidence-gated-agents-publication.md).
+
+## 2026-10-31 — Add tracking coordinate-conversion example
+
+Added `examples/07_tracking_coordinate_conversion.py` in the same script and
+output-directory style as the existing user examples. It forms five total
+energy offsets corresponding to relative momentum deviations from
+`-1e-4` through `+1e-4`, calls `particle_diagnostics` for 8,192 turns, compares
+the tracked tune slopes to `PTC.chromaticities()`, and retains CSV, PNG, JSON,
+and SHA-256 identities under `test_outputs/07_tracking_coordinate_conversion/`.
+README instructions and the technical-note tracking section now point to the
+example; its plot and claim/source manifests are recorded.
+
+The run completed all five particles for all 8,192 turns without loss. At the
+`5e-5` central step the tracked slopes were `dQx/delta=-4.894145` and
+`dQy/delta=-4.941702`, compared with API values `-4.955304` and `-4.934983`.
+The `1e-4` estimates were `-4.891025` and `-4.941511`. This example makes the
+corrected energy/momentum mapping inspectable; the slope differences have no
+acceptance status. PTC also printed its known cavity-localization and
+`DLMAX > LMAX` resplitting warnings; the example completed, and these warnings
+are outside this coordinate example's scope. The output summary pins the
+example, core, library, and flat-file hashes. No full test suite was run.
+The technical-note PDF was rebuilt after bibliography and cross-reference passes;
+the final `main.log` has no LaTeX warnings or overfull/underfull boxes. A local
+technical-note `.gitignore` keeps generated LaTeX intermediates out of the
+commit while retaining the refreshed PDF and figure.

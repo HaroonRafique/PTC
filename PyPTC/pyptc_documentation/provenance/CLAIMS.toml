@@ -241,6 +241,15 @@ checks = [{ kind = "contains", text = "particles=1000" }, { kind = "contains", t
 status = "code_mapped"
 
 [[claims]]
+id = "EXAMPLE-03"
+section = "Tracking coordinate conversion example"
+class = "implemented"
+claim = "The coordinate-conversion example tracks five Python bunch rows corresponding to a symmetric relative-momentum scan for 8192 turns and records tune slopes, CSV, PNG, JSON, and input/source hashes."
+source = "EX07"
+lines = [1, 143]
+status = "code_mapped_run_recorded_not_acceptance"
+
+[[claims]]
 id = "ERR-01"
 section = "EFIELD supported fields and guard"
 class = "implemented"
@@ -392,3 +401,12 @@ claims = ["PROV-03", "PROV-04"]
 selection = "Stored full error-table closed-orbit comparison output."
 quantity_units = "Horizontal and vertical orbit fields; interpretation/tolerance review pending."
 supports = "Shows the specific stored comparison only; no universal tolerance is inferred."
+
+[[figures]]
+id = "FIG-08"
+path = "pyptc_documentation/tech_note/figures/tracking_coordinate_conversion.png"
+sha256 = "06ce0226bb23bcdf8316257919395e3c59aa4cdaada78f5f2796d8ecefc73cf8"
+claims = ["EXAMPLE-03", "PROV-03", "PROV-04"]
+selection = "Stored output from the five-particle, 8192-turn coordinate-conversion example."
+quantity_units = "Tune shifts plotted against relative momentum deviation; scan CSV and summary retain raw values and hashes."
+supports = "Demonstrates that the Python bunch helper's tune response follows the chromaticity API locally; it is not tolerance-based acceptance."

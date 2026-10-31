@@ -1,5 +1,5 @@
 id,role,path,sha256,revision_or_identity,documented_scope
-PYCORE,implementation,pyptc/core.py,352030761ae8421e4eaa415ebdf38a7f08fdd0fcd95713c1fe347a40528159c0,"worktree descendant of f457621; content hash pins coordinate-fix version","PTC Python wrapper, initialization, queries, edits, tracking"
+PYCORE,implementation,pyptc/core.py,352030761ae8421e4eaa415ebdf38a7f08fdd0fcd95713c1fe347a40528159c0,"commit 96fd26b; file SHA-256 pins coordinate-fix implementation","PTC Python wrapper, initialization, queries, edits, tracking"
 PYINIT,implementation,pyptc/__init__.py,fe8ec3d5e3c42bb88a064d6c3f28ae59f2a12874a3817f7d235731c46f563b9f,8824003c956390e921a1a469f77c247859a63258,"Package exports"
 PYLATTICE,implementation,pyptc/lattice.py,1efaa2c2b314e447e9a01f398c564d76b1f0c0b431dce553e263a4538350800c,8824003c956390e921a1a469f77c247859a63258,"PTC flat-file fibre parsing and name resolution"
 PYOPTICS,implementation,pyptc/optics.py,fd1ea801f512469e81feeb2c0c944d9d3a89e8fbe232450e435e6a895f1e01a7,8824003c956390e921a1a469f77c247859a63258,"Convenience optics API and explicit unexposed functions"
@@ -14,6 +14,7 @@ EX02,implementation,examples/02_track_bunch_dashboard.py,d8a5e429d186086c7626802
 EX03,implementation,examples/03_track_bunch_with_apertures.py,22835510f5649f9c7035ef55b3910f0d15c242d056ba2fcf21952f0d54877c63,8824003c956390e921a1d469f77c247859a63258,"Aperture/loss example generating FIG-04"
 EX04,implementation,examples/04_single_element_misalignment.py,31b47170b39530998f86632f2e167b20e09748795a7173207d5e63dd2fbb21c7,8824003c956390e921a1d469f77c247859a63258,"Misalignment example generating FIG-05"
 EX06,implementation,examples/06_madx_efield_api.py,2d152fdaa8c4fc8521266aa97d45c3cc2663b2f5efc19f24c3f14c2b27baefe7,8824003c956390e921a1d469f77c247859a63258,"Side-by-side EFIELD example generating FIG-06"
+EX07,implementation,examples/07_tracking_coordinate_conversion.py,9836679e3f6515c3c246ebb6f784f599b952ea7b128185ef2428f6c84b4e61cc,"stored run summary and source SHA-256","Tracking energy-to-momentum conversion example generating FIG-08 and coordinate scan evidence"
 MADXCOMPARE,implementation,workflows/madx/compare_madx_pyptc_closed_orbits.py,482cb46c04cf3bef58cf5a3e7a6071624e27b09f3b3afa0739e21b339569f8b0,8824003c956390e921a1d469f77c247859a63258,"Full error-table comparison workflow for FIG-07"
 DEFAULTFLAT,implementation,workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt,052380ab09cd8f68ff9563eefe00ee83fba4995a25506f5d7c78da7c8b592eb9,generated artifact in repository at documentation snapshot,"Default simplified flat-file lattice input represented in stored examples"
 TEMPLATE,other_authority,/home/hr/Repositories/chopped_beam_orbit_analysis/v3_documentation/v3_report/isistechreport.cls,42101e7db7d03af462b3db9fdcab431b2498fb76e379e44324225a762cbc8f36,external template asset,"Copied ISIS technical-note document class; original template source is not edited"

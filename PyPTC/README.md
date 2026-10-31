@@ -72,6 +72,19 @@ exit CSVs, per-case plots, and a machine-readable result under
 `PyPTC/test_outputs/06_madx_efield_api/`. Its comparisons are evidence for
 review, not tolerance-based acceptance.
 
+To inspect the bunch tracking coordinate conversion, run the small-momentum
+scan example:
+
+```bash
+python3 PyPTC/examples/07_tracking_coordinate_conversion.py
+```
+
+It tracks five particles whose Python `dE` inputs correspond to a symmetric
+scan in relative momentum deviation, then compares the measured tune slopes
+with `PTC.chromaticities()`. The CSV, plot, and summary are written to
+`PyPTC/test_outputs/07_tracking_coordinate_conversion/`. This demonstrates
+the wrapper's coordinate mapping; it is not an optics acceptance test.
+
 ## Basic Usage
 
 Build the standalone shared library:

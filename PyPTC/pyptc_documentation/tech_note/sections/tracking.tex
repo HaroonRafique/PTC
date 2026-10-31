@@ -3,7 +3,19 @@
 
 The bunch helpers accept rows in the Python/PyParticleBunch order \texttt{x, xp, y, yp, z, dE}; \texttt{dE} is a total-energy deviation. In the default PTC tracking state used by these helpers, the fifth coordinate is relative momentum deviation, \(\delta=p/p_0-1\), rather than relative energy deviation. With synchronous energy \(E_0=p_0c/\beta_0\) and inferred rest mass \(m^2=E_0^2-(p_0c)^2\), the wrapper computes \(\delta=\sqrt{(E_0+dE)^2-m^2}/p_0c-1\). The inverse is \(dE=\sqrt{m^2+[p_0c(1+\delta)]^2}-E_0\). The sixth-coordinate mapping is \(L=-z/\beta_0\). This documents the implemented convention and its code/manual basis; it is not a physics validation of every active PTC state or operating regime. [claim:TRACK-01] [claim:TRACK-02]
 
-\path{track_bunch()} uses the same conversion at each node while updating the synchronous reference, and returns either the final array or one copied snapshot per turn when \texttt{record\_turns=True}. The low-level \path{track_particle_ptc()} and \path{track_particle_ptc_with_loss()} methods do not perform this conversion: they forward six raw PTC coordinates, whose meaning depends on the active PTC state. [claim:TRACK-03] [claim:TRACK-02]
+The node-by-node bunch helper applies the same conversion at each node while updating the synchronous reference. It returns the final array or one copied snapshot per turn when turn recording is enabled. [claim:TRACK-03]
+
+The low-level single-particle methods do not convert coordinates. They forward six raw values to PTC, whose meaning depends on the active PTC state. [claim:TRACK-02]
+
+Example 07 creates a symmetric relative-momentum scan and converts each offset to the total-energy deviation used by the Python bunch helper. It tracks the particles and compares the resulting tune shifts with the chromaticity API. CSV, plot, summary, and hashes are stored in the named example output directory. [claim:EXAMPLE-03] [claim:PROV-03]
+
+All five particles completed 8,192 turns in the recorded run. At the \(\pm5\times10^{-5}\) central step, tracking gives \(dQ_x/d\delta=-4.8941\) and \(dQ_y/d\delta=-4.9417\). The API gives \(-4.9553\) and \(-4.9350\), respectively. These differences are recorded for inspection; this is an implementation example, not an acceptance result. [claim:EXAMPLE-03]
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.98\textwidth]{figures/tracking_coordinate_conversion.png}
+  \caption{Tune shifts from the coordinate-conversion example compared with the linear prediction from PyPTC chromaticities. Values are from the stored five-particle, 8,192-turn scan. This illustrates the wrapper path and does not establish a benchmark tolerance. [claim:FIG-08] [claim:PROV-03]}
+\end{figure}
 
 The standard bunch example creates its input with the PyParticleBunch helper, tracks a fixed-size bunch for a stated turn count, and writes before/after diagnostic dashboards and CSV files. The outputs show an example run only; they do not prove model validity for other lattices or operating conditions. [claim:EXAMPLE-02]
 

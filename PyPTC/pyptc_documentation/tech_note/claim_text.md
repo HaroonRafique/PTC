@@ -22,6 +22,8 @@ The bare optics example writes plot, CSV, and JSON artifacts to its output direc
 
 The bunch example generates a 1000-particle input and requests 64 turns of diagnostics. [claim:EXAMPLE-02]
 
+The tracking-coordinate example creates a symmetric momentum-deviation scan, converts it to total-energy offsets for Python bunch input, tracks five particles for 8192 turns, and writes CSV, PNG, and JSON evidence with source/input hashes. Its result is an implementation example, not a benchmark acceptance. [claim:EXAMPLE-03] [claim:FIG-08] [claim:PROV-03]
+
 The bunch helpers convert Python/PyParticleBunch total-energy deviation `dE` to and from the default-state PTC relative momentum deviation `delta`, using the synchronous `p0c` and `beta0`; the longitudinal mapping is `L=-z/beta0`. Low-level particle methods forward raw PTC coordinates. This is a source/manual mapping, not a validation of every PTC state or operating regime. [claim:TRACK-01] [claim:TRACK-02]
 
 The simple bunch tracker validates an N x 6 array, copies it, tracks through the machine nodes for the requested turns, and optionally retains per-turn snapshots. [claim:TRACK-03]

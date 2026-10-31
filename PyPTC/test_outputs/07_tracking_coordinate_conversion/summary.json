@@ -1,0 +1,44 @@
+{
+  "beta0": 0.367133282695325,
+  "chromaticities_from_api_per_delta": {
+    "chromx": -4.9553035708473105,
+    "chromy": -4.934982977661852
+  },
+  "coordinate_contract": {
+    "energy_conversion": "dE = sqrt(m^2 + (p0c*(1+delta))^2) - p0c/beta0",
+    "longitudinal_conversion": "L = -z/beta0",
+    "ptc_fifth_coordinate": "delta = p/p0 - 1",
+    "python_input": "x, xp, y, yp, z, dE; dE is total-energy deviation in GeV"
+  },
+  "example_sha256": "9836679e3f6515c3c246ebb6f784f599b952ea7b128185ef2428f6c84b4e61cc",
+  "lattice": "/home/hr/Codes/PTC_PyORBIT3_Codex_Merge_Jul26/PTC/PyPTC/workflows/madx/outputs/simplified/PTC-PyORBIT_flat_file.flt",
+  "lattice_sha256": "052380ab09cd8f68ff9563eefe00ee83fba4995a25506f5d7c78da7c8b592eb9",
+  "library_sha256": "d999479587a829469c84e175b9bc4b85b272eb7d58a9aa5a7994cce63e13ac2c",
+  "machine": {
+    "charge": 1,
+    "circumference_m": 163.36281999999989,
+    "gamma_t": 5.156726629547425,
+    "harmonic": 71,
+    "kinetic_energy_gev": 0.07044002991247011,
+    "mass_gev": 0.9999999986892394,
+    "n_nodes": 375
+  },
+  "outputs": [
+    "coordinate_scan.csv",
+    "coordinate_scan.png"
+  ],
+  "p0c_gev": 0.370331763608763,
+  "pyptc_core_sha256": "352030761ae8421e4eaa415ebdf38a7f08fdd0fcd95713c1fe347a40528159c0",
+  "scope": "coordinate-conversion example; not an acceptance or tolerance test",
+  "tracking_central_slopes_per_delta": {
+    "central_step_0.0001": {
+      "dqx_d_delta": -4.891024719599901,
+      "dqy_d_delta": -4.941511163190082
+    },
+    "central_step_5e-05": {
+      "dqx_d_delta": -4.89414517342468,
+      "dqy_d_delta": -4.941701759288986
+    }
+  },
+  "tracking_turns_per_particle": 8192
+}
