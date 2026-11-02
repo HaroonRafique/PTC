@@ -16,6 +16,8 @@ import traceback
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 STEP_DIR = Path(__file__).resolve().parents[3]
 ITERATION_DIR = Path(__file__).resolve().parent
 BASELINE_FILE = STEP_DIR / "reference-inputs/tolerance-baseline.md"
@@ -614,9 +616,9 @@ def profile_capabilities(
         {"observable": "full tunes", "classification": "comparable", "reason": "full tunes are lifted to the MAD-X branch; scalar residual and baseline status are retained per case"},
         {"observable": "circumference", "classification": "comparable", "reason": "scalar residual and baseline status are retained per case"},
         {"observable": "chromaticity", "classification": "comparable", "reason": "MAD-X DQ and PyPTC chromaticities are compared directly as dQ/d(delta_p), with no beta0 scaling"},
-        {"observable": "one-turn 4D map", "classification": "unbenchmarked", "reason": "optional corroborating methods were not selected or inventoried as matched outputs"},
+        {"observable": "one-turn 4D map", "classification": "diagnostic-pending-tolerance", "reason": "nominal MAD-X PTC_TWISS and PyPTC finite-difference maps are retained in coupled_map_comparison.json; coordinate convention review and tolerance remain pending"},
         {"observable": "eigenvalues and normal forms", "classification": "unbenchmarked", "reason": "optional corroborating methods were not selected or inventoried as matched outputs"},
-        {"observable": "coupling indicators", "classification": "unbenchmarked", "reason": "coupling is not evaluated; plane Twiss does not establish uncoupled dynamics"},
+        {"observable": "coupling indicators", "classification": "diagnostic-pending-tolerance", "reason": "nominal map cross-plane terms are retained; perturbation cases and coupled normal forms are not evaluated"},
         {"observable": "element-position sampling", "classification": "comparable" if mapping_status == "verified" else "blocked", "reason": "named element exits are identity and position checked" if mapping_status == "verified" else "element-exit map not verified"},
         {"observable": "corrector response", "classification": "pending-tolerance" if response_case_count else "blocked", "reason": "signed x/y orbit response has a shared criterion; other response observables remain pending"},
         {"observable": "single-element field strength", "classification": "pending-tolerance" if response_case_count else "blocked", "reason": "field response is retained; no shared response criterion applies"},
@@ -1189,7 +1191,7 @@ def run_attempt() -> Path:
         "accepted_admission": {"attempt_id": ADMISSION_ID, "review_disposition": "accepted", "scope": "snapshot admission only; its original API-4 library remains preserved as admission evidence", "bundle_path": str(ADMISSION_BASIS.relative_to(STEP_DIR)), "result_sha256": optics.sha256(ADMISSION_BASIS / "result.json"), "report_sha256": optics.sha256(ADMISSION_BASIS / "report.md")},
         "target_code_under_test": {"source_revision": provenance["candidate_source_revision"], "api_level": provenance["candidate_api_level"], "library_path": str(library), "library_sha256": provenance["library_sha256"], "build_script": "build/build_ptc.sh"},
         "identities": provenance,
-        "recipe": {"variant": "00_Simplified_Lattice with 2023.strength overlay", "sequence": "synchrotron", "reference_mode": "case-local working-copy snapshots", "ordered_inputs": ["ISIS.injected_beam", "ISIS.elements", "ISIS.strength", "2023.strength", "ISIS.sequence"], "a1": 0.0, "b1": 0.0, "kqtd": 0.0, "kqtf": 0.0, "all_individual_trim_variables": 0.0, "rf_active": False, "rf_state_evidence": "pinned source files have no cavity or RF field declaration", "ptc_harmonic_metadata": 71, "transverse_mode": "uncoupled-transverse-twiss", "coupling_assessment": "not evaluated; conclusion is limited to uncoupled plane observables", "resplitting": "nominal uses accepted flat file; supported perturbations regenerate case-local flat files with the accepted resplit scripts", "tracking_mode": tracking_mode, "perturbation_cases": case_inventory["dispositions"]["included"][1:]},
+        "recipe": {"variant": "00_Simplified_Lattice with 2023.strength overlay", "sequence": "synchrotron", "reference_mode": "case-local working-copy snapshots", "ordered_inputs": ["ISIS.injected_beam", "ISIS.elements", "ISIS.strength", "2023.strength", "ISIS.sequence"], "a1": 0.0, "b1": 0.0, "kqtd": 0.0, "kqtf": 0.0, "all_individual_trim_variables": 0.0, "rf_active": False, "rf_state_evidence": "pinned source files have no cavity or RF field declaration", "ptc_harmonic_metadata": 71, "transverse_mode": "coupled-4d-map-and-plane-twiss", "coupling_assessment": "nominal one-turn map compared; tolerance and coupled normal-form acceptance pending", "resplitting": "nominal uses accepted flat file; supported perturbations regenerate case-local flat files with the accepted resplit scripts", "tracking_mode": tracking_mode, "perturbation_cases": case_inventory["dispositions"]["included"][1:]},
         "campaign_case_inventory": {"path": "campaign_case_inventory.json", "case_count": case_inventory["case_count"], "dispositions": case_inventory["dispositions"]},
         "runtime": {"python": sys.version, "platform": platform.platform()},
         "output_directory": str(run_dir),
@@ -1206,11 +1208,44 @@ def run_attempt() -> Path:
         target_dir = case_dir / "target"
         tfs_path, madx_info, headers, reference_rows = optics.run_madx_reference(REPO_ROOT, snapshot, reference_dir, accepted)
         target_info, target_rows, fibres, node_groups = optics.run_pyptc_optics(REPO_ROOT, flat_file, library, target_dir)
+        map_path = reference_dir / "ptc_twiss.tfs"
+        map_headers, map_columns, map_rows = optics.parse_tfs(map_path)
+        map_terms = [f"re{i}{j}" for i in range(1, 5) for j in range(1, 5)]
+        missing_terms = sorted(set(term.upper() for term in map_terms) - set(map_columns))
+        if missing_terms:
+            raise RuntimeError(f"MAD-X PTC_TWISS map is missing required columns: {missing_terms}")
+        madx_map = np.asarray([[float(map_rows[-1][f"re{i}{j}".upper()]) for j in range(1, 5)] for i in range(1, 5)])
+        pyptc_map = np.asarray(target_info["one_turn_map"]["matrix"], dtype=float)
+        map_difference = pyptc_map - madx_map
+        cross_plane_indices = [(i, j) for i in (0, 1) for j in (2, 3)] + [(i, j) for i in (2, 3) for j in (0, 1)]
+        coupling_result = {
+            "status": "diagnostic-pending-coordinate-and-tolerance-review",
+            "reference_method": "MAD-X 5.02.00 PTC_TWISS closed-orbit one-turn map, ICASE=6, NO=1; final sequence row",
+            "target_method": target_info["one_turn_map"]["method"],
+            "coordinate_order": ["x", "px", "y", "py"],
+            "madx_twiss_file": str(map_path.relative_to(run_dir)),
+            "madx_twiss_sha256": optics.sha256(map_path),
+            "madx_final_map_s_m": float(map_rows[-1]["S"]),
+            "map_columns": map_terms,
+            "maximum_absolute_matrix_residual": float(np.max(np.abs(map_difference))),
+            "rms_matrix_residual": float(np.sqrt(np.mean(map_difference ** 2))),
+            "maximum_absolute_cross_plane_residual": float(max(abs(map_difference[i, j]) for i, j in cross_plane_indices)),
+            "pyptc_symplectic_residual_frobenius": float(target_info["one_turn_map"]["symplectic_residual_frobenius"]),
+            "madx_map": madx_map.tolist(),
+            "pyptc_map": pyptc_map.tolist(),
+            "residual_matrix": map_difference.tolist(),
+            "tolerance": None,
+        }
+        optics.write_json(case_dir / "coupled_map_comparison.json", coupling_result)
+        optics.write_csv(case_dir / "coupled_map_matrices.csv", [
+            {"row_coordinate": coupling_result["coordinate_order"][i], "column_coordinate": coupling_result["coordinate_order"][j], "madx": madx_map[i, j], "pyptc": pyptc_map[i, j], "pyptc_minus_madx": map_difference[i, j], "is_cross_plane": (i, j) in cross_plane_indices}
+            for i in range(4) for j in range(4)
+        ])
         case_inventory["cases"][0]["effective_harmonic_state"]["ptc_harmonic_metadata"] = target_info.get("machine_summary", {}).get("harmonic")
         optics.write_json(case_dir / "scope_declaration.json", {
-            "transverse_mode": "uncoupled-transverse-twiss",
-            "coupling_assessment": "not evaluated; result scope is limited to plane-based observables",
-            "scope_limit": "uncoupled plane observables only; coupled normal modes and coupling indicators are not compared",
+            "transverse_mode": "coupled-4d-map-and-plane-twiss",
+            "coupling_assessment": "nominal one-turn map compared; tolerance and coupled normal-form acceptance pending",
+            "scope_limit": "coupled-map comparison is nominal-only; perturbation-case coupling and normal forms are not compared",
             "rf_active": False,
             "rf_state_evidence": "pinned source files have no cavity or RF field declaration",
             "effective_harmonic_state": case_inventory["cases"][0]["effective_harmonic_state"],
@@ -1327,8 +1362,8 @@ def run_attempt() -> Path:
         )
         optics.write_json(run_dir / "cases/nominal/capability_matrix.json", {
             "case_id": "nominal", "coverage": "nominal case only",
-            "transverse_mode": "uncoupled-transverse-twiss",
-            "coupling_assessment": "not evaluated; result scope is limited to plane-based observables",
+            "transverse_mode": "coupled-4d-map-and-plane-twiss",
+            "coupling_assessment": "nominal one-turn map compared; tolerance and coupled normal-form acceptance pending",
             "effective_rf_harmonic_state": {"rf_active": False, "a1": 0.0, "b1": 0.0, "ptc_harmonic_metadata": 71},
             "reference_engine": {"name": "MAD-X", "version": "5.02.00", "binary_sha256": madx_info["binary_sha256"]},
             "target_engine": {"name": "PyPTC", "api_level": provenance["candidate_api_level"], "library_sha256": provenance["library_sha256"]},
@@ -1395,6 +1430,7 @@ def run_attempt() -> Path:
             "aligned_profiles": "cases/nominal/aligned_profiles.csv",
             "profile_metrics": "cases/nominal/profile_residual_metrics.csv",
             "scalar_comparisons": "cases/nominal/scalar_comparisons.csv",
+            "coupled_map_comparison": "cases/nominal/coupled_map_comparison.json",
             "capability_matrix": "cases/nominal/capability_matrix.json",
             "plot_manifest": "plot-manifest.json",
             "declared_case_count": case_inventory["case_count"],
@@ -1430,6 +1466,10 @@ def run_attempt() -> Path:
             f"MAD-X returned {len(reference_rows)} named TWISS rows; PyPTC returned {len(target_rows)} orbit-node Twiss rows and {len(node_groups)} printer groups. The mapping status is `{mapping_summary['status']}` with {mapping_summary['mapped_boundaries']} matched element exits at a position tolerance of {optics.POSITION_TOLERANCE_M:g} m. Mapping method and every row identity are retained in `boundary_map.csv`.",
             "",
             f"Reference dispersion columns were multiplied by this run's beta0={beta0:.12g}, derived from the MAD-X TWISS GAMMA header. The pinned baseline {PINNED_BASELINE_ID} was applied to every matched profile and scalar observable with a defined criterion. Profile metrics retain per-observable maximum and RMS residuals, the tolerance, source ID, and within/out-of/pending status. The baseline is provisional and user/physics review remains pending.",
+            "",
+            "## Coupled one-turn map",
+            "",
+            f"A nominal 4D map comparison is retained in `cases/nominal/coupled_map_comparison.json` and `coupled_map_matrices.csv`. MAD-X PTC_TWISS map coordinates are compared with PyPTC's centered finite-difference tracking map in `(x, px, y, py)` order. Maximum absolute matrix residual is {coupling_result['maximum_absolute_matrix_residual']:.6g}; maximum absolute cross-plane residual is {coupling_result['maximum_absolute_cross_plane_residual']:.6g}. This is diagnostic only: coordinate convention equivalence and an observable-specific tolerance require review, and no perturbation-case map or coupled normal-form comparison is claimed.",
             "",
             "## Chromaticity, tracking, and limitations",
             "",

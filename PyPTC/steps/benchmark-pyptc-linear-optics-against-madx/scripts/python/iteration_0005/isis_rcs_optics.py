@@ -165,6 +165,14 @@ def make_reference_recipe(input_dir: Path, tfs_path: Path) -> str:
         "SELECT, FLAG=TWISS, CLEAR;",
         "SELECT, FLAG=TWISS, COLUMN=name, keyword, s, x, px, y, py, betx, bety, alfx, alfy, dx, dpx, dy, dpy, mux, muy;",
         f'TWISS, CHROM, SAVE, FILE="{tfs_path.resolve()}";',
+        "propagation_method=2; order_of_integrator=6; integration_steps_per_element=5;",
+        "PTC_CREATE_UNIVERSE;",
+        "PTC_CREATE_LAYOUT, TIME=TRUE, MODEL=propagation_method, EXACT=TRUE, METHOD=order_of_integrator, NST=integration_steps_per_element;",
+        "PTC_ALIGN;",
+        "SELECT, FLAG=PTC_TWISS, CLEAR;",
+        "SELECT, FLAG=PTC_TWISS, COLUMN=NAME,S,X,PX,Y,PY,RE11,RE12,RE13,RE14,RE21,RE22,RE23,RE24,RE31,RE32,RE33,RE34,RE41,RE42,RE43,RE44;",
+        f'PTC_TWISS, CLOSED_ORBIT, ICASE=6, NO=1, FILE="{(tfs_path.parent / "ptc_twiss.tfs").resolve()}";',
+        "PTC_END;",
     ))
     return "\n".join(lines) + "\n"
 

@@ -16,6 +16,7 @@ repo_root, flat_file, library, printer, summary_path, node_csv = map(Path, argum
 error_table = Path(arguments[6]).resolve() if len(arguments) == 7 else None
 sys.path.insert(0, str(repo_root))
 from pyptc import PTC
+from pyptc.optics import one_turn_map
 
 from isis_rcs_optics import sha256, write_csv
 
@@ -35,6 +36,7 @@ if error_table is not None:
 machine = ptc.machine_summary()
 tunes = ptc.tunes()
 chromaticities_native = ptc.chromaticities()
+coupled_map = one_turn_map(ptc)
 profile = ptc.all_node_twiss_orbit()
 longitudinal = np.cumsum([float(row["length"]) for row in profile])
 for row, s_value in zip(profile, longitudinal):
@@ -43,7 +45,7 @@ for row, s_value in zip(profile, longitudinal):
 ptc.run_script(printer)
 write_csv(node_csv, profile)
 summary = {
-    "executed_api_calls": [*api_calls, "PTC.machine_summary()", "PTC.tunes()", "PTC.chromaticities()", "PTC.all_node_twiss_orbit()", "PTC.run_script(PRINTORBITNODES)"],
+    "executed_api_calls": [*api_calls, "PTC.machine_summary()", "PTC.tunes()", "PTC.chromaticities()", "PTC.all_node_twiss_orbit()", "pyptc.optics.one_turn_map()", "PTC.run_script(PRINTORBITNODES)"],
     "error_table": str(error_table) if error_table else None,
     "applied_error_records": [record.__dict__ for record in applied_errors],
     "python_api_source": "pyptc/core.py",
@@ -52,6 +54,7 @@ summary = {
     "machine_summary": machine,
     "tunes": tunes,
     "chromaticities_native": chromaticities_native,
+    "one_turn_map": {**coupled_map, "matrix": coupled_map["matrix"].tolist(), "reference_orbit": coupled_map["reference_orbit"].tolist()},
     "circumference_from_node_lengths_m": float(longitudinal[-1]) if len(longitudinal) else 0.0,
 }
 summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")

@@ -1226,6 +1226,26 @@ hashes. Attempt report/result/manifest hashes are respectively
 `6c5943050d7ee9ed7a3d27f5ec94fa62f33dd578d658998ef600107d90fd000a`, and
 `310a4f6b17311a50437980fb3583397c2b76ab0078ff25bef3f52e273f87e5b8`.
 No attempt output was staged or committed.
+
+## 2026-11-02 — Add nominal coupled-map comparison to optics runner
+
+Extended the linear-optics benchmark runner to retain a nominal 4D one-turn
+map comparison. The target map is estimated through the committed
+`pyptc.optics.one_turn_map()` API; the MAD-X recipe now requests a closed-orbit
+`PTC_TWISS` map and writes its 4D `RE` block. The attempt output records both
+matrices, elementwise residuals, cross-plane residual summary, MAD-X map-table
+identity, and PyPTC symplectic residual. The run scope is updated to say that
+the map comparison is nominal-only and diagnostic; its tolerance, map
+convention, and coupled normal-form acceptance remain for review. This work
+was motivated by attempt 023 feedback, which already records coupling as not
+evaluated; that immutable assessment was not changed. The diagnostic smoke
+initially exposed uppercase TFS column names; the parser check was corrected.
+The complete step runner then finished an agent-diagnostic smoke with
+`completed-needs-human-review`; its successful temporary bundle was removed
+automatically. The focused map tests could not be run because the benchmark
+environment does not include `pytest`. Feedback 0024 records the smoke result,
+code hashes, and review limits. The runner is ready for a fresh user attempt;
+map coordinate conventions and coupling tolerances still require review.
 After recording feedback 0023 and the ledger/index disposition, ran the
 step's pruning dry run and applied its three-bundle retention policy. Raw
 attempt 020 was removed from the working tree; its report/result/manifest

@@ -170,3 +170,11 @@ both phase profiles in every case, and 14 vertical chromaticities. All 38
 plot-manifest readability flags remain unreviewed; response meaningfulness
 floors and most response tolerances are pending. Attempt 023 is not accepted,
 and no publication completion is implied.
+
+The runner now adds a nominal one-turn coupled-map comparison: MAD-X
+`PTC_TWISS` supplies the 4D map and PyPTC estimates it by centered finite
+differences through `pyptc.optics.one_turn_map()`. The full matrices, residuals,
+cross-plane residual summary, source map table, and PyPTC symplectic residual
+are retained in the nominal case bundle. This is diagnostic evidence only;
+the comparison tolerance and coupled normal-form observables remain pending
+review, and the 38 perturbation cases are not yet separately map-compared.
