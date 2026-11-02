@@ -1162,3 +1162,15 @@ cases and retained an in-bundle skill snapshot with revision
 `b57248367f33b0985b136bf119cb366fc03604d47a34e52fb05aaa42518994ae`. It is
 agent diagnostic evidence only and needs human review; it is not a user-run
 skill attempt or acceptance result. Shell syntax and Python compilation pass.
+
+## 2026-11-02 — Keep smoke runs outside benchmark attempts
+
+Changed `benchmark-pyptc-attempt.sh --smoke` to use a temporary `.smoke-*`
+directory under the benchmark test-output area instead of allocating an
+`attempt-NNN` bundle. Successful smoke output is removed automatically;
+failed smoke output is retained outside `runs/` for debugging. The Python
+workflow now accepts that confined diagnostic path only for the
+`agent-diagnostic` run class. Removed the smoke-generated `runs/attempt-023`
+and `runs/attempt-024` directories as requested. The verification smoke
+completed all 38 cases, and its temporary output was removed. `runs/` still
+contains only attempts 020–022; shell syntax and Python compilation pass.

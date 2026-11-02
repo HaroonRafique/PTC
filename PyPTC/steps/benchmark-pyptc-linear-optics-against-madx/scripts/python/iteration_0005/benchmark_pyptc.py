@@ -1165,9 +1165,13 @@ def run_attempt() -> Path:
         raise RuntimeError("Local tolerance-baseline snapshot hash differs from the pinned skill reference")
     run_dir = Path(os.environ["PYPTC_BENCHMARK_RUN_DIR"]).resolve()
     output_id = os.environ["PYPTC_BENCHMARK_ATTEMPT_ID"]
-    if not run_dir.is_dir() or run_dir.parent != (STEP_DIR / "runs").resolve() or run_dir.name != output_id:
-        raise RuntimeError("Shell orchestrator supplied an invalid attempt bundle path")
     run_class = os.environ.get("PYPTC_BENCHMARK_RUN_CLASS", "user-run")
+    if run_class == "agent-diagnostic":
+        smoke_root = (STEP_DIR.parents[1] / "test_outputs/benchmark-pyptc-linear-optics-against-madx").resolve()
+        if not run_dir.is_dir() or smoke_root not in run_dir.parents or output_id != "diagnostic-smoke":
+            raise RuntimeError("Shell orchestrator supplied an invalid temporary smoke path")
+    elif not run_dir.is_dir() or run_dir.parent != (STEP_DIR / "runs").resolve() or run_dir.name != output_id:
+        raise RuntimeError("Shell orchestrator supplied an invalid attempt bundle path")
     tracking_mode = os.environ.get("PYPTC_BENCHMARK_TRACKING_MODE", "thick").strip().lower()
     if tracking_mode not in {"thick", "both"}:
         raise RuntimeError("PYPTC_BENCHMARK_TRACKING_MODE must be 'thick' or 'both'")
@@ -1175,8 +1179,8 @@ def run_attempt() -> Path:
     manifest: dict[str, Any] = {
         "attempt_id": output_id,
         "attempt_class": run_class,
-        "skill": {"name": "benchmark-code-against-isis-rcs-optics", "revision": skill_revision, "file_blob": skill_blob, "source_worktree_modified": os.environ.get("PYPTC_BENCHMARK_SKILL_WORKTREE_DIRTY", "false") == "true", "sha256": skill_sha256, "snapshot": str(skill_file.relative_to(STEP_DIR))},
-        "tolerance_baseline": {"id": PINNED_BASELINE_ID, "sha256": PINNED_BASELINE_SHA256, "snapshot": str(baseline_file.relative_to(STEP_DIR)), "status": "provisional shared screening baseline; user/physics review pending"},
+        "skill": {"name": "benchmark-code-against-isis-rcs-optics", "revision": skill_revision, "file_blob": skill_blob, "source_worktree_modified": os.environ.get("PYPTC_BENCHMARK_SKILL_WORKTREE_DIRTY", "false") == "true", "sha256": skill_sha256, "snapshot": str(skill_file.relative_to(STEP_DIR.parents[1]))},
+        "tolerance_baseline": {"id": PINNED_BASELINE_ID, "sha256": PINNED_BASELINE_SHA256, "snapshot": str(baseline_file.relative_to(STEP_DIR.parents[1])), "status": "provisional shared screening baseline; user/physics review pending"},
         "workflow_source_hashes": {
             str(path.relative_to(STEP_DIR)): optics.sha256(path)
             for path in (Path(__file__).resolve(), ITERATION_DIR / "isis_rcs_optics.py", ITERATION_DIR / "ptc_optics_worker.py", ITERATION_DIR / "ptc_tracking_worker.py")

@@ -22,6 +22,7 @@ run_dir=
 stage=preflight
 active_command=
 active_log=
+preserve_smoke=0
 
 log() { printf '[%s] %s\n' "$(date '+%H:%M:%S')" "$*"; }
 run_logged() {
@@ -51,33 +52,46 @@ failure_handler() {
 - Partial evidence: $run_dir
 EOF
     log "FAILED at $stage (exit $exit_code); inspect $run_dir/failure.md."
+    [[ $mode == agent-diagnostic ]] && preserve_smoke=1
   else
     log "Preflight failed at $stage; no attempt was allocated."
   fi
   exit "$exit_code"
 }
 trap failure_handler ERR
+cleanup_smoke() {
+  if [[ $mode == agent-diagnostic && $preserve_smoke == 0 && -n $run_dir && -d $run_dir ]]; then
+    rm -rf "$run_dir"
+  fi
+}
+trap cleanup_smoke EXIT
 
 [[ -x $python && -s $workflow && -s $skill_source && -s $baseline_snapshot ]] || { echo 'Benchmark environment, shared skill source, workflow module, or tolerance baseline is missing; check setup and the isis-modelling-agents checkout.' >&2; exit 3; }
 [[ $(sha256sum "$baseline_snapshot" | awk '{print $1}') == 77bb8564d562a0a72b1eae738b097d6d614177f40db4abe01f81cb5236d671c8 ]] || { echo 'Shared tolerance baseline has changed; review it before running.' >&2; exit 3; }
-mkdir -p "$runs_root"
-highest=0
-for directory in "$runs_root"/attempt-*; do
-  [[ -d $directory ]] || continue
-  number=${directory##*/attempt-}
-  [[ $number =~ ^[0-9]+$ ]] || continue
-  ((10#$number > highest)) && highest=$((10#$number))
-done
-number=$((highest + 1))
-while :; do
-  printf -v run_id 'attempt-%03d' "$number"
-  run_dir="$runs_root/$run_id"
-  if mkdir "$run_dir" 2>/dev/null; then break; fi
-  number=$((number + 1))
-done
-
 run_type=user-skill-test
-[[ $mode == agent-diagnostic ]] && run_type=agent-diagnostic
+if [[ $mode == agent-diagnostic ]]; then
+  run_id=diagnostic-smoke
+  smoke_root="$repo_root/test_outputs/benchmark-pyptc-linear-optics-against-madx"
+  mkdir -p "$smoke_root"
+  run_dir=$(mktemp -d "$smoke_root/.smoke-XXXXXX")
+  run_type=agent-diagnostic
+else
+  mkdir -p "$runs_root"
+  highest=0
+  for directory in "$runs_root"/attempt-*; do
+    [[ -d $directory ]] || continue
+    number=${directory##*/attempt-}
+    [[ $number =~ ^[0-9]+$ ]] || continue
+    ((10#$number > highest)) && highest=$((10#$number))
+  done
+  number=$((highest + 1))
+  while :; do
+    printf -v run_id 'attempt-%03d' "$number"
+    run_dir="$runs_root/$run_id"
+    if mkdir "$run_dir" 2>/dev/null; then break; fi
+    number=$((number + 1))
+  done
+fi
 mkdir -p "$run_dir/inputs"
 skill_snapshot="$run_dir/inputs/benchmark-skill-SKILL.md"
 cp "$skill_source" "$skill_snapshot"
