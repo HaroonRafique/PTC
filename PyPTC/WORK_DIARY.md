@@ -1231,3 +1231,14 @@ step's pruning dry run and applied its three-bundle retention policy. Raw
 attempt 020 was removed from the working tree; its report/result/manifest
 hashes and outcome remain in feedback 0019 and the review ledger. Attempts
 021–023 remain. This pruning is not committed.
+
+## 2026-11-02 — Expose a coupled one-turn optics map
+
+Added `pyptc.optics.one_turn_map()` as a centered finite-difference estimate
+of the transverse 4D one-turn Jacobian in `(x, px, y, py)` order. It uses
+one-turn particle tracking around the closed orbit, rejects invalid steps and
+lost probes, and returns the map with its reference orbit, step, method, and
+symplectic residual. Added focused tests for recovering a synthetic coupled
+linear map and rejecting invalid steps. The implementation and tests were
+committed in `3ef772f`; the diary entry is recorded in this follow-up commit.
+The focused tests were not run during this documentation update.
