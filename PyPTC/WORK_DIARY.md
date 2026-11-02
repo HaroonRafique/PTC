@@ -1133,3 +1133,32 @@ The technical-note PDF was rebuilt after bibliography and cross-reference passes
 the final `main.log` has no LaTeX warnings or overfull/underfull boxes. A local
 technical-note `.gitignore` keeps generated LaTeX intermediates out of the
 commit while retaining the refreshed PDF and figure.
+
+## 2026-11-02 — Store benchmark skill snapshots in attempt bundles
+
+Changed the PyPTC optics benchmark evidence layout to match the Xsuite testbed.
+The exact iteration-0005 skill was copied into retained attempts 020, 021, and
+022 and their manifest snapshot paths now point to those copies; their recorded
+skill revision and content hash are preserved. The tolerance baseline and
+Python requirements were moved to shared benchmark-step locations. The runner
+now copies the current skill from the `isis-modelling-agents` checkout into
+each new attempt and records source revision, Git blob, dirty state, and
+content hash. Setup and workflow code no longer read skill text from an
+iteration folder. Removed iteration-0001 through iteration-0005 directories;
+the generation-specific Python workflow code remains under `scripts/python/`.
+
+Historical feedback and attempt reports retain their original iteration names
+as chronology. The current README distinguishes those historical labels from
+the new per-attempt snapshots. Three unrelated untracked benchmark preview PNGs
+were left untouched. Validation status is recorded with this change's commit.
+
+The first orchestration smoke, diagnostic attempt 023, stopped before case
+execution because the Python workflow still referenced removed pinned-skill
+constants. The workflow was updated to read the skill revision and hash from
+the orchestrator environment. Diagnostic attempt 024 then completed all 38
+cases and retained an in-bundle skill snapshot with revision
+`330746975383bc01ae100bea18ae54299b83cb2e`, Git blob
+`7a1754e0c7838f4aee532b07dc708f76761bfc70`, and SHA-256
+`b57248367f33b0985b136bf119cb366fc03604d47a34e52fb05aaa42518994ae`. It is
+agent diagnostic evidence only and needs human review; it is not a user-run
+skill attempt or acceptance result. Shell syntax and Python compilation pass.

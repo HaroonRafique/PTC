@@ -1,29 +1,56 @@
 ---
 name: benchmark-code-against-isis-rcs-optics
-description: Use when comparing an admitted code's ISIS RCS linear optics or bounded tracking with cpymad/MAD-X; exclude nonlinear, resonance, and production studies.
+description: >-
+  Benchmark admitted-code ISIS RCS transverse linear optics against pinned
+  cpymad/MAD-X; include coupled optics when meaningful. Excludes longitudinal,
+  tracking, nonlinear, and production studies.
 ---
 
-# Benchmark a Code Against ISIS RCS Optics
+# Benchmark Transverse Linear Optics Against ISIS RCS
 
 Use this skill after `admit-code-to-isis-rcs` has a reviewed accepted outcome.
-Establish a first, capability-aware comparison of a target code with a named
-ISIS RCS `cpymad`/MAD-X reference. This is linear-optics and bounded
-single-particle evidence, not a nonlinear or production benchmark.
+Establish a capability-aware comparison of a target code's transverse linear
+optics with a named ISIS RCS `cpymad`/MAD-X reference. Declare whether the
+comparison covers uncoupled plane Twiss or coupled transverse optics. A
+successful result applies only to that declared transverse scope; it does not
+claim longitudinal or 6D optics, tracking agreement, nonlinear validation,
+or production readiness.
 
 ## Scope and boundary
 
 This skill compares the same identified reference recipe, effective machine
-state, and reference particle on both sides. It covers closed or reference
-orbit where applicable, linear optics, phase advance, tunes, dispersion,
-circumference, and a small deterministic single-particle tracking cross-check.
-Compare chromaticity when both codes provide an equivalent tune-versus-momentum
-observable. Element-by-element quantities and turn-by-turn coordinates may be
-compared when both sides provide equivalent observables.
+state, and reference particle on both sides. Its transverse core covers the
+closed or reference orbit, transverse Twiss or coupled normal modes as
+declared, phase advance, plane tunes `Qx/Qy` or explicitly ordered normal-mode
+tunes, horizontal and vertical dispersion and their derivatives,
+circumference, and momentum chromaticity when both codes provide matched
+definitions. Declare whether RF is active and whether transverse
+coupling is present or meaningful, even when the selected calculation excludes
+those effects. Record effective RF and harmonic settings when they contribute
+to the machine state.
+
+Inventory availability of a one-turn 4D transverse map, eigenvalues, and
+normal-form or coupling indicators. These are optional corroborating
+capabilities, not universal acceptance gates; compare them only when the run
+explicitly selects them and both APIs, coordinate order, reference point,
+normalization, and criteria are reconciled. A plane-Twiss comparison alone
+does not establish coupled normal-mode or map agreement. The shared screening
+baseline applies only where observable definition and residual metric match.
+Do not apply plane-based `Qx/Qy` tolerances to coupled normal-mode tunes unless
+an explicitly reviewed criterion covers those modes.
+
+This is not a general longitudinal-optics or 6D benchmark. Synchrotron tune,
+momentum compaction, slip factor, longitudinal normal modes, aperture or
+acceptance, nonlinear dynamics, resonance studies, long-term tracking,
+collective effects, large particle sets, and optimization are outside its
+acceptance scope. A bounded tracking check may be run as a separately labelled
+diagnostic after the transverse optics are interpretable; it cannot substitute
+for a transverse observable or establish tracking agreement under this skill.
 
 Do not use it for amplitude-dependent tune, tune scans, resonance crossing,
 Poincaré maps, long-term stability, collective effects, large particle sets,
-or optimisation. Those need a later nonlinear or benchmark workflow after
-this stage is accepted. Do not retune either model, change the machine state,
+or optimisation; use a later nonlinear or benchmark workflow after this stage
+is accepted. Do not retune either model, change the machine state,
 or alter an input recipe merely to reduce a discrepancy. If the user explicitly
 directs an additional benchmark input or overlay beyond the accepted admission
 recipe, record it as a separate benchmark recipe, including its provenance,
@@ -52,8 +79,9 @@ around it; do not duplicate or modify core physics when an adapter is enough.
   abstractions.
 - Make the normal simulation entry point a readable sequence of those calls:
   resolve the machine input, initialise/load the lattice, define and validate
-  the reference beam, calculate orbit and Twiss/linear optics, then perform
-  the declared bounded tracking and save diagnostics. Keep configuration and
+  the reference beam, calculate orbit and the declared transverse linear
+  optics, then save diagnostics. Keep any separately selected tracking check
+  clearly outside the transverse acceptance result. Keep configuration and
   analysis calls visible at the top level; keep their implementations in the
   reusable functions.
 - Document the setup and run commands and each public helper's purpose,
@@ -63,8 +91,8 @@ around it; do not duplicate or modify core physics when an adapter is enough.
 
 If the target project does not yet have this scaffold, create it before
 benchmarking. Keep admission-level installation and lattice-load checks within
-`admit-code-to-isis-rcs`; use this skill to add and exercise the optics and
-bounded-tracking actions without changing their physics definitions.
+`admit-code-to-isis-rcs`; use this skill to add and exercise transverse-optics
+actions without changing their physics definitions.
 
 ## Required inputs
 
@@ -77,8 +105,13 @@ Before running a comparison, identify and record:
   state, lattice variant, selected sequence, reference-particle record, and
   reference-run artefacts. Hash every input and record effective settings so
   both code paths can be shown to use the same state;
-- target-code configuration and supported public APIs for orbit, optics,
-  tracking, and tune estimation;
+- the declared transverse calculation mode, coupling applicability, RF/harmonic
+  state, and target code/version APIs and outputs for each in-scope observable.
+  Freeze the mode, coupling assessment, and effective RF/harmonic state in the
+  case configuration and retain them in nominal and perturbed case records,
+  the capability matrix, and the report; do not infer uncoupled applicability
+  from plane-Twiss output alone. Track APIs and tune estimators belong only to
+  a separately requested diagnostic;
 - coordinate, unit, sign, longitudinal-variable, and element/position mapping
   conventions; and
 - an observable-specific comparison plan: definition, sampling or mapping,
@@ -90,9 +123,14 @@ also declare the nominal-to-perturbed response observable, response norm, and
 minimum meaningful response in each engine. Choose an observable that is
 physically sensitive to the component being tested; closed-orbit response is
 not suitable for every alignment or field perturbation. Record the pinned
-target-library version, the inspected public import/application API, and every
-effective setting. Verify effective behavior with a controlled response
-comparison; a source-table read-back, element-name match, mutated source model,
+target-library version, the inspected public import/application API, every
+effective setting, and the loaded binary/library identity and API/ABI level
+where the target exposes one. Confirm that the runtime library is compatible
+with the Python/API wrapper used by the benchmark; an older admitted binary
+may not expose an API added to a newer source tree. Record accepted and
+candidate library identities separately when the candidate must be rebuilt.
+Verify effective behavior with a controlled response comparison; a
+source-table read-back, element-name match, mutated source model,
 or successful import call does not establish that the target applies a
 perturbation. For each cross-code response observable, also declare its
 agreement tolerance, tolerance source, and acceptance owner, or classify it
@@ -112,11 +150,31 @@ response tolerance is absent when one has been reviewed for the stated
 observable, plane, and metric, and do not extend that criterion to unreviewed
 families.
 
-Do not infer a tolerance from a convenient plot or an unrelated code. If no
-reviewed tolerance exists, calculate and retain the difference but classify
-the observable as `pending-tolerance`; it cannot support an agreement claim.
+Do not infer a tolerance from a convenient plot or an unrelated code. Use the
+shared baseline below when its observable and metric apply. If no criterion in
+that baseline or an explicit reviewed campaign-specific decision applies,
+calculate and retain the difference but classify the observable as
+`pending-tolerance`; it cannot support an agreement claim. Record which
+baseline revision or campaign decision was used.
 Stop with `blocked` for an ambiguous reference identity, admission scope,
 machine state, convention, mapping, or observable definition.
+
+## Shared screening tolerance baseline
+
+Use the current best available shared linear-optics screening criteria in
+[`references/tolerance-baseline.md`](references/tolerance-baseline.md) by
+default for every target code. The profile, scalar, circumference, and signed
+corrector x/y response values there were adopted from user-approved Xsuite
+testbed criteria at the user's direction on 2026-10-28. Treat them as
+provisional shared defaults pending PyPTC comparison and user/physics review;
+they are not physics acceptance limits. Record the baseline revision/hash and
+criterion with every case result; the current baseline ID is
+`OPTICS-BASELINE-2026-10-28-v1`. Apply a value only after matching its
+observable, coordinate/unit definition, reference state, branch, sample map,
+and residual metric. A reviewed campaign-specific decision may supersede the
+default for its stated scope, but record the decision and do not silently
+change the shared baseline. Criteria for unlisted observables and unreviewed
+response families remain `pending-tolerance`.
 
 ## Chromaticity definition and coordinate conversion
 
@@ -177,8 +235,44 @@ Report the native definition, conversion factor, `beta0`, tune branch/mode,
 offsets and estimator method with the converted values. Check that the result
 is stable to a bounded change in finite-difference step when making a precision
 claim. The MAD-X definition establishes units and normalization, not a
-cross-code acceptance tolerance; until one is supplied and reviewed, classify
-the difference as `pending-tolerance`.
+cross-code acceptance tolerance. After conversion to `dQ/d(delta_p)`, use the
+separate horizontal and vertical screening limits in the shared tolerance
+baseline. If the derivative definition or estimator is not reconciled,
+classify the difference as `blocked` or `non-equivalent`; do not apply the
+numerical limit to an unmatched native derivative.
+
+#### PyPTC API-level-5 coordinate evidence
+
+For PyPTC API-level-5, the Python `PTC.chromaticities()` result was identified
+as `dQ/dPT` for the investigated build. The Python particle convention is
+`PT = DeltaE/p0c`; at the reference particle,
+`dPT/dDELTAP = beta0`. Therefore convert the PyPTC native values to the common
+momentum definition with:
+
+```text
+dQ/dDELTAP = beta0 * PTC.chromaticities()
+```
+
+In the paired attempt-019 evidence with MAD-X 5.02.00, `DQ1/DQ2` were measured
+as `dQ/dDELTAP`. The converted values were:
+
+| Plane | PyPTC native `dQ/dPT` | PyPTC converted `dQ/dDELTAP` | MAD-X `DQ` (`dQ/dDELTAP`) | PyPTC minus MAD-X |
+|---|---:|---:|---:|---:|
+| X | -4.745307641 | -1.742160372 | -4.745390843 | +3.003230471 |
+| Y | -4.806147200 | -1.764496599 | -4.806168146 | +3.041671547 |
+
+The close raw native numbers were derivatives with respect to different
+coordinates and did not indicate agreement. This conversion resolves the
+coordinate interpretation for the cited PyPTC API-level-5 and MAD-X 5.02.00
+combination; it does not explain the large normalized discrepancy, establish
+physics agreement, or select a tolerance. Preserve the attempt-019 report and
+its original blocked result as-run; use the investigation's converted values
+as a subsequent diagnostic correction, not as rewritten run output. For other
+PyPTC or MAD-X versions, verify the actual API and version-specific MAD-X
+definition before applying this conversion. Do not infer the PyPTC rule from
+the MAD-X release rule or assume all quantities use the same derivative
+coordinate: in the same investigation, MAD-X `DX/DY/DPX/DPY` were per `PT`,
+while its MAD-X 5.02 `DQ1/DQ2` were per `DELTAP`.
 
 If a plane-specific chromaticity residual persists after reference-state,
 coordinate, and estimator reconciliation, inspect whether the pinned target
@@ -204,6 +298,23 @@ only model setting that reproduces this curve. These are findings for that
 input and pinned versions, not expected values or acceptance criteria for
 another run.
 
+Subsequent user-run attempt-030 evidence applied the reviewed
+`edge="dipole-only"` setting to every fresh Xsuite line; its report audits all
+110 bends across all 38 cases. At nominal, horizontal chromaticity agreed
+within `7.78e-8` and vertical chromaticity within `8.03e-9`. All 28 signed
+corrector cases passed the existing `100 µm` per-coordinate x/y orbit-response
+limit. The user subsequently directed that the Xsuite-derived profile,
+scalar, circumference, and corrector x/y criteria be the shared best screening
+values so far across codes, pending PyPTC comparison and review; the exact
+criteria are maintained in the linked tolerance baseline. Attempt-030's
+measured outcomes remain specific to that pinned campaign and do not make the
+bend model universal or extend the corrector response limit to optics-profile,
+tune, or chromaticity responses. Keep the other
+attempt-030 response-residual envelopes as measured values for later matched
+PyPTC comparison, never as tolerances. For each response family, the campaign
+record should identify the observable, units, residual statistic, maximum, and
+case producing that maximum.
+
 Keep the diagnostic variant separate from the main benchmark result. Record
 the effective bend-edge setting for every fresh Xsuite line used in the main
 cases. If no expert method review has adopted a bend-edge override, state the
@@ -217,26 +328,73 @@ production benchmark fix, universal equivalence, or physics acceptance. The
 change remains a model-level result; the detailed MAD-X element-map equivalence
 has not been independently proved.
 
-## Capability inventory and comparability
+## Scope declaration and capability inventory
 
-Before calculations, make a compact capability matrix for the reference and
-target code. Include reference/closed orbit, `Qx`/`Qy`, `βx`/`βy`, `αx`/`αy`,
-horizontal and vertical dispersion and derivatives, phase advance,
-circumference, chromaticity, element/position sampling, single-particle
-tracking, and tune-from-tracking. Where both sides expose equivalent
-definitions, also inventory corrector kicks/orbit response, trim-quadrupole or
-harmonic tune control, integer/fractional/harmonic tunes, RF/harmonic data,
-aperture metadata, and error or misalignment application. For each, record one
-of:
+Before calculations, declare the transverse comparison mode:
+
+- `uncoupled-transverse-twiss`: compare the plane-based transverse orbit,
+  Twiss, phase, tune, dispersion, circumference, and matched chromaticity
+  observables listed in the scope. State whether coupling is absent,
+  negligible for this state, or simply not evaluated. If meaningful coupling
+  is present but not compared, limit the conclusion to uncoupled plane Twiss;
+  do not describe it as complete transverse-optics agreement.
+- `coupled-transverse-optics`: when the selected state meaningfully couples
+  the transverse planes, compare matched normal-mode and coupling observables
+  from both codes. Record the mode ordering, normalization, phase convention,
+  and coupling indicators. If either code cannot provide a comparable result,
+  report the capability gap and limit the conclusion accordingly.
+
+Record the calculation mode and effective RF/harmonic state, including whether
+RF is active. RF state is machine-state provenance; longitudinal or 6D results
+are outside this skill's acceptance scope.
+
+Build a compact, functional capability matrix for the reference and target.
+For each capability, record both code/version, the API and output used, any
+required configuration, applicability to the selected state, observable
+convention and mapping, and disposition. Include the in-scope orbit, plane
+Twiss or coupled modes, phase, tunes, dispersion and derivatives,
+chromaticity, circumference, and element/position sampling. Also inventory
+availability of a one-turn 4D transverse map, eigenvalues/normal forms, and
+coupling indicators. These map/normal-form items are optional corroborating
+checks unless the declared benchmark explicitly selects them; API availability
+alone is not comparable evidence. If selected, align coordinate order,
+reference point, normalization, closed-orbit state, linearization procedure,
+and normal-form convention, and define a reviewed criterion.
+
+Record element/position sampling, corrector, single-element field-strength,
+alignment, and verified error-table-intersection capabilities as separate
+matrix entries when they are part of the declared case inventory. Keep each
+entry's case scope and classification aligned; success in one family must not
+close another. Keep optional diagnostics such as tracking-derived tune
+separate from transverse Twiss tunes. Mark longitudinal
+6D optics, synchrotron tune, momentum compaction, slip factor, aperture or
+acceptance, and other excluded functions as `out-of-scope` where a matrix entry
+is useful; do not make them transverse acceptance gates.
+
+For every declared case, retain its transverse mode, coupling assessment, and
+effective RF/harmonic state in the case configuration and saved result; the
+capability matrix and report must identify the scope these states cover. Mark
+whether each classification is nominal-only or covers all applicable cases.
+Do not use nominal plane-Twiss output to infer that perturbed cases are
+uncoupled, or use a nominal pass to classify a whole perturbation family as
+within tolerance. Keep element-position sampling, full error/misalignment,
+single-element field strength, and verified survey-intersection classifications
+separate. If the comparison has no reviewed criterion for one of these scopes,
+retain its measured result as `pending-tolerance` even when other observables
+or perturbation families pass.
+
+Use these dispositions consistently:
 
 - `comparable`: same observable, state, convention, and mapping are available;
 - `unavailable`: one side cannot produce it;
 - `non-equivalent`: outputs exist but definitions or models differ materially;
 - `blocked`: an unresolved dependency prevents a meaningful calculation;
-- `unbenchmarked`: the target exposes a feature with no reviewed comparable
-  reference or expectation yet; and
+- `unbenchmarked`: a target feature has no reviewed comparable reference or
+  expectation yet;
+- `out-of-scope`: the capability is explicitly outside this transverse
+  benchmark; and
 - `pending-tolerance`, `within-tolerance`, or `out-of-tolerance`: a completed
-  comparable calculation with its acceptance state.
+  comparable calculation with its screening disposition.
 
 Use `blocked` with the reason `target-application failure` when a declared
 reference perturbation has a meaningful response in the chosen observable but
@@ -249,25 +407,17 @@ can be observed; it is not a cross-code tolerance. Application failure is
 missing setup/interface evidence, not a numerical result and never
 `pending-tolerance`.
 
-Run every fair comparison exposed by the inventory. Do not silently omit a
-capability because it is inconvenient. A missing common-core capability may
-produce a useful limited report, but cannot support full first-pass acceptance;
-state that scope explicitly. Chromaticity and element/position comparison are
-additional capability-aware checks, not common-core prerequisites. Record
-unavailability without preventing an otherwise complete scoped first-pass
-result, but compare chromaticity when both codes can provide a documented
-tune-versus-momentum observable. Convert it to the common momentum definition
-below; do not skip the comparison merely because the codes use different
-longitudinal momentum variables.
-
-The common core, when both paths support it, is orbit, `βx`/`βy`, `αx`/`αy`,
-dispersion and derivatives, phase advance, scalar `Qx`/`Qy`, circumference,
-and matched bounded tracking. Each needs an equivalent reference and target
-record, resolved conventions and mapping, an aligned table or scalar summary,
-residual metrics, and a required plot or readable table. `pending-tolerance`
-means that this completed evidence awaits a tolerance decision; it cannot
-stand in for absent data, a missing plot, an unresolved mapping, or a
-target-only tracking record.
+Run every comparable observable selected within the declared transverse scope.
+Do not silently omit one because it is inconvenient. An unavailable or
+non-equivalent in-scope observable limits the result and must be reported; it
+does not expand the skill to longitudinal, tracking, or production work.
+Optional map/normal-form checks and separately selected tracking diagnostics
+are not prerequisites unless the run explicitly promotes them into its scope.
+For each completed in-scope comparison, retain equivalent reference and target
+records, resolved conventions and mapping, aligned data or scalar summary,
+residual metrics, and its tolerance status. `pending-tolerance` describes
+completed comparable evidence awaiting a criterion; it cannot stand in for
+missing data, unresolved mapping, or failed target application.
 
 ## Case isolation
 
@@ -279,6 +429,18 @@ transformation/application record, and entry-point identity. An orchestrator
 may run several cases, but it must not conceal state inheritance between them.
 Treat a state-leaking or unidentifiable declared case as technically
 incomplete, not as a numerical comparison result.
+
+Before running, publish a machine-readable case inventory derived from the
+capability inventory and declared benchmark scope. For each candidate case,
+record its family and source identity, the disposition (`included`,
+`not-applicable`, `unsupported`, or `blocked`/`deferred`), the reason and
+evidence, and the reference and target application status. Do not silently
+reduce a multi-case campaign to nominal. A cross-code case list from another
+campaign is a planning cross-reference, not proof that each case is applicable
+or equivalent in this target; assess and justify the disposition of every
+candidate. Cases not executed remain visible with their reason and without
+fabricated results or plots. Keep exact case IDs in the campaign inventory,
+not in this generic skill.
 
 ## Perturbation application evidence
 
@@ -299,8 +461,13 @@ For an error table, classify every requested component on each side as
 record consistent with the documented transformation, not merely successful
 input parsing. A full-table comparison is comparable only over the
 intersection of components verified on both sides; show all excluded
-components and their classification. Keep the component names and
-code-specific transformations in the campaign.
+components and their classification. Where MAD-X applies a source table and
+emits an `ESAVE` or equivalent applied-error table, also normalize and compare
+the source components with the saved MAD-X-applied components. Retain a
+machine-readable per-component source-to-MAD-X verdict, including omitted,
+unsupported, transformed, and unmatched components; retaining the two raw
+tables without a normalized comparison is not a completed audit. Keep the
+component names and code-specific transformations in the campaign.
 
 When a benchmark claims complete corrector-response coverage, define the
 source-identified corrector set and declared kick settings and polarities
@@ -332,6 +499,23 @@ field-error control does not validate alignment transforms. Compare cases in
 stages and keep independent unresolved observables separate; reporting them
 together does not establish a causal relationship.
 
+For the pinned ISIS/Xsuite diagnostic context, distinguish the Bend DPSI orbit
+finding from quadrupole DPSI optics residuals. In Xtrack `0.110.0`, for an
+isolated `+1 mrad` MAD-X Bend `DPSI`, a disposable remap of imported Bend
+`DPSI` from `rot_s_rad` to `rot_s_rad_no_frame` reduced the reported
+main-dipole vertical-orbit response residual from `3.317 mm` to `1.591 nm`.
+The same remap did not remove the quadrupole beta-response residuals for QD,
+QF, and QDS (`betx/bety` maxima `1.699e-3/1.583e-3 m`,
+`1.500e-3/1.370e-3 m`, and `1.330e-4/1.230e-4 m`). Their cause
+remains unresolved; test matched coupled Twiss or map observables before
+attributing them to either code. QTF/QTD had zero effective strength and
+zero harmonic drive in that setup, so their negligible response does not
+validate powered-trim alignment behavior. These are pinned campaign findings,
+not generic expected values or production mapping rules. Keep any transform
+remap diagnostic-only unless the specific target code/version and recipe are
+separately reviewed and the resulting configuration is verified on every
+fresh benchmark state.
+
 ## Procedure
 
 1. Confirm the admission review disposition is accepted and that its scope
@@ -345,8 +529,8 @@ together does not establish a causal relationship.
    Confirm that the target project also has the documented shell environment
    setup and user-facing, reusable functions described above. If it does not,
    add that scaffold before the comparison; use the admission skill for
-   installation and initial lattice-load checks, then expose the optics and
-   tracking actions as readable target-code functions.
+   installation and initial lattice-load checks, then expose transverse-optics
+   actions as readable target-code functions.
 
 2. Freeze the comparison configuration. Record the reference and target
    commands, versions, dependency/runtime identities, every ordered input and
@@ -356,9 +540,12 @@ together does not establish a causal relationship.
    target-library source/API for relevant import behavior; record the source
    revision and every effective option, and use a controlled comparison to
    distinguish unsupported import from a configuration-induced model change.
-   Declare proposed observables, mapping/sampling, tolerances, and the
-   independent reviewer or acceptance record before interpreting results. For
-   every declared case,
+   Declare the transverse mode, coupling applicability, RF/harmonic state,
+   proposed observables, mapping/sampling, tolerances, and the independent
+   reviewer or acceptance record before interpreting results. Inventory the
+   reference and target APIs/outputs and mark the one-turn 4D map and coupled
+   normal-form capabilities optional unless the selected scope includes them.
+   For every declared case,
    record its fresh-state entry point, configuration, transformation, and
    source identity before it is executed. For a perturbation, also record the
    response observable/norm/threshold and target public application API with
@@ -406,18 +593,36 @@ together does not establish a causal relationship.
    promise for other releases: inspect the pinned version's API/source and
    verify the actual output before constructing the map.
 
+   For PyPTC, do not align `all_node_twiss_orbit()` rows with MAD-X TWISS rows
+   by array index or nearest `s`. Its ordinary orbit-node grid can combine
+   several short MAD-X elements and add internal samples within longer
+   elements. A bounded marker probe found a Python-level route to request
+   element exits: read ordered fibre names from the flat file, write the PTC
+   `SETORBITMARKER` pre-orbit command in an isolated working directory before
+   lattice initialization, then use `PRINTORBITNODES` through the existing
+   wrapper and parse node identity metadata. Match using fibre index/name,
+   occurrence, physical `s`, and boundary side; verify every expected exit,
+   including zero-length and repeated-position elements. In the cited probe,
+   named exits were added to the internal nodes and all 586/586 flat-file
+   fibre ends matched; the later user-run attempt-019 also retained a verified
+   586/586 MAD-X-exit map. These results validate sampling identity only, not
+   profile agreement. This marker route is version-specific: verify it against
+   the pinned PyPTC/PTC build. It does not request arbitrary positions inside
+   an unsplit fibre; do not change the `LMAX` split policy or insert markers
+   inside thick elements as a shortcut for an unverified map.
+
 4. Generate the reference and target linear-optics records without changing
-   the reviewed machine state. For every `comparable` common-core observable,
-   retain the raw records and compact aligned comparison table or scalar
-   summary. Calculate signed and absolute differences, maximum and RMS
+   the reviewed machine state. For every `comparable` in-scope transverse
+   observable, retain the raw records and compact aligned comparison table or
+   scalar summary. Calculate signed and absolute differences, maximum and RMS
    residuals where meaningful, and the tolerance verdict. Show scalar results
    and profile residuals together: agreement in global tunes or circumference
    cannot stand in for agreement of beta, alpha, dispersion, phase, or
    chromaticity profiles. Leave large unexplained residuals visible and do not
    make a broad optics-agreement claim from selected scalar matches. Reference
    Twiss, phase, and tune values identify the run; target-code agreement
-   requires the aligned comparison. A missing available common-core reference
-   or target record makes the technical comparison incomplete, not
+   requires the aligned comparison. A missing available in-scope reference or
+   target record makes the technical comparison incomplete, not
    `pending-tolerance`.
 
    For chromaticity, retain the native value and definition alongside the
@@ -428,8 +633,10 @@ together does not establish a causal relationship.
    tune-versus-momentum curves at common physical momentum offsets. If the
    method, mode, or coordinate cannot be reconciled, classify chromaticity as
    `blocked` or `non-equivalent`, explain why, and retain the differences
-   without inventing a tolerance. A completed conversion without an
-   observable-specific reviewed tolerance remains `pending-tolerance`.
+   without applying an unmatched tolerance. After conversion, apply the shared
+   horizontal or vertical chromaticity criterion when its definition and
+   estimator match; otherwise leave the result `pending-tolerance` or
+   `blocked`/`non-equivalent` as appropriate.
 
 5. Produce reviewable plots from saved aligned data, not hand-copied numbers.
    Create one combined multi-panel plot file for each simulation case. Include
@@ -476,11 +683,14 @@ together does not establish a causal relationship.
    name or choose colours as a substitute for classification evidence. Render
    other element families distinctly and consistently, with a legend or key.
 
-   Add an associated working-point panel with explicit labels `Bare horizontal
-   tune`, `Bare vertical tune`, `Bare horizontal chromaticity`, and `Bare
-   vertical chromaticity`. For each label show the MAD-X/reference value, the
-   target-code value, and the signed target-minus-reference difference. Use
-   `dQ/d(delta_p)` for chromaticity after the documented conversion. Show the
+   Add an associated working-point panel. For uncoupled plane optics, use the
+   explicit labels `Bare horizontal tune`, `Bare vertical tune`, `Bare
+   horizontal chromaticity`, and `Bare vertical chromaticity`. For coupled
+   optics, label ordered normal modes and their chromaticities explicitly;
+   do not call a mode horizontal or vertical unless that is the documented
+   convention. For each value show the MAD-X/reference result, target result,
+   and signed target-minus-reference difference. Use `dQ/d(delta_p)` for
+   chromaticity after the documented conversion. Show the
    effective recipe/overlay identity, units, and verified sample mapping in
    the plot or its caption. Build this overview from saved nominal records and
    identify it as a distinct panel group in the case-level plot manifest and
@@ -507,31 +717,36 @@ together does not establish a causal relationship.
    directories when composites are stored in a shared case-artifact folder;
    record which representative figure was checked for normal-size readability.
 
-6. Run a bounded deterministic single-particle tracking cross-check only after
-   its linear prerequisites are interpretable. Run both reference and target
-   with the same declared initial condition relative to the same orbit, the
-   same observation point and coordinate convention, a predeclared finite turn
-   count, loss/finite policy, a named integration recipe for each engine, and
-   tune-estimator settings. Record relevant integration controls and provide a
-   bounded refinement or convergence check when making a precision tune claim.
-   Retain both records, coordinate-versus-turn and phase-space plots,
-   estimator inputs/settings, estimator resolution and limitations, and the
-   derived tune comparison; do not use a scan or production tracking campaign.
-   Before plotting, tuning, or classifying the result as comparable,
-   validate that both records contain the declared complete turn count at the
-   same observation point. State whether the retained sample count includes an
-   initial row or only completed turns, and verify the corresponding expected
-   count. Select and checkpoint the reference-tracking recipe/engine before
-   execution; retain its runtime log or trace. Classify reference-engine setup
-   failure, truncated reference record, target runtime failure, and numerical
-   disagreement separately. A partial or target-only tracking record is
-   `blocked` setup/interface evidence, not a completed common-core tracking or
-   tune comparison. Compare turn-by-turn coordinates only when synchronisation
-   and element mapping are equivalent; otherwise compare stated derived
-   observables and record the limitation.
+   Use one vertically stitched PNG per executed case as the case-level plot
+   artifact; do not also emit a PDF or separate parameter/response images. For
+   the current Xsuite/PyPTC campaign presentation, use `3300 × 1600` pixel
+   strips at 400 dpi as the starting layout, with margins that keep axis labels
+   and scientific-notation offsets visible and table sizing that keeps all
+   text inside its cells. These dimensions are a rendering choice, not a
+   sampling requirement or universal legibility threshold: adjust layout and
+   font sizes to the panel content and verify at normal viewing size. Clearly
+   head the nominal groups for the magnet-family map, bare working-point table,
+   and independent `βx`, `βy`, `Dx`, `Dy`, `x`, and `y` views; repeat useful
+   section headings for remaining Twiss, dispersion, orbit/momentum, phase,
+   scalar, and any separately selected diagnostic groups so a vertically
+   stitched image remains navigable.
 
-7. Compare every additional fair capability, such as chromaticity or
-   element-by-element values, with the same provenance and classification.
+6. Do not make tracking part of the transverse optics verdict. If the user
+   requests a bounded tracking diagnostic, run it only after the transverse
+   linear model is interpretable and label it separately. Record both engines,
+   initial condition and reference orbit, observation point, coordinate
+   convention, finite turn count, loss/finite policy, integration recipes,
+   tune-estimator resolution, retained sample counts, and runtime logs. Treat
+   turn-by-turn coordinates as non-equivalent when synchronization or
+   integrators differ; keep tracking-derived tune `pending-tolerance` unless a
+   criterion and adequately resolved estimator have been reviewed. A tracking
+   result does not fill a missing transverse capability or establish
+   transverse-optics agreement.
+
+7. Compare any additional selected transverse capability, such as matched
+   coupled normal modes, a one-turn 4D map, or element-by-element values, with
+   the same provenance and classification. Do not require optional map checks
+   unless the declared scope or expert review selects them.
    When claiming corrector response, correction, misalignment, or error-table
    comparability, define named perturbation cases, source identity and hash,
    transformation, applied-element mapping, and per-case evidence before
@@ -574,6 +789,47 @@ together does not establish a causal relationship.
    preserve the original reference and scope rather than treating a previous
    target code as automatically authoritative.
 
+   Check report consistency against the saved machine-readable per-case
+   results. A capability verdict's stated case scope must be the same scope
+   used to aggregate its classification: label it as nominal-only only when
+   only the nominal result is being reported, or expose nominal and
+   campaign-wide classifications separately. Do not attach a campaign-wide
+   `out-of-tolerance` verdict to a `cases: ["nominal"]` label. Explanations
+   must describe the observed evidence: when a field-strength control has
+   verified nonzero responses in both engines but no reviewed response
+   tolerance, classify it `pending-tolerance` and say that the response was
+   measured and the criterion is pending; do not claim the responses were
+   `None` or unobservable. Reconcile the capability matrix, report text,
+   tolerance summary, and per-case response records before publication.
+
+   A review correction may reclassify saved results without rerunning the
+   simulation. Preserve the as-run report and criteria snapshot, identify the
+   exact correction and evidence used, and state explicitly that no engine was
+   rerun. Do not make the corrected report appear to be the original run
+   output.
+
+   Summarize measured response-residual envelopes by case family and
+   observable when they will support comparison with a later target code.
+   For profile responses, calculate each engine's `perturbed - nominal`
+   response first, then report the maximum absolute pointwise target-minus-
+   reference response residual over the verified common sample map. For scalar
+   tune or chromaticity responses, report the absolute scalar response
+   residual. Include units, metric, worst-case case ID, recipe/model settings,
+   and source hashes. Keep corrector, field-strength, isolated alignment, full
+   survey, and verified-intersection survey envelopes separate. These are
+   measured outcomes, not tolerances. Compare them with PyPTC only after
+   matching the case applicability, perturbation, response definition,
+   normalization, mapping/sampling, and residual metric; leave the response
+   tolerance pending until separately reviewed.
+
+   Use the shared circumference criterion from the tolerance baseline as the
+   default across codes. Record its baseline revision/hash. It originated as
+   the user's 1 mm absolute decision in Xsuite attempt-030 and is a provisional
+   screening value, not physics acceptance. If separately requested, keep
+   tracking-derived tune `pending-tolerance` until reviewed and turn-by-turn
+   coordinates `non-equivalent` when the two integrators differ; neither changes the
+   transverse-optics verdict.
+
    Whenever a code reaches technical completion under this skill, append a
    repository-level completion record to
    `docs/publications/evidence-gated-agents/evidence/chronology.md`. Use one
@@ -585,12 +841,15 @@ together does not establish a causal relationship.
    criterion and its source/reviewer, the signed target-minus-reference
    difference and appropriate maximum/RMS residual, and the resulting
    `within-tolerance`, `out-of-tolerance`, or `pending-tolerance` status. When
-   no tolerance has been supplied, retain the measured differences and mark
-   them `pending-tolerance`; do not omit them. Identify user-approved
-   screening tolerances as campaign-specific and keep them distinct from
-   physics acceptance. Keep full tables, plots, and raw run artefacts in the
-   campaign repository; the shared record is a compact summary and provenance
-   link, not a duplicate campaign archive.
+   no applicable criterion in the shared baseline or reviewed override exists,
+   retain the measured differences and mark them `pending-tolerance`; do not
+   omit them. Identify the shared screening baseline as the current best
+   provisional values, pending PyPTC comparison and review, and keep it
+   distinct from physics acceptance. Use the shared tolerance baseline across
+   codes, identify its revision/hash, and record any reviewed campaign-specific
+   override and its scope. Keep full tables, plots, and raw run artefacts in
+   the campaign repository; the shared record is a compact summary and
+   provenance link, not a duplicate campaign archive.
 
 ## Evidence bundle
 
@@ -605,21 +864,29 @@ bundle must include:
 - native and converted chromaticity values for both planes, their tune mode
   and momentum-coordinate definitions, reference-particle beta where needed,
   sampled offsets/method/step, conversion factors, and signed differences;
-- the capability matrix, including unavailable, non-equivalent, blocked, and
-  unbenchmarked functions;
-- exactly one combined multi-panel plot file per simulation case, containing
+- the declared transverse calculation mode, evidence for whether coupling is
+  absent, negligible, meaningful, or not evaluated, and effective RF/harmonic
+  state;
+- the capability matrix, including the API/output and version on each side,
+  applicability, mapping/convention, and unavailable, non-equivalent, blocked,
+  unbenchmarked, or out-of-scope dispositions;
+- the machine-readable case inventory, with an explicit disposition and
+  evidence-backed reason for each candidate case;
+- exactly one vertically stitched PNG per executed simulation case, containing
   profile, scalar/working-point, and declared response plot groups, plus a
   manifest that links the case artifact and each panel group to its exact data,
   observable definition, units, scaling, mapping, case/code identities, and
   signed residual direction; include the nominal master TWISS/orbit overview
   and working-point values as a panel group in the nominal case file, with
-  distinct sample-count and raster-rendering metadata;
-- tracking initial conditions, turn count, loss/finite policy, retained
-  reference and target coordinates or compact diagnostics, named integration
-  recipes and relevant controls, tune-estimator method/settings/resolution,
-  any refinement or convergence check, derived tune comparison, tracking
-  plots, observation-point identity, requested-versus-retained sample counts,
-  and reference/target runtime logs or traces;
+  distinct sample-count and raster-rendering metadata; do not emit a PDF or
+  separate per-parameter or response images;
+- if a tracking diagnostic is run, its initial conditions, turn count,
+  loss/finite policy, retained reference and target records or compact
+  diagnostics, named integration recipes and relevant controls,
+  tune-estimator method/settings/resolution, derived tune comparison,
+  observation-point identity, requested-versus-retained sample counts, and
+  reference/target runtime logs or traces; keep this evidence outside the
+  transverse acceptance verdict;
 - named perturbation-case records, where those capabilities are compared,
   including independently invocable entry points, fresh-state confirmation,
   source identities/hashes, transformations, element mappings, target public
@@ -648,18 +915,18 @@ Technical comparison evidence is ready for review only when:
   and base reference; any separately authorized benchmark-only input is
   identified, provenance-pinned, applied consistently to both paths, and
   excluded from the admission claim;
-- every comparable profile common-core observable is aligned, quantified, and
+- every comparable in-scope transverse profile is aligned, quantified, and
   included with visible sample markers in its own panel group within the
   single composite plot file for its case; no separate per-parameter plot
   files are emitted, including for response plots. Each panel group is linked
   from the data-derived plot manifest with sample count/mapping kept distinct
   from raster dimensions/DPI, and classified; every
-  scalar common-core observable has a readable aligned summary table or
+  in-scope transverse scalar has a readable aligned summary table or
   working-point panel, and the nominal case composite includes the master
   TWISS/orbit overview with both codes on the same mapped longitudinal
   coordinate, recipe, and working-point comparison;
-- no available common-core observable lacks an equivalent reference/target
-  record, resolved convention/mapping, aligned data, or required plot/table;
+- no available in-scope transverse observable lacks equivalent reference/target
+  records, resolved convention/mapping, aligned data, or a required plot/table;
 - every missing, non-equivalent, blocked, and target-only capability is
   visible in the capability matrix;
 - every agreement claim has a predeclared reviewed tolerance, while all other
@@ -667,11 +934,10 @@ Technical comparison evidence is ready for review only when:
 - every available chromaticity comparison uses the common
   `dQ/d(delta_p)` definition or is explicitly classified `blocked` or
   `non-equivalent`, with its conversion and tune-estimation method retained;
-- the bounded tracking cross-check has documented initial conditions, finite/
-  loss result, named integration recipes, retained reference and target
-  records, tune method and estimator limits, derived tune comparison, plots,
-  limitations, reference-tracking checkpoint, common observation point, and
-  complete declared sample counts; and
+- the declared coupling state and transverse calculation mode are explicit;
+  if meaningful transverse coupling is present and the result claims coupled
+  optics, matched normal-mode/coupling observables have been compared or their
+  gap limits the claim; optional map results are reported only when selected;
 - every declared perturbation case has fresh-state configuration provenance
   and no unresolved state inheritance, and every meaningful reference response
   uses an observable sensitive to that perturbation and has target-side
@@ -682,8 +948,8 @@ Technical comparison evidence is ready for review only when:
   bidirectional corrector-coverage claim includes every declared corrector and
   polarity; and
 - the report names the remaining nonclaims and does not relabel a reference
-  fingerprint, target-only capability, or tracking smoke check as optics or
-  nonlinear agreement; and
+  fingerprint, target-only capability, or tracking smoke check as transverse
+  optics or nonlinear agreement; and
 - this repository contains a `REP-####` completion record for the target code,
   reference, recipe, and completed run, with per-observable/per-case
   tolerances, signed differences and residual summaries, and the review state
@@ -693,10 +959,9 @@ Technical comparison evidence is ready for review only when:
 
 Keep deterministic harness checks independent of retained raw bundles. Use
 compact fixtures to verify that independently invoked cases with conflicting
-perturbations do not inherit state; complete and partial tracking records are
-distinguished; initial-plus-turn and completed-turn sample-count conventions
-are validated; and plot-manifest entries name identities, units, mapping, the
-signed residual direction, and the residual-panel layout. A test fixture may
+perturbations do not inherit state and that plot-manifest entries name
+identities, units, mapping, the signed residual direction, and the
+residual-panel layout. A test fixture may
 imitate a failed reference engine, but must not label that setup/interface
 failure as numerical disagreement. Include fixtures where an import succeeds
 but a required target application setting is omitted, and where a full table
@@ -705,9 +970,7 @@ silently applies only some components. They must classify the former as
 coverage, and permit comparison only for the verified component intersection.
 Include a perturbation whose orbit response is zero while a declared optics
 observable changes, so an insensitive orbit-only gate is not mistaken for
-failed application. Include a tracking case where identical coarse FFT bins
-are reported with their resolution limits and are not promoted to a precision
-tune-agreement claim. Verify that the nominal master-plot manifest entry
+failed application. Verify that the nominal master-plot manifest entry
 links the aligned nominal data, effective recipe, shared position mapping,
 both code identities, magnet-family classification source, and converted
 working-point values. Fixtures must include an entry-versus-exit offset and a
@@ -741,6 +1004,26 @@ bend-edge setting is recorded for every fresh main-case line; an approved
 override must be applied consistently, while an unapproved diagnostic variant
 must not replace the main-case result. Check that capability explanations name
 the exact tolerance scope and do not contradict its observable-level verdict.
+Check that the machine-readable case inventory accounts for every candidate,
+with a reason and evidence for each case not run, and does not present the
+Xsuite attempt-029 inventory as automatically equivalent to PyPTC cases. For
+each executed case, require exactly one vertically stitched PNG and no PDF
+or per-parameter/response image. Treat the current Xsuite/PyPTC 3300 × 1600,
+400 dpi layout as a starting presentation specification, not proof of
+readability. PyPTC attempt-019's 3300 × 36800 nominal composite remained too
+dense to review at normal size despite its large raster. Simplify and organize
+the panel layout, keep headings and labels legible, and inspect the dense
+nominal and a representative perturbed case at normal viewing size while
+retaining the one-composite-per-case requirement and all declared panels.
+Verify that each capability's case scope matches the rows used to classify it,
+and that field-control explanations agree with the recorded response and
+tolerance state. Check that observed response envelopes identify their units,
+metric, family, and worst-case ID, and are explicitly not treated as
+tolerances. Verify the report records the
+shared tolerance-baseline revision/hash and applies the 1 mm absolute
+circumference criterion as the current provisional default. Leave
+tracking-tune tolerance pending. A correction based on saved results must
+retain the as-run snapshot and state that no simulation was rerun.
 
 Only a separate reviewed acceptance may authorise a subsequent nonlinear
 workflow. An accepted first-pass optics comparison does not validate tune
@@ -767,12 +1050,28 @@ their implementations for another target code:
 | [Xsuite ISIS testbed](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test), attempt-018 feedback files `steps/benchmark-code-against-isis-rcs-optics/feedback/0009-attempt-018-benchmark-assessment.md` (SHA-256 `9a92ce3c6d090aea0af49fc6e904816555da99420a97875321d2a951ebbbfe55`) and `0010-attempt-018-master-twiss-plot.md` (SHA-256 `cd45af03a5da3ffbd1f79e3a3ca9f27a6328df19f594bbed0e15750bc6a8926c`) | User-reported attempt-018 plot gaps: missing bare/nominal master TWISS/orbit view, marker prominence, and the need to distinguish sample density from raster rendering; both feedback files were untracked when these hashes were recorded, and no tolerance or resolution adequacy is established |
 | [Xsuite ISIS testbed](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test), attempt-019 feedback `steps/benchmark-code-against-isis-rcs-optics/feedback/0011-attempt-019-master-plot-and-twiss-boundary-investigation.md` (SHA-256 `4a7f717d379aaa18396c4ee90b525a55dfb3c00deb6d44914b6348e724ceccb8`) | User-run diagnostic identifies a version-specific entry-versus-exit row/position labeling error in the testbed profile exporter and requests separate parameter panels, magnet-family colours, and explicit bare tune/chromaticity labels; the shared skill requires verified boundary mapping and plot presentation but does not validate the testbed fix or establish reviewed tolerances or physics acceptance |
 | [Xsuite ISIS testbed](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/060b3b5aee52e11fdc40bb1ab98bea9d20a1ba9d/steps/benchmark-code-against-isis-rcs-optics/feedback/0012-attempt-020-assessment-and-twiss-boundary-fix.md) (SHA-256 `560eacaefcfa3c2959697f5061948ab1c9d120d209e7cea75fd2ce39a91e31ea`) | User-run attempt-020 verified the row-boundary mapping in eleven cases and reported profile residuals; technical completion is distinct from tolerance and physics acceptance |
-| [Xsuite ISIS testbed](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/060b3b5aee52e11fdc40bb1ab98bea9d20a1ba9d/steps/benchmark-code-against-isis-rcs-optics/feedback/0013-attempt-020-user-approved-optics-tolerances.md) (SHA-256 `a01d3b9581aa270f2a77fec168faa51cd1e4c8bbef51544acb80e16ba5e8da90`) | User-approved provisional screening tolerances and attempt-020 per-observable differences; these criteria are specific to that campaign and do not alone establish physics acceptance |
+| [Xsuite ISIS testbed](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/060b3b5aee52e11fdc40bb1ab98bea9d20a1ba9d/steps/benchmark-code-against-isis-rcs-optics/feedback/0013-attempt-020-user-approved-optics-tolerances.md) (SHA-256 `a01d3b9581aa270f2a77fec168faa51cd1e4c8bbef51544acb80e16ba5e8da90`) | Original user-approved Xsuite screening criteria and attempt-020 differences; later user direction adopted the updated Xsuite set as the shared best provisional transverse screening baseline, pending PyPTC comparison and review |
 | [Xsuite ISIS testbed, attempt-022 feedback 0014](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/07361be33d8dd55e27f974a6b791e883e2bed0e4/steps/benchmark-code-against-isis-rcs-optics/feedback/0014-attempt-022-misalignment-import-investigation.md) (SHA-256 `843e0b776a53c96b58fe315d5364c989eb2bd609e04e40396b896804ca1aaf9b`) | User-run attempt-022 and bounded diagnostic show that component application and source-table readback do not alone prove transform-semantic equivalence; inspect source operation order/frame and target API mapping, test components in isolated states, and keep diagnostic remaps separate from benchmark configuration; campaign and physics review remain pending |
 | [Xsuite ISIS testbed, attempt-023 feedback 0015](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/0bb80a925a2055507c6d53bf53451e6e423c37ec/steps/benchmark-code-against-isis-rcs-optics/feedback/0015-attempt-023-corrector-sweep-and-response-tolerances.md) (SHA-256 `46189befbcc12125fdbf2a05326ffb944c7d2c7a0c78616069c9b5450ca58014`) | Attempt-023 had only two positive corrector cases and response floors but no reviewed cross-code response tolerances; feedback proposes conditional full element-by-polarity coverage, a separate field-error control for staged localization, and per-observable response verdicts; campaign and physics review remain pending |
 | [Xsuite ISIS testbed, attempt-025 feedback 0016](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/2ae7cb9201072e61ce105d0b303e2a2d36da6a94/steps/benchmark-code-against-isis-rcs-optics/feedback/0016-attempt-025-corrector-response-and-normalization-review.md) (SHA-256 `b8af712847309c0b9c84df228230dccb6cf23ba0915ce4ab41528a2af853bc82`) | Identifies MAD-X dispersion response subtraction before beta normalization and separates campaign-specific corrector orbit screening from optics-profile, tune, and chromaticity response criteria; establishes no physics acceptance |
 | [Xsuite ISIS testbed, vertical chromaticity investigation (2026-10-27)](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/2ae7cb9201072e61ce105d0b303e2a2d36da6a94/steps/benchmark-code-against-isis-rcs-optics/diagnostics/vertical-chromaticity-investigation-2026-10-27.md) (SHA-256 `90e95181ac055d50c747f6b61520bd14971fcb6f5c16dbc98d3cfd669832ff6f`) | Pinned-version controlled Xsuite bend-edge variants make the vertical chromaticity slope approach the MAD-X result while retaining close nominal tunes; motivates a bounded diagnostic only, not a production setting or universal equivalence claim |
 | [Xsuite ISIS testbed](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test), `steps/benchmark-code-against-isis-rcs-optics/feedback/0017-attempt-026-plot-readability-and-bend-edge-follow-up.md` (SHA-256 `8ab3cbad05f8ef9570f6e7419fa587b52a7ab40a24bd92f78c27444a3b1ac809`; untracked at testbed HEAD `2ae7cb9201072e61ce105d0b303e2a2d36da6a94`) | Attempt-026 kept importer-default bend settings in its main cases; `dipole-only` and `full` were diagnostic-only. Requires the effective model to be explicit on every fresh main-case line, visual readability at normal size, artifact paths to match real non-empty directories, and capability explanations to match tolerance scope |
+| [Xsuite ISIS testbed, attempt-028 addendum to feedback 0017](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/8ba4d5c82ba17e1423133262fc4eeea5d2d54e41/steps/benchmark-code-against-isis-rcs-optics/feedback/0017-attempt-026-plot-readability-and-bend-edge-follow-up.md) (current file SHA-256 `47503b2a4557e13f18f5933d668b78205d6426eaa02ff865e9310359a8fc9f49`) | User-run follow-up reports the `dipole-only` setting on all fresh lines, close nominal chromaticity and all 28 corrector orbit responses within the existing `100 µm` limit; also identifies capability-scope and stale field-response explanation defects. Campaign-specific result, not physics acceptance |
+| [Xsuite ISIS testbed, attempt-029 report](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/8ba4d5c82ba17e1423133262fc4eeea5d2d54e41/steps/benchmark-code-against-isis-rcs-optics/runs/attempt-029/report.md) (SHA-256 `712c9e6e410e6b9f7c25e64221d8917d0a5a3ee51f20b33aa982be38a8c1300d`) and [plot investigation](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/8ba4d5c82ba17e1423133262fc4eeea5d2d54e41/steps/benchmark-code-against-isis-rcs-optics/diagnostics/plot-style-and-bend-edge-investigation-2026-10-27.md) (SHA-256 `f1dc0e8228b75d4d539128e9dcafb25225f9b2ff2ea0708180c111b88d18b1e9`) | Attempt-029 retained a 2500×1200, 300 dpi case PNG with unreadable labels and repeated reporting defects; the investigation specifies the later 3300×1600, 400 dpi stitched-strip layout, headings, margins, and table-fit guidance. Presentation evidence only |
+| [Xsuite ISIS testbed, attempt-030 feedback 0018](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/8ba4d5c82ba17e1423133262fc4eeea5d2d54e41/steps/benchmark-code-against-isis-rcs-optics/feedback/0018-attempt-030-response-envelope-review.md) (SHA-256 `f7d539e4067a82ac5d1857d79bca5af068c26246cd670c75c8fadbf9db2ac0b0`) and [attempt-030 report](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/8ba4d5c82ba17e1423133262fc4eeea5d2d54e41/steps/benchmark-code-against-isis-rcs-optics/runs/attempt-030/report.md) (SHA-256 `824c6335b677ad7ee0c4a45d7d9789e4634fc82029dbc2b88a85d6528476d994`) | Records the user-approved `1 mm` absolute circumference criterion, tracking-tune tolerance still pending, and measured response envelopes for later PyPTC comparison; envelopes are not tolerances. Review correction reclassified saved evidence without rerunning simulation |
+| [Xsuite testbed repository](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test), `steps/benchmark-code-against-isis-rcs-optics/feedback/0020-diagnostic-residual-tolerance-decision.md` (SHA-256 `d2d42c26ba0250379cb487a14c97ccbfc1f75936cc5b2a86de2409aef70ab216`; untracked at testbed HEAD `acb45e021c9dc06ad5c172c0d06b74abb9f160d4`) and `reference-inputs/comparison-tolerances.json` (SHA-256 `a7fbe56a89030be02aaaac03c1b0222d7f86482ea31639b3115ded42b30abe97`; modified, uncommitted) | User-approved full-campaign Qx/Qy and dQ/d(delta_p) limits added to the Xsuite criteria set. The user now directs that the Xsuite set be used as the shared provisional screening baseline pending PyPTC comparison and review |
+| [Xsuite user-run attempt-032 assessment, feedback 0021](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/acb45e021c9dc06ad5c172c0d06b74abb9f160d4/steps/benchmark-code-against-isis-rcs-optics/feedback/0021-attempt-032-assessment.md) (SHA-256 `1999429ca0ab1605471b63bc3385be266cc4023dd9db127b49bd17f47dd9b0a8`) and report SHA-256 `1bbe4570a873bcca7eed7e6540511407e18cd8f1e9a6d55576ef7e3e289ea595` | User-run attempt-032 exercised the Xsuite criteria in all 38 cases; 19 scalar/profile observables met them. Its review remains open; it does not establish physics or skill acceptance, response-family criteria, tracking-tune tolerance, or a revision-matched test of the current skill |
+| [Xsuite ISIS testbed, feedback 0022](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/acb45e021c9dc06ad5c172c0d06b74abb9f160d4/steps/benchmark-code-against-isis-rcs-optics/feedback/0022-transverse-linear-optics-scope-and-capability-gaps.md) (SHA-256 `eb8fdd96965166985b8ebde7722428d95069b0d79ea8a4abeff562380d0770f1`) | User-directed transverse-linear-optics scope; requires explicit coupling and RF state, treats coupled optics as applicable when meaningful, keeps the 4D map optional, and separates longitudinal/6D and tracking work from transverse acceptance |
+| [Xsuite ISIS testbed, linear-optics skill assessment](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/acb45e021c9dc06ad5c172c0d06b74abb9f160d4/steps/benchmark-code-against-isis-rcs-optics/diagnostics/linear-optics-skill-assessment-2026-10-28.md) (SHA-256 `9aaba5e797467db3f8ef9ff7ad9f0d6f2d796ba52782899ef48a73245c03021c`) | Assesses the existing workflow, pending user review of attempt-032, tracking and response-tolerance gaps, and the boundary between the transverse skill and later nonlinear/production work |
+| [Xsuite ISIS testbed, capability-gap assessment](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/acb45e021c9dc06ad5c172c0d06b74abb9f160d4/steps/benchmark-code-against-isis-rcs-optics/diagnostics/linear-optics-capability-gap-assessment-2026-10-28.md) (SHA-256 `614813d543f006e059d45678c2969fa16544bfbe522b7cdc72963dedc7b9a168`) | Functional MAD-X/Xsuite capability inventory; distinguishes uncoupled plane Twiss from coupled optics and optional map/longitudinal APIs, and requires API/configuration/mapping evidence rather than inferring equivalence from feature availability |
+| [Xsuite ISIS testbed, magnet-family EALIGN investigation](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/acb45e021c9dc06ad5c172c0d06b74abb9f160d4/steps/benchmark-code-against-isis-rcs-optics/diagnostics/magnet-family-ealign-investigation-2026-10-28/REPORT.md) (SHA-256 `b2ef04bfc7ab02afb70fc841002fb289176e3dea64740912ee59d39f6ede513c`) | Pinned Xtrack 0.110.0 diagnostic: Bend DPSI no-frame remap reduced the vertical-orbit residual, but did not remove QD/QF/QDS DPSI beta residuals; cause unresolved and trim alignment untested at zero effective strength |
+| [Xsuite ISIS testbed, feedback 0003](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test/-/blob/acb45e021c9dc06ad5c172c0d06b74abb9f160d4/steps/benchmark-code-against-isis-rcs-optics/feedback/0003-madx-dispersion-normalisation-and-error-table-application.md) (SHA-256 `828b12be7dbcb568771e20d4dda001185940117856a5d029987c0234e22951eb`) | Requires run-local MAD-X TWISS `GAMMA`-based Lorentz-beta normalization for `dx`, `dpx`, `dy`, and `dpy`, applied consistently to aligned values, response subtraction, metrics, tables, and plots; also establishes auditable source-to-applied error-table checks |
+| [PyPTC repository](https://github.com/HaroonRafique/PTC), `PTC/PyPTC/steps/benchmark-pyptc-linear-optics-against-madx/feedback/0009-user-run-attempt-005-assessment.md` and `feedback/0010-skill-case-inventory-vs-xsuite-testbed.md` (0009 SHA-256 `6435bcc9886dae946d9e6b611a18c690e653b3200bc7c9b57d87082634b1f04b`; 0010 SHA-256 `a5cd23294051e849e97709ce3aecf86de60bdd3804e3943e33f1da6252b84a7a`, untracked at checkout HEAD `ec2d687cea6bb215db5b7cd71752d930850931e0`) | PyPTC attempt-005 exposes unresolved native chromaticity coordinates, stale plot-manifest paths, unreadable normal-scale composite, and nominal-only execution; feedback 0010 asks for a disposition of every candidate case against the Xsuite inventory, without treating Xsuite case IDs as automatically applicable PyPTC requirements |
+| [PyPTC repository, iteration-0004 campaign](https://github.com/HaroonRafique/PTC/tree/ff1db1ffe078c0478295ee8af54591c2d516b135/PTC/PyPTC/steps/benchmark-pyptc-linear-optics-against-madx) — exact skill snapshot `iteration-0004/SKILL.md` (SHA-256 `b6819ee834b1d3d114216ffd4bae4b52e87715e5baa4525f03394bde5241ae0b`), feedback 0016 (SHA-256 `9d255f736986c81caa71896c539a2100ce8489effd497c4e894fe5ff0d22ce18`), and feedback 0018 (SHA-256 `ed8c4d8c7d2353e1443a62ebeb7cf8afd8f78956284174c05f4c590da818caac`) | Attempt-018's API-level-5 diagnostic and attempt-019's user-run assessment cover all 38 declared cases; preserve the separation between accepted API-4 admission library and rebuilt API-5 candidate, and do not treat case execution as acceptance. Feedback 0018 identifies the unreadable 3300 × 36800 nominal composite, unreviewed response tolerances/floors, and missing normalized per-component source-to-MAD-X-ESAVE audit |
+| [PyPTC feedback 0017, centralized entry points](https://github.com/HaroonRafique/PTC/blob/ff1db1ffe078c0478295ee8af54591c2d516b135/PTC/PyPTC/steps/benchmark-pyptc-linear-optics-against-madx/feedback/0017-centralize-entrypoints-outside-iterations.md) (SHA-256 `fff7fa72940410469ebdb566c651d789da5f33cc73f18147e79aea49d627952d`), attempt-018 report (`64987e964976ca66daa27fd3779db2383f184a1966803dceb8e5754293d07c93`), attempt-019 report (`bc319ad6653196d96e39f977affef6a8028f6e0986f7775b2a9a54a80769d114`), review ledger (`bc7929551a7a9d20b740d97bc51c6330e707bd998e37e11f7600af446def9369`), and runs index (`caa8fa0f300651470504fc643252e75a1f075eaa53d875876b29172db6a878ed`) | Runner relocation is PyPTC-repository-specific and is not imposed on other repositories. The reports, ledger, and index preserve the diagnostic/user-run distinction, 38-case disposition, attempt-019's original blocked result, and its assessed/no-acceptance status |
+| [PyPTC investigation 0002: derivative coordinates and units](https://github.com/HaroonRafique/PTC/blob/ff1db1ffe078c0478295ee8af54591c2d516b135/PTC/PyPTC/steps/benchmark-pyptc-linear-optics-against-madx/investigations/0002-derivative-coordinates-and-units.md) (SHA-256 `29bb2ed7ebac6c5de6fcbddd7bf1a01186c1f2897c8b5103936922c2e24c6145`) | Bounded API-level-5/MAD-X-5.02.00 investigation resolves PyPTC `dQ/dPT`, MAD-X 5.02 `DQ=dQ/dDELTAP`, the `beta0` conversion, and the resulting +3.003230471/+3.041671547 common-coordinate residuals. It explicitly does not identify the physical cause, set a tolerance, or accept attempt 019 |
+| [Xsuite ISIS testbed](https://gitlab.stfc.ac.uk/accelerator_simulation_framework/agentic_xsuite_test), `steps/benchmark-code-against-isis-rcs-optics/feedback/0023-current-transverse-scope-attempt-gap.md` (SHA-256 `b1a72bd655f6a9786522032d08edda8841c2781dfdb5eb4983a0984c8fb00080`; untracked at checkout HEAD `449862d757f84419ef614d0c4e7ff2e3b4d95551`), with attempt-032 report (`1bbe4570a873bcca7eed7e6540511407e18cd8f1e9a6d55576ef7e3e289ea595`), result (`a90fe5c76dfc716445d9c2945e3f95e24a4a68414dc0812f0cb12ff0bf99c819`), capability matrix (`504f83da0e5aef801bbbf9da1643a1cbd29b3828130e3f26a3bc891168d7c800`), and tracking comparison (`d26bc3928167c27274aaf66cbdc6e861a8a3823d3ec6e06e81ba89781f23462e`) | Feedback 0023 confirms the need to persist transverse mode, coupling applicability, and RF state in case configuration/records, the capability matrix, and report; attempt-032 omitted coupling assessment and left several perturbation capabilities pending. Its horizontal tracking FFT is too coarsely resolved for a tracking-tune claim, and user review remains open. Attempt-032 used an older skill snapshot (`b6819ee834b1d3d114216ffd4bae4b52e87715e5baa4525f03394bde5241ae0b`), so it is not a revision-matched test of the current skill. The working-copy tolerance file has the same SHA-256 as the documented provisional baseline; this feedback does not revise its values or establish physics acceptance |
+| [PyPTC sampling-grid investigation](https://github.com/HaroonRafique/PTC/blob/807a8d06e15e52628827031432110c90d1286bdb/PTC/PyPTC/steps/benchmark-pyptc-linear-optics-against-madx/diagnostics/sampling-grid-investigation-20261027.md) (SHA-256 `778af42470691aae00828bb7fd6f0566cfbc170c38f477e06118a23cd51a616b`) and [orbit-marker capability assessment](https://github.com/HaroonRafique/PTC/blob/807a8d06e15e52628827031432110c90d1286bdb/PTC/PyPTC/steps/benchmark-pyptc-linear-optics-against-madx/diagnostics/ptc-orbit-marker-capability-20261027.md) (SHA-256 `9c7bbc125eb90846a126314b9b5236720dac5e959585c2aa4117f49746b14a8d`); latest PyPTC feedback 0018 (SHA-256 `ed8c4d8c7d2353e1443a62ebeb7cf8afd8f78956284174c05f4c590da818caac`) | The initial 375-row PyPTC orbit-node grid did not directly match 586 MAD-X exits. A later bounded marker probe used the existing PTC pre-orbit marker and `PRINTORBITNODES` interfaces to identify all 586 fibre ends; attempt-019 independently retained a 586/586 mapped sample set. This establishes a sampling route and identity mapping, not profile agreement. Feedback 0018's unresolved plot, EFIELD-audit, and tolerance-review limits remain in force |
 
 See `SOURCE_MATERIAL_HIERARCHY.md` for the distinction between generic
 workflow, code knowledge, ISIS-machine facts, benchmark definitions, and

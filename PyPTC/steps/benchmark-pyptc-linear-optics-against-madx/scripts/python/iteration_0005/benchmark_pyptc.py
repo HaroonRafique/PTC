@@ -18,16 +18,15 @@ from typing import Any
 
 STEP_DIR = Path(__file__).resolve().parents[3]
 ITERATION_DIR = Path(__file__).resolve().parent
-SKILL_SNAPSHOT_DIR = STEP_DIR / "iteration-0005"
+BASELINE_FILE = STEP_DIR / "reference-inputs/tolerance-baseline.md"
 REPO_ROOT = STEP_DIR.parents[1]
 ADMISSION_ID = "attempt-20261027T194128Z"
 ADMISSION_BASIS = STEP_DIR / f"admission_basis-accepted-{ADMISSION_ID}"
-PINNED_SKILL_REVISION = "3aad35af0ad53337fc259e14d0d614fd55821aa5"
-PINNED_SKILL_SHA256 = "b57248367f33b0985b136bf119cb366fc03604d47a34e52fb05aaa42518994ae"
 PINNED_BASELINE_ID = "OPTICS-BASELINE-2026-10-28-v1"
 PINNED_BASELINE_SHA256 = "77bb8564d562a0a72b1eae738b097d6d614177f40db4abe01f81cb5236d671c8"
+PINNED_SKILL_REVISION = os.environ.get("PYPTC_BENCHMARK_SKILL_REVISION", "unknown")
+PINNED_SKILL_SHA256 = os.environ.get("PYPTC_BENCHMARK_SKILL_SHA256", "unknown")
 MAD_X_CHROM_DELTA_P_STEP = 1.0e-6
-ITERATION = "0005"
 
 
 def campaign_case_catalog() -> list[dict[str, Any]]:
@@ -1155,10 +1154,13 @@ def run_attempt() -> Path:
     """Execute the fresh nominal optics application and write its evidence bundle."""
     accepted, snapshot, flat_file, library = load_admission_basis()
     provenance = verify_inputs(accepted, snapshot, flat_file, library)
-    skill_file = SKILL_SNAPSHOT_DIR / "SKILL.md"
-    if optics.sha256(skill_file) != PINNED_SKILL_SHA256:
-        raise RuntimeError("Local skill snapshot hash differs from the iteration's pinned skill revision")
-    baseline_file = SKILL_SNAPSHOT_DIR / "references/tolerance-baseline.md"
+    skill_file = Path(os.environ["PYPTC_BENCHMARK_SKILL_FILE"]).resolve()
+    skill_revision = os.environ["PYPTC_BENCHMARK_SKILL_REVISION"]
+    skill_blob = os.environ["PYPTC_BENCHMARK_SKILL_BLOB"]
+    skill_sha256 = os.environ["PYPTC_BENCHMARK_SKILL_SHA256"]
+    if optics.sha256(skill_file) != skill_sha256:
+        raise RuntimeError("Per-attempt skill snapshot hash differs from the orchestrator record")
+    baseline_file = BASELINE_FILE
     if optics.sha256(baseline_file) != PINNED_BASELINE_SHA256:
         raise RuntimeError("Local tolerance-baseline snapshot hash differs from the pinned skill reference")
     run_dir = Path(os.environ["PYPTC_BENCHMARK_RUN_DIR"]).resolve()
@@ -1173,8 +1175,7 @@ def run_attempt() -> Path:
     manifest: dict[str, Any] = {
         "attempt_id": output_id,
         "attempt_class": run_class,
-        "iteration": ITERATION,
-        "skill": {"name": "benchmark-code-against-isis-rcs-optics", "revision": PINNED_SKILL_REVISION, "source_worktree_modified": False, "sha256": PINNED_SKILL_SHA256, "snapshot": str(skill_file.relative_to(STEP_DIR))},
+        "skill": {"name": "benchmark-code-against-isis-rcs-optics", "revision": skill_revision, "file_blob": skill_blob, "source_worktree_modified": os.environ.get("PYPTC_BENCHMARK_SKILL_WORKTREE_DIRTY", "false") == "true", "sha256": skill_sha256, "snapshot": str(skill_file.relative_to(STEP_DIR))},
         "tolerance_baseline": {"id": PINNED_BASELINE_ID, "sha256": PINNED_BASELINE_SHA256, "snapshot": str(baseline_file.relative_to(STEP_DIR)), "status": "provisional shared screening baseline; user/physics review pending"},
         "workflow_source_hashes": {
             str(path.relative_to(STEP_DIR)): optics.sha256(path)

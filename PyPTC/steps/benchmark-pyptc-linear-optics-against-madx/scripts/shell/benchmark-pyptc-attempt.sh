@@ -14,8 +14,8 @@ step_root=$(cd "$script_dir/../.." && pwd -P)
 repo_root=$(cd "$step_root/../.." && pwd -P)
 python="$step_root/.venv/bin/python"
 workflow="$step_root/scripts/python/iteration_0005/benchmark_pyptc.py"
-skill_snapshot="$step_root/iteration-0005/SKILL.md"
-baseline_snapshot="$step_root/iteration-0005/references/tolerance-baseline.md"
+skill_source="${ISIS_MODELLING_AGENTS_ROOT:-$HOME/Repositories/isis-modelling-agents}/skills/machine-integration/benchmark-code-against-isis-rcs-optics/SKILL.md"
+baseline_snapshot="$step_root/reference-inputs/tolerance-baseline.md"
 runs_root="$step_root/runs"
 run_id=
 run_dir=
@@ -58,9 +58,8 @@ EOF
 }
 trap failure_handler ERR
 
-[[ -x $python && -s $workflow && -s $skill_snapshot && -s $baseline_snapshot ]] || { echo 'Benchmark environment, workflow module, or pinned iteration-0005 snapshots are missing; run ./scripts/shell/setup-benchmark.sh.' >&2; exit 3; }
-[[ $(sha256sum "$skill_snapshot" | awk '{print $1}') == b57248367f33b0985b136bf119cb366fc03604d47a34e52fb05aaa42518994ae ]] || { echo 'Iteration-0005 skill snapshot has changed; rebuild the iteration before running.' >&2; exit 3; }
-[[ $(sha256sum "$baseline_snapshot" | awk '{print $1}') == 77bb8564d562a0a72b1eae738b097d6d614177f40db4abe01f81cb5236d671c8 ]] || { echo 'Iteration-0005 tolerance baseline snapshot has changed; rebuild the iteration before running.' >&2; exit 3; }
+[[ -x $python && -s $workflow && -s $skill_source && -s $baseline_snapshot ]] || { echo 'Benchmark environment, shared skill source, workflow module, or tolerance baseline is missing; check setup and the isis-modelling-agents checkout.' >&2; exit 3; }
+[[ $(sha256sum "$baseline_snapshot" | awk '{print $1}') == 77bb8564d562a0a72b1eae738b097d6d614177f40db4abe01f81cb5236d671c8 ]] || { echo 'Shared tolerance baseline has changed; review it before running.' >&2; exit 3; }
 mkdir -p "$runs_root"
 highest=0
 for directory in "$runs_root"/attempt-*; do
@@ -79,6 +78,14 @@ done
 
 run_type=user-skill-test
 [[ $mode == agent-diagnostic ]] && run_type=agent-diagnostic
+mkdir -p "$run_dir/inputs"
+skill_snapshot="$run_dir/inputs/benchmark-skill-SKILL.md"
+cp "$skill_source" "$skill_snapshot"
+skill_sha256=$(sha256sum "$skill_snapshot" | awk '{print $1}')
+skill_repo="${ISIS_MODELLING_AGENTS_ROOT:-$HOME/Repositories/isis-modelling-agents}"
+skill_revision=$(git -C "$skill_repo" rev-parse HEAD)
+skill_blob=$(git -C "$skill_repo" rev-parse HEAD:skills/machine-integration/benchmark-code-against-isis-rcs-optics/SKILL.md)
+skill_dirty=$(git -C "$skill_repo" status --short -- skills/machine-integration/benchmark-code-against-isis-rcs-optics/SKILL.md)
 cat > "$run_dir/manifest.env" <<EOF
 run_id=$run_id
 status=running
@@ -88,10 +95,12 @@ orchestrator=$script_path
 orchestrator_sha256=$(sha256sum "$script_path" | awk '{print $1}')
 workflow_module=$workflow
 workflow_module_sha256=$(sha256sum "$workflow" | awk '{print $1}')
-iteration=0005
-skill_revision=3aad35af0ad53337fc259e14d0d614fd55821aa5
+skill_source=$skill_source
+skill_revision=$skill_revision
+skill_blob=$skill_blob
+skill_worktree_dirty=$([[ -n $skill_dirty ]] && echo true || echo false)
 skill_snapshot=$skill_snapshot
-skill_sha256=$(sha256sum "$skill_snapshot" | awk '{print $1}')
+skill_sha256=$skill_sha256
 tolerance_baseline_id=OPTICS-BASELINE-2026-10-28-v1
 tolerance_baseline=$baseline_snapshot
 tolerance_baseline_sha256=$(sha256sum "$baseline_snapshot" | awk '{print $1}')
@@ -103,6 +112,11 @@ run_logged "$run_dir/workflow.log" env \
   PYPTC_BENCHMARK_RUN_CLASS="$mode" \
   PYPTC_BENCHMARK_RUN_DIR="$run_dir" \
   PYPTC_BENCHMARK_ATTEMPT_ID="$run_id" \
+  PYPTC_BENCHMARK_SKILL_FILE="$skill_snapshot" \
+  PYPTC_BENCHMARK_SKILL_REVISION="$skill_revision" \
+  PYPTC_BENCHMARK_SKILL_BLOB="$skill_blob" \
+  PYPTC_BENCHMARK_SKILL_SHA256="$skill_sha256" \
+  PYPTC_BENCHMARK_SKILL_WORKTREE_DIRTY="$([[ -n $skill_dirty ]] && echo true || echo false)" \
   MPLCONFIGDIR="$step_root/.mplconfig" \
   "$python" "$workflow"
 
