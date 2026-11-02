@@ -613,7 +613,7 @@ def profile_capabilities(
         {"observable": "phase advance", "classification": profile_state, "reason": "element-exit phase values and phase origin are retained with per-case baseline status" if mapping_status == "verified" else "element-exit map not verified"},
         {"observable": "full tunes", "classification": "comparable", "reason": "full tunes are lifted to the MAD-X branch; scalar residual and baseline status are retained per case"},
         {"observable": "circumference", "classification": "comparable", "reason": "scalar residual and baseline status are retained per case"},
-        {"observable": "chromaticity", "classification": "comparable", "reason": "API-level-5 PyPTC dQ/dPT is converted with run-local beta0; MAD-X 5.02 DQ is already dQ/dDELTAP"},
+        {"observable": "chromaticity", "classification": "comparable", "reason": "MAD-X DQ and PyPTC chromaticities are compared directly as dQ/d(delta_p), with no beta0 scaling"},
         {"observable": "one-turn 4D map", "classification": "unbenchmarked", "reason": "optional corroborating methods were not selected or inventoried as matched outputs"},
         {"observable": "eigenvalues and normal forms", "classification": "unbenchmarked", "reason": "optional corroborating methods were not selected or inventoried as matched outputs"},
         {"observable": "coupling indicators", "classification": "unbenchmarked", "reason": "coupling is not evaluated; plane Twiss does not establish uncoupled dynamics"},
@@ -1414,8 +1414,7 @@ def run_attempt() -> Path:
             chrom = chromaticity_info["planes"][plane]
             chromaticity_table_rows.append(
                 f"| {label} | {chrom['reference_native']:.7g} | {chrom['target_native']:.7g} | "
-                f"{chrom['converted_target_dQ_d_delta_p']:.7g} | {chrom['signed_difference']:+.4g} | "
-                f"{chrom['tolerance']:.3g} | {chrom['classification']} |"
+                f"{chrom['signed_difference']:+.4g} | {chrom['tolerance']:.3g} | {chrom['classification']} |"
             )
         report = [
             f"# PyPTC/MAD-X linear-optics attempt {output_id}",
@@ -1436,10 +1435,10 @@ def run_attempt() -> Path:
             "",
             f"The machine-readable inventory assesses all {case_inventory['case_count']} candidates from the Xsuite attempt-029 cross-reference separately for PyPTC; the list is not treated as automatic case equivalence. {len(case_inventory['executed_case_ids'])} cases completed and were plotted: {', '.join(case_inventory['executed_case_ids'])}. Completed perturbation cases use fresh case-local inputs and independent MAD-X/PyPTC application paths. Per-engine nominal-subtracted profile and scalar responses are retained for completed cases. The full local survey table is retained unchanged; its source-to-ESAVE audit is emitted only when that audit stage completes. Cases that fail before the PyPTC worker do not establish target application. The exact Xsuite attempt-029 EFIELD table remains unavailable, so its candidate is not claimed as byte-for-byte equivalent. Unexecuted candidates: {', '.join(case_inventory['execution_summary']['unexecuted_candidate_ids']) or 'none'}. Response tolerances remain pending review.",
             "",
-            f"MAD-X 5.02.00 reports `DQ1/DQ2` as `dQ/dDELTAP`; the PyPTC API-level-5 evidence identifies `PTC.chromaticities()` as `dQ/dPT`. PyPTC values are converted to `dQ/d(delta_p)` with this run's beta0={beta0:.12g}. Both converted planes are outside the provisional baseline; the derivative-coordinate interpretation and cause of the large difference remain open for review.",
+            "MAD-X 5.02.00 `DQ1/DQ2` and PyPTC `PTC.chromaticities()` both represent tune derivatives with respect to relative momentum, `dQ/d(delta_p)`. The native values are compared directly; no beta0 scaling is applied. The per-plane differences and screening classifications below use that common coordinate.",
             "",
-            "| Plane | MAD-X DQ | PyPTC native dQ/dPT | PyPTC converted dQ/d(delta_p) | Converted difference | Limit | Status |",
-            "|---|---:|---:|---:|---:|---:|---|",
+            "| Plane | MAD-X dQ/d(delta_p) | PyPTC dQ/d(delta_p) | Difference (PyPTC−MAD-X) | Limit | Status |",
+            "|---|---:|---:|---:|---:|---|",
             *chromaticity_table_rows,
             "",
             f"Profile response residual envelopes are summarized by family and observable in `response_summary.csv`; scalar response envelopes are in `scalar_response_summary.csv`. The shared corrector x/y orbit-response criterion is recorded per signed case, but its application status remains pending because a meaningful-response floor has not been reviewed. Other response families, including optics and chromaticity, remain `pending-tolerance`. Bounded tracking status is `{tracking_status}` and is a separate diagnostic, not a transverse optics gate. Requested mode: `{tracking_mode}`; thick MAD-X `PTC_TRACK` is compared with PyPTC's thick workflow. Both use the PTC tracking engine. Optional thin MAD-X output is reference-only and separately classified because no matching PyPTC thin control is established. No target-only or partial record is presented as a cross-code comparison. No nonlinear, long-term, collective-effects, clean-checkout admission, or production claim is made.",

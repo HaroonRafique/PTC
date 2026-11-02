@@ -156,16 +156,17 @@ code/reference/recipe/run reaches technical completion; an incomplete attempt
 creates no `REP`, `EVAL`, physics claim, or acceptance. Keep full run bundles
 here and do not copy bulky outputs into the publication repository.
 
-The latest user run, attempt 022, is recorded in
-[`feedback/0021-user-run-attempt-022-assessment.md`](feedback/0021-user-run-attempt-022-assessment.md).
-All 38 cases completed, including the eight EFIELD/misalignment cases that
-previously stopped in the runner audit. Their source-to-ESAVE audits each
-compare 3,838 values with zero mismatches. The run still needs human review:
-profile metrics exceed provisional limits, the representative corrector
-response plot has overlapping table text, and response tolerances remain
-pending. Supplemental feedback 0022 and investigation 0003 correct attempt
-022's chromaticity coordinate interpretation: no `beta0` factor applies to
-the PyPTC getter or MAD-X 5.02.00 `DQ`; 90/190 scalar metrics are now classified
-outside provisional limits, with 14 vertical chromaticities still out. No
-acceptance or publication completion is implied. The runner and skill need a
-separate reviewed correction before the next benchmark run.
+The latest user run, attempt 023, is recorded in
+[`feedback/0023-user-run-attempt-023-assessment.md`](feedback/0023-user-run-attempt-023-assessment.md).
+All 38 cases completed and were plotted, and 586/586 MAD-X element exits map
+to PyPTC nodes. The run retains the corrected direct native chromaticity
+comparison from investigation 0003: all horizontal and 24/38 vertical cases
+meet the provisional screen. However, its pinned skill snapshot still
+instructs a `beta0` conversion for API-level-5 PyPTC, so the runner's
+evidence-backed interpretation conflicts with the shared skill text pending
+separate review and revision. Overall, 92/532 profile and 90/190 scalar
+metrics remain outside provisional limits, including all tune comparisons,
+both phase profiles in every case, and 14 vertical chromaticities. All 38
+plot-manifest readability flags remain unreviewed; response meaningfulness
+floors and most response tolerances are pending. Attempt 023 is not accepted,
+and no publication completion is implied.

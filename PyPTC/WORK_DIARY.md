@@ -1174,3 +1174,60 @@ workflow now accepts that confined diagnostic path only for the
 and `runs/attempt-024` directories as requested. The verification smoke
 completed all 38 cases, and its temporary output was removed. `runs/` still
 contains only attempts 020–022; shell syntax and Python compilation pass.
+
+## 2026-11-02 — Compare native chromaticities directly in the benchmark runner
+
+Updated the active iteration-0005 optics workflow to follow the findings in
+`steps/benchmark-pyptc-linear-optics-against-madx/investigations/0003-chromaticity-coordinate-reassessment.md`.
+For the pinned PyPTC `PTC.chromaticities()` path and MAD-X 5.02.00 `DQ1/DQ2`,
+both values are derivatives per relative momentum. The runner now compares
+the native values directly, removes the incorrect `beta0` multiplication,
+labels the target derivative as `dQ/d(delta_p)`, and reports per-plane direct
+differences. Legacy machine-readable `converted_*` field names remain for
+consumer compatibility, but their values are now identity-mapped and their
+metadata states that no scaling is applied. The obsolete MAD-X conversion
+helper no longer applies a `beta0` factor to a `PT` label.
+
+Ran the isolated `--smoke` diagnostic with shared skill revision
+`330746975383bc01ae100bea18ae54299b83cb2e` (blob
+`7a1754e0c7838f4aee532b07dc708f76761bfc70`, SHA-256
+`b57248367f33b0985b136bf119cb366fc03604d47a34e52fb05aaa42518994ae`). It
+completed with status `completed-needs-human-review`; the temporary
+`.smoke-*` bundle was removed by the runner. This diagnostic is not a user
+attempt and does not establish acceptance. Python compilation, shell syntax,
+and `git diff --check` passed. The runner and skill were not changed in the
+evidence-gated publication repository. Updated the orchestrator's diagnostic
+completion message so it does not tell the operator to inspect the temporary
+report after automatic cleanup.
+
+## 2026-11-02 — Assess user-run linear-optics attempt 023
+
+Assessed the complete user run in
+`steps/benchmark-pyptc-linear-optics-against-madx/runs/attempt-023/` against
+its exact skill snapshot, then compared the workflow with the existing PyPTC
+optics and EFIELD examples/tests. All 38 cases and plots completed, and all
+586 MAD-X element exits map to PyPTC exits. The attempt records 440/532
+profile metrics and 100/190 scalar metrics within provisional tolerances;
+tune/phase residuals, 14 vertical chromaticities, two `dx` and fourteen `dy`
+profiles remain outside. Corrected native chromaticities reproduce the
+investigation-0003 interpretation: horizontal 38/38 and vertical 24/38 pass
+the provisional limits.
+
+The attempt's pinned skill snapshot still directs a beta0 scaling of
+API-level-5 PyPTC chromaticity, which conflicts with investigation 0003 and
+feedback 0022. The direct runner comparison is supported by the source and
+state-controlled evidence, but the shared skill must be separately revised
+before the attempt can be considered fully skill-conformant. All 38 plots
+remain unreviewed at normal size; response meaningfulness floors and most
+response tolerances remain pending. The attempt remains unaccepted. Feedback
+0023, the review ledger, run index, and step README record its outcome and
+hashes. Attempt report/result/manifest hashes are respectively
+`853899dd25acb9f178797da756a9b72357527f8fb8563e5d9fd0f1e1415f0215`,
+`6c5943050d7ee9ed7a3d27f5ec94fa62f33dd578d658998ef600107d90fd000a`, and
+`310a4f6b17311a50437980fb3583397c2b76ab0078ff25bef3f52e273f87e5b8`.
+No attempt output was staged or committed.
+After recording feedback 0023 and the ledger/index disposition, ran the
+step's pruning dry run and applied its three-bundle retention policy. Raw
+attempt 020 was removed from the working tree; its report/result/manifest
+hashes and outcome remain in feedback 0019 and the review ledger. Attempts
+021–023 remain. This pruning is not committed.

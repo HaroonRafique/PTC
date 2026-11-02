@@ -139,4 +139,8 @@ stage=validate-output-bundle
   echo 'Workflow did not produce its canonical result, report, and plot manifest.' >&2; exit 3;
 }
 printf 'status=completed\nexecution_status=completed\n' >> "$run_dir/manifest.env"
-log "Run complete. Review $run_dir/report.md and $run_dir/plots/cases/nominal.png."
+if [[ $mode == agent-diagnostic ]]; then
+  log 'Smoke completed; temporary output will be removed.'
+else
+  log "Run complete. Review $run_dir/report.md and $run_dir/plots/cases/nominal.png."
+fi

@@ -863,7 +863,10 @@ def scalar_comparisons(
     for plane, key in (("x", "chromx"), ("y", "chromy")):
         ref_value = reference_chromaticity[plane]
         target_value = float(target_chromaticity[key])
-        converted_target = beta0 * target_value
+        # The investigation established that both APIs return dQ/d(delta_p).
+        # Keep the legacy converted_* output keys for schema compatibility;
+        # they now hold the native values without a beta0 rescaling.
+        converted_target = target_value
         converted_reference = ref_value
         tolerance = 9.0e-4 if plane == "x" else 3.5e-4
         delta = None if ref_value is None else converted_target - converted_reference
@@ -871,14 +874,14 @@ def scalar_comparisons(
             "reference_native": ref_value,
             "reference_definition": "MAD-X 5.02.00 DQ1/DQ2 = dQ/dDELTAP" if ref_value is not None else "missing",
             "target_native": target_value,
-            "target_definition": "PyPTC API-level-5 PTC.chromaticities() = dQ/dPT; skill evidence identifies PT=DeltaE/p0c",
+            "target_definition": "PyPTC PTC.chromaticities() = dQ/d(delta_p), delta_p=(p-p0)/p0",
             "converted_reference_dQ_d_delta_p": converted_reference,
             "converted_target_dQ_d_delta_p": converted_target,
-            "conversion": "dQ/d(delta_p) = beta0 * dQ/dPT for PyPTC; MAD-X 5.02.00 DQ is already dQ/dDELTAP",
+            "conversion": "identity; MAD-X and PyPTC native derivatives use relative momentum",
             "beta0": beta0,
             "signed_difference": delta,
             "classification": "blocked" if delta is None else ("within-tolerance" if abs(delta) <= tolerance else "out-of-tolerance"),
-            "reason": "matched derivative coordinates converted using the pinned skill evidence" if delta is not None else "MAD-X chromaticity is missing",
+            "reason": "native derivatives compared directly in the shared relative-momentum coordinate" if delta is not None else "MAD-X chromaticity is missing",
             "tolerance": tolerance,
             "tolerance_source": "OPTICS-BASELINE-2026-10-28-v1",
             "acceptance_owner": "provisional shared screening baseline; user/physics review pending",
@@ -900,7 +903,7 @@ def scalar_comparisons(
     return rows, {
         "reference_gamma": float(reference_headers.get("GAMMA", "nan")),
         "reference_native_definition": "MAD-X 5.02.00 DQ1/DQ2=dQ/dDELTAP, DELTAP=(p-p0)/p0; conversion factor 1",
-        "target_native_definition": "PyPTC API-level-5 PTC.chromaticities()=dQ/dPT",
+        "target_native_definition": "PyPTC PTC.chromaticities()=dQ/d(delta_p), delta_p=(p-p0)/p0",
         "common_coordinate": "dQ/d(delta_p)",
         "beta0": beta0,
         "reference_madx_version": "5.02.00",
@@ -908,7 +911,7 @@ def scalar_comparisons(
         "reference_nominal_delta_p": 0.0,
         "reference_finite_difference_method": "MAD-X TWISS, CHROM evaluates at DELTAP and DELTAP+step",
         "reference_finite_difference_step_delta_p": 1.0e-6,
-        "target_api_method": "PTC.chromaticities() via PyPTC API level 5; derivative coordinate dQ/dPT",
+        "target_api_method": "PTC.chromaticities(); derivative coordinate dQ/d(delta_p)",
         "target_native_values": target_chromaticity,
         "planes": chromaticity,
         "classification": "comparable; screening classification is per plane",
@@ -1042,11 +1045,14 @@ def write_case_composite(
 
 
 def converted_chromaticity_from_madx(dq_d_delta_p: float, beta0: float, native_coordinate: str) -> tuple[float | None, float]:
-    """Convert supported MAD-X native derivative to dQ/d(delta_p)."""
+    """Return MAD-X DQ unchanged only for the pinned DELTAP convention.
+
+    ``beta0`` remains in the signature for compatibility with earlier callers;
+    MAD-X 5.02 DQ is already per relative momentum. A PT derivative is not
+    silently converted here.
+    """
     if native_coordinate == "DELTAP":
         return dq_d_delta_p, 1.0
-    if native_coordinate == "PT":
-        return beta0 * dq_d_delta_p, beta0
     return None, float("nan")
 
 
